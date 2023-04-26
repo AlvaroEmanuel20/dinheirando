@@ -3,6 +3,7 @@ import { compare } from 'bcryptjs';
 import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { GoogleProfile } from './strategies/google.strategy';
 
 export interface UserPayload {
   sub: string;
@@ -34,5 +35,10 @@ export class AuthService {
     return {
       accessToken: this.jwtService.sign(user),
     };
+  }
+
+  async googleLogin(user: GoogleProfile) {
+    if (!user) throw new Error('Google account not found');
+    return user;
   }
 }

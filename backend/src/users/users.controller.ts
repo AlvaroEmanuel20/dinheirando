@@ -4,7 +4,6 @@ import {
   Post,
   Patch,
   Delete,
-  Param,
   NotFoundException,
   ConflictException,
   Body,
@@ -18,19 +17,21 @@ import {
   createUserSchema,
   updateUserSchema,
 } from './validations/users.validation';
-import { ObjectIdPipe } from 'src/shared/pipes/objectId.pipe';
+import { Public } from 'src/auth/decorators/public.decorator';
+import { User } from './decorators/user.decorator';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Get(':userId')
-  async showUser(@Param('userId', ObjectIdPipe) userId: string) {
+  @Get()
+  async showUser(@User('userId') userId: string) {
     const user = await this.usersService.showUser(userId);
     if (!user) throw new NotFoundException('User not found');
     return user;
   }
 
+  @Public()
   @Post()
   @UsePipes(new JoiValidationPipe(createUserSchema))
   async createUser(@Body() data: CreateUserDto) {
@@ -41,10 +42,10 @@ export class UsersController {
     }
   }
 
-  @Patch(':userId')
+  @Patch()
   @UsePipes(new JoiValidationPipe(updateUserSchema))
   async updateUser(
-    @Param('userId', ObjectIdPipe) userId: string,
+    @User('userId') userId: string,
     @Body() data: UpdateUserDto,
   ) {
     try {
@@ -58,8 +59,8 @@ export class UsersController {
     }
   }
 
-  @Delete(':userId')
-  async deleteUser(@Param('userId', ObjectIdPipe) userId: string) {
+  @Delete()
+  async deleteUser(@User('userId') userId: string) {
     try {
       return await this.usersService.deleteUser(userId);
     } catch (error) {
