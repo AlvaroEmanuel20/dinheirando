@@ -25,7 +25,7 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
-  async showUser(@User('userId') userId: string) {
+  async showUser(@User('sub') userId: string) {
     const user = await this.usersService.showUser(userId);
     if (!user) throw new NotFoundException('User not found');
     return user;
@@ -44,10 +44,7 @@ export class UsersController {
 
   @Patch()
   @UsePipes(new JoiValidationPipe(updateUserSchema))
-  async updateUser(
-    @User('userId') userId: string,
-    @Body() data: UpdateUserDto,
-  ) {
+  async updateUser(@User('sub') userId: string, @Body() data: UpdateUserDto) {
     try {
       return await this.usersService.updateUser(data, userId);
     } catch (error) {
@@ -60,7 +57,7 @@ export class UsersController {
   }
 
   @Delete()
-  async deleteUser(@User('userId') userId: string) {
+  async deleteUser(@User('sub') userId: string) {
     try {
       return await this.usersService.deleteUser(userId);
     } catch (error) {

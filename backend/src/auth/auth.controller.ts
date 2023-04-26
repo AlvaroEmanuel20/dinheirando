@@ -8,14 +8,16 @@ import {
   HttpCode,
   Get,
   Redirect,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { CookieOptions, Request, Response } from 'express';
 import { LocalAuthGuard } from './guards/localAuth.guard';
-import { AuthService, UserPayload } from './auth.service';
+import { AuthService, GoogleUserProfile, UserPayload } from './auth.service';
 import { Public } from './decorators/public.decorator';
 import { GoogleAuthGuard } from './guards/googleAuth.guard';
-import { GoogleProfile } from './strategies/google.strategy';
 import { ConfigService } from '@nestjs/config';
+import { RefreshJwtAuthGuard } from './guards/refreshJwtAuth.guard';
+import { JwtAuthGuard } from './guards/jwtAuth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -38,11 +40,12 @@ export class AuthController {
   @Post('login')
   @HttpCode(200)
   async login(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
-    const { accessToken } = await this.authService.login(
+    const { accessToken, refreshToken } = await this.authService.login(
       req.user as UserPayload,
     );
 
     res.cookie('access_token', accessToken, this.cookieOptions);
+    res.cookie('refresh_token', refreshToken, this.cookieOptions);
   }
 
   @Public()
@@ -55,16 +58,53 @@ export class AuthController {
   @Public()
   @Get('google/callback')
   @UseGuards(GoogleAuthGuard)
-  @Redirect('http://localhost:3000/')
-  async googleAuthCallback(@Req() req: Request) {
+  @Redirect()
+  async googleAuthCallback(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     try {
+      if (!req.user) throw new NotFoundException('Google account not found');
       const user = await this.authService.googleLogin(
-        req.user as GoogleProfile,
+        req.user as GoogleUserProfile,
       );
 
+      const { accessToken, refreshToken } = await this.authService.login({
+        sub: user.userId,
+        isVerified: user.isVerified,
+      });
+
+      res.cookie('access_token', accessToken, this.cookieOptions);
+      res.cookie('refresh_token', refreshToken, this.cookieOptions);
       return { url: this.configService.get<string>('CLIENT_URL') };
     } catch (error) {
-      throw new NotFoundException('Google account not found');
+      console.log(error);
+      throw new InternalServerErrorException('Error to login with Google');
     }
+  }
+
+  @UseGuards(RefreshJwtAuthGuard)
+  @Public()
+  @Post('refresh')
+  @HttpCode(200)
+  async refresh(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const { accessToken, refreshToken } = await this.authService.login(
+      req.user as UserPayload,
+    );
+
+    res.cookie('access_token', accessToken, this.cookieOptions);
+    res.cookie('refresh_token', refreshToken, this.cookieOptions);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('logout')
+  @HttpCode(200)
+  async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    await this.authService.logout(req.user as UserPayload);
+    res.clearCookie('access_token', this.cookieOptions);
+    res.clearCookie('refresh_token', this.cookieOptions);
   }
 }

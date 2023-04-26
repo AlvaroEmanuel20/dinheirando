@@ -2,12 +2,15 @@ import { Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { UserPayload } from '../auth.service';
-import { UsersService } from 'src/users/users.service';
 import { Request } from 'express';
+import { UsersService } from 'src/users/users.service';
+import { UserPayload } from '../auth.service';
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy) {
+export class RefreshJwtStrategy extends PassportStrategy(
+  Strategy,
+  'refreshJwt',
+) {
   constructor(
     private readonly configService: ConfigService,
     private readonly usersService: UsersService,
@@ -16,13 +19,13 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       jwtFromRequest: (req: Request) => {
         let token = null;
         if (req && req.cookies) {
-          token = req.cookies['access_token'];
+          token = req.cookies['refresh_token'];
         }
 
         return token;
       },
       ignoreExpiration: false,
-      secretOrKey: configService.get<string>('JWT_SECRET'),
+      secretOrKey: configService.get<string>('REFRESH_JWT_SECRET'),
     });
   }
 

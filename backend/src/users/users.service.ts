@@ -5,12 +5,14 @@ import { Model } from 'mongoose';
 import { CreateUserDto, UpdateUserDto } from './dto/users.dto';
 import { MailService } from 'src/mail/mail.service';
 import { hash } from 'bcryptjs';
+import { ServiceTokensService } from 'src/serviceTokens/serviceTokens.service';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectModel(User.name) private userModel: Model<User>,
+    @InjectModel(User.name) private readonly userModel: Model<User>,
     private readonly mailService: MailService,
+    private readonly serviceTokenService: ServiceTokensService,
   ) {}
 
   async showUser(userId: string) {
@@ -25,11 +27,13 @@ export class UsersService {
     data.password = await hash(data.password, 10);
     const newUser = await this.userModel.create(data);
 
-    await this.mailService.sendMail({
-      to: data.email,
-      subject: 'Dinheirando - Confirme seu email',
-      html: '<h1>Testando</h1>',
-    });
+    if (!data.isVerified) {
+      await this.mailService.sendMail({
+        to: data.email,
+        subject: 'Dinheirando - Confirme seu email',
+        html: '<h1>Testando</h1>',
+      });
+    }
 
     return { userId: newUser._id };
   }
@@ -54,6 +58,8 @@ export class UsersService {
   }
 
   async deleteUser(userId: string) {
+    await this.serviceTokenService.deleteTokens(userId, 'REFRESH');
+    await this.serviceTokenService.deleteTokens(userId, 'TRANSACTIONAL');
     await this.userModel.findByIdAndDelete(userId).orFail();
     return { userId };
   }

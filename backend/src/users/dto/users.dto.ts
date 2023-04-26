@@ -1,4 +1,7 @@
 export class CreateUserDto {
+  avatar?: string;
+  isVerified?: boolean;
+  isGoogleAccount?: boolean;
   name: string;
   email: string;
   password: string;
