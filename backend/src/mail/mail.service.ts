@@ -5,7 +5,7 @@ import * as nodemailer from 'nodemailer';
 
 interface MailMetadata {
   to: string;
-  subject: string;
+  subject?: string;
   plainText?: string;
   html?: string;
   templateId?: number;
@@ -92,12 +92,13 @@ export class MailService {
           sender: { name: fromEmailName, email: fromEmail },
           to: [{ email: to }],
           replyTo: { email: replyEmail },
+          templateId,
+          params,
         };
 
         await this.apiSendinBlue.sendTransacEmail(this.smtpEmailSendinBlue);
       }
     } catch (error) {
-      console.log(error);
       return error as Error;
     }
   }

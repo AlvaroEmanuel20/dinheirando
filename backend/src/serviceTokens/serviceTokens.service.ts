@@ -7,6 +7,13 @@ import { ConfigService } from '@nestjs/config';
 
 type ServiceType = 'REFRESH' | 'TRANSACTIONAL_EMAIL' | 'TRANSACTIONAL_PASSWORD';
 
+export interface ServiceTokenPayload {
+  userId: string;
+  type: ServiceType;
+  exp: number;
+  iat: number;
+}
+
 export interface CreateServiceToken {
   token: string;
   user: string | Types.ObjectId;
@@ -61,7 +68,7 @@ export class ServiceTokensService {
     return token;
   }
 
-  async verifyTransactional(token: string) {
+  async verifyTransactional(token: string): Promise<ServiceTokenPayload> {
     return await this.jwtService.verifyAsync(token, {
       secret: this.configService.get<string>('TRANSACTIONAL_JWT_SECRET'),
     });

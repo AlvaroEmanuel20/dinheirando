@@ -24,3 +24,14 @@ export const updateUserSchema = Joi.object({
       'any.only': 'Confirm password should be equals to new password',
     }),
 });
+
+export const resetPasswordSchema = Joi.object({
+  email: Joi.string().email().required(),
+});
+
+export const putResetPasswordSchema = Joi.object({
+  password: Joi.string().min(8).required(),
+  confirmPassword: Joi.string().valid(Joi.ref('password')).required().messages({
+    'any.only': 'Confirm password should be equals to new password',
+  }),
+});

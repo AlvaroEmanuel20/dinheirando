@@ -15,3 +15,12 @@ export class UpdateUserDto {
   incomeGoal?: number;
   expenseGoal?: number;
 }
+
+export class ResetPasswordDto {
+  email: string;
+}
+
+export class PutResetPasswordDto {
+  password: string;
+  confirmPassword: string;
+}
