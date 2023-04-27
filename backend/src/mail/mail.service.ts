@@ -8,6 +8,8 @@ interface MailMetadata {
   subject: string;
   plainText?: string;
   html?: string;
+  templateId?: number;
+  params?: any;
 }
 
 @Injectable()
@@ -55,7 +57,14 @@ export class MailService {
     console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
   }
 
-  async sendMail({ to, subject, plainText, html }: MailMetadata) {
+  async sendMail({
+    to,
+    subject,
+    plainText,
+    html,
+    templateId,
+    params,
+  }: MailMetadata) {
     try {
       const env = this.configService.get<'dev' | 'prod'>('MAIL_ENV');
       const fromEmail = this.configService.get<string>('FROM_EMAIL');

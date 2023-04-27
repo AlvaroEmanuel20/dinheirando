@@ -14,7 +14,10 @@ export class ServiceToken {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true })
   user: User;
 
-  @Prop({ required: true, enum: ['REFRESH', 'TRANSACTIONAL'] })
+  @Prop({
+    required: true,
+    enum: ['REFRESH', 'TRANSACTIONAL_EMAIL', 'TRANSACTIONAL_PASSWORD'],
+  })
   serviceType: string;
 }
 

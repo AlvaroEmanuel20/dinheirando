@@ -59,7 +59,12 @@ export class UsersService {
 
   async deleteUser(userId: string) {
     await this.serviceTokenService.deleteTokens(userId, 'REFRESH');
-    await this.serviceTokenService.deleteTokens(userId, 'TRANSACTIONAL');
+    await this.serviceTokenService.deleteTokens(userId, 'TRANSACTIONAL_EMAIL');
+    await this.serviceTokenService.deleteTokens(
+      userId,
+      'TRANSACTIONAL_PASSWORD',
+    );
+
     await this.userModel.findByIdAndDelete(userId).orFail();
     return { userId };
   }
