@@ -8,7 +8,6 @@ import {
   HttpCode,
   Get,
   Redirect,
-  InternalServerErrorException,
 } from '@nestjs/common';
 import { CookieOptions, Request, Response } from 'express';
 import { LocalAuthGuard } from './guards/localAuth.guard';
@@ -63,24 +62,19 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
-    try {
-      if (!req.user) throw new NotFoundException('Google account not found');
-      const user = await this.authService.googleLogin(
-        req.user as GoogleUserProfile,
-      );
+    if (!req.user) throw new NotFoundException('Google account not found');
+    const user = await this.authService.googleLogin(
+      req.user as GoogleUserProfile,
+    );
 
-      const { accessToken, refreshToken } = await this.authService.login({
-        sub: user.userId,
-        isVerified: user.isVerified,
-      });
+    const { accessToken, refreshToken } = await this.authService.login({
+      sub: user.userId,
+      isVerified: user.isVerified,
+    });
 
-      res.cookie('access_token', accessToken, this.cookieOptions);
-      res.cookie('refresh_token', refreshToken, this.cookieOptions);
-      return { url: this.configService.get<string>('CLIENT_URL') };
-    } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException('Error to login with Google');
-    }
+    res.cookie('access_token', accessToken, this.cookieOptions);
+    res.cookie('refresh_token', refreshToken, this.cookieOptions);
+    return { url: this.configService.get<string>('CLIENT_URL') };
   }
 
   @UseGuards(RefreshJwtAuthGuard)
