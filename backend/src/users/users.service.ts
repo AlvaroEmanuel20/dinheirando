@@ -29,37 +29,26 @@ export class UsersService {
     data.password = await hash(data.password, 10);
     const newUser = await this.userModel.create(data);
 
-    if (!data.isVerified) {
+    if (!data.isVerified)
       await this.sendConfirmEmail(newUser.id, data.email, data.name);
-
-      /*await this.mailService.sendMail({
-        to: data.email,
-        subject: 'Dinheirando - Confirme seu email',
-        html: '<h1>Hello World!</h1>',
-      });*/
-    }
 
     return { userId: newUser._id };
   }
 
   async validateUserAccount(token: string) {
-    try {
-      const payload = await this.serviceTokenService.verifyTransactional(token);
-      await this.userModel
-        .findByIdAndUpdate(payload.userId, { isVerified: true })
-        .orFail();
+    const payload = await this.serviceTokenService.verifyTransactional(token);
+    await this.userModel
+      .findByIdAndUpdate(payload.userId, { isVerified: true })
+      .orFail();
 
-      await this.serviceTokenService.deleteTokens(
-        payload.userId,
-        'TRANSACTIONAL_EMAIL',
-      );
-    } catch (error) {
-      throw new Error('Invalid token');
-    }
+    await this.serviceTokenService.deleteTokens(
+      payload.userId,
+      'TRANSACTIONAL_EMAIL',
+    );
   }
 
   async newConfirmEmail(userId: string) {
-    const user = await this.userModel.findById(userId);
+    const user = await this.userModel.findById(userId).orFail();
     await this.sendConfirmEmail(userId, user.email, user.name);
   }
 
@@ -73,12 +62,6 @@ export class UsersService {
       });
 
       await this.sendConfirmEmail(userId, data.email, data.name);
-
-      /*await this.mailService.sendMail({
-        to: data.email,
-        subject: 'Dinheirando - Confirme seu novo email',
-        html: '<h1>Testando</h1>',
-      });*/
     }
 
     return { userId };
@@ -109,7 +92,7 @@ export class UsersService {
       templateId: this.configService.get<number>('CONFIRM_ACCOUNT_TEMPLATE_ID'),
       params: {
         name: name,
-        confirmLink: `${serverUrl}/users/account/confirm?token=${token}`,
+        confirmLink: `${serverUrl}/users/confirm?token=${token}`,
       },
     });
   }

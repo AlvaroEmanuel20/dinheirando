@@ -34,4 +34,5 @@ export const putResetPasswordSchema = Joi.object({
   confirmPassword: Joi.string().valid(Joi.ref('password')).required().messages({
     'any.only': 'Confirm password should be equals to new password',
   }),
+  token: Joi.string().required(),
 });

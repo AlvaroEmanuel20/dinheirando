@@ -22,5 +22,5 @@ export class ResetPasswordDto {
 
 export class PutResetPasswordDto {
   password: string;
-  confirmPassword: string;
+  token: string;
 }
