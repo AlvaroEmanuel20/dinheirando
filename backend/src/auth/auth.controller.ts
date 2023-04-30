@@ -17,7 +17,15 @@ import { GoogleAuthGuard } from './guards/googleAuth.guard';
 import { ConfigService } from '@nestjs/config';
 import { RefreshJwtAuthGuard } from './guards/refreshJwtAuth.guard';
 import { JwtAuthGuard } from './guards/jwtAuth.guard';
+import {
+  ApiFoundResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   private readonly cookieOptions: CookieOptions = {
@@ -38,6 +46,8 @@ export class AuthController {
   @Public()
   @Post('login')
   @HttpCode(200)
+  @ApiUnauthorizedResponse()
+  @ApiOkResponse({ description: 'Returns access and refresh tokens' })
   async login(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const { accessToken, refreshToken } = await this.authService.login(
       req.user as UserPayload,
@@ -50,6 +60,7 @@ export class AuthController {
   @Public()
   @Get('google')
   @UseGuards(GoogleAuthGuard)
+  @ApiOkResponse({ description: 'Open OAuth google page' })
   async googleAuth() {
     //
   }
@@ -58,6 +69,11 @@ export class AuthController {
   @Get('google/callback')
   @UseGuards(GoogleAuthGuard)
   @Redirect()
+  @ApiFoundResponse({
+    description: 'Returns to frontend with access and refresh tokens',
+  })
+  @ApiUnauthorizedResponse()
+  @ApiNotFoundResponse()
   async googleAuthCallback(
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
@@ -81,6 +97,10 @@ export class AuthController {
   @Public()
   @Post('refresh')
   @HttpCode(200)
+  @ApiOkResponse({
+    description: 'Sends to frontend a new access and refresh tokens',
+  })
+  @ApiUnauthorizedResponse()
   async refresh(
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
@@ -96,6 +116,8 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Post('logout')
   @HttpCode(200)
+  @ApiOkResponse({ description: 'Remove access and refresh tokens cookies' })
+  @ApiUnauthorizedResponse()
   async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     await this.authService.logout(req.user as UserPayload);
     res.clearCookie('access_token', this.cookieOptions);

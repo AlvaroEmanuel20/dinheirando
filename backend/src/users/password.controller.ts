@@ -21,8 +21,16 @@ import {
 import { PutResetPasswordDto, ResetPasswordDto } from './dto/users.dto';
 import { PasswordService } from './password.service';
 import mongoose from 'mongoose';
+import {
+  ApiFoundResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 
-@Controller('password')
+@ApiTags('passwords')
+@Controller('passwords')
 export class PasswordController {
   constructor(
     private readonly passwordService: PasswordService,
@@ -34,6 +42,8 @@ export class PasswordController {
   @Post('reset')
   @UsePipes(new JoiValidationPipe(resetPasswordSchema))
   @HttpCode(200)
+  @ApiNotFoundResponse()
+  @ApiOkResponse({ description: 'Send a reset password email' })
   async resetPassword(@Body() data: ResetPasswordDto) {
     try {
       await this.passwordService.resetPassword(data);
@@ -46,6 +56,9 @@ export class PasswordController {
   @Public()
   @Get('reset/confirm')
   @Redirect()
+  @ApiNotFoundResponse()
+  @ApiUnauthorizedResponse()
+  @ApiFoundResponse({ description: 'Redirect to reset pass page' })
   async confirmResetPassword(@Query('token') token: string) {
     try {
       const clientUrl = this.configService.get<string>('CLIENT_URL');
@@ -66,6 +79,9 @@ export class PasswordController {
   @Put()
   @UsePipes(new JoiValidationPipe(putResetPasswordSchema))
   @Redirect()
+  @ApiFoundResponse({ description: 'Redirect to frontend app' })
+  @ApiNotFoundResponse()
+  @ApiUnauthorizedResponse()
   async putResetPassword(@Body() data: PutResetPasswordDto) {
     try {
       await this.passwordService.putResetPassword(data);
