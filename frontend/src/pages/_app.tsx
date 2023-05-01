@@ -1,8 +1,22 @@
 import type { AppProps } from "next/app";
 import Head from "next/head";
-import { MantineProvider } from "@mantine/core";
+import {
+  ColorScheme,
+  ColorSchemeProvider,
+  MantineProvider,
+} from "@mantine/core";
+import { useLocalStorage } from "@mantine/hooks";
 
 export default function App({ Component, pageProps }: AppProps) {
+  const [colorScheme, setColorScheme] = useLocalStorage<ColorScheme>({
+    key: "theme-scheme",
+    defaultValue: "light",
+    getInitialValueInEffect: true,
+  });
+
+  const toggleColorScheme = (value?: ColorScheme) =>
+    setColorScheme(value || (colorScheme === "dark" ? "light" : "dark"));
+
   return (
     <>
       <Head>
@@ -15,13 +29,18 @@ export default function App({ Component, pageProps }: AppProps) {
         <link rel="icon" href="/favicon.svg" />
       </Head>
 
-      <MantineProvider
-        withGlobalStyles
-        withNormalizeCSS
-        theme={{ colorScheme: "light" }}
+      <ColorSchemeProvider
+        colorScheme={colorScheme}
+        toggleColorScheme={toggleColorScheme}
       >
-        <Component {...pageProps} />
-      </MantineProvider>
+        <MantineProvider
+          withGlobalStyles
+          withNormalizeCSS
+          theme={{ colorScheme }}
+        >
+          <Component {...pageProps} />
+        </MantineProvider>
+      </ColorSchemeProvider>
     </>
   );
 }

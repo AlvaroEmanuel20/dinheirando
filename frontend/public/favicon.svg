@@ -1,9 +1,10 @@
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Uploaded to: SVG Repo, www.svgrepo.com, Transformed by: SVG Repo Mixer Tools -->
-<svg width="120px" height="120px" viewBox="-2.4 -2.4 28.80 28.80" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g id="SVGRepo_bgCarrier" stroke-width="0">
-<rect x="-2.4" y="-2.4" width="28.80" height="28.80" rx="14.4" fill="#5F3DC4" strokewidth="0"/>
-</g>
-<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
-<g id="SVGRepo_iconCarrier"> <circle cx="12" cy="12" r="10" stroke="#FCC419" stroke-width="2"/> <path d="M15 9.94728C14.5 9.3 13.8 8.5 12 8.5C10.2 8.5 9 9.51393 9 9.94728C9 10.3806 9.06786 10.9277 10 11.5C10.7522 11.9618 12.6684 12.0439 13.5 12.5C14.679 13.1467 14.8497 13.8202 14.8497 14.0522C14.8497 14.6837 13.4175 15.4852 12 15.5C10.536 15.5153 9.5 14.7 9 14.0522" stroke="#FCC419" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/> <path d="M12 7V17" stroke="#FCC419" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/> </g>
-</svg>
+<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_1127_209472)">
+<path d="M116.424 67.0588H64.0809L98.9404 101.918C100.273 103.251 102.465 103.359 103.835 102.068C112.372 94.0257 118.244 83.1838 119.967 70.9963C120.262 68.9096 118.531 67.0588 116.424 67.0588ZM112.932 52.7647C111.115 26.4132 90.0573 5.3559 63.7059 3.53825C61.6941 3.39928 60 5.0956 60 7.11178V56.4706H109.361C111.377 56.4706 113.071 54.7765 112.932 52.7647ZM49.4118 67.0588V14.7155C49.4118 12.6088 47.561 10.8772 45.4765 11.1728C19.189 14.8875 -0.904418 37.853 0.0308762 65.3757C0.992641 93.6419 25.3301 116.821 53.6095 116.466C64.7272 116.327 75 112.745 83.4463 106.754C85.189 105.518 85.3037 102.953 83.7926 101.442L49.4118 67.0588Z" fill="#FCC419"/>
+</g>
+<defs>
+<clipPath id="clip0_1127_209472">
+<rect width="120" height="120" fill="white"/>
+</clipPath>
+</defs>
+</svg>
