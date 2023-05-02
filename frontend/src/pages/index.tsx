@@ -16,7 +16,7 @@ import { IconLock, IconMail, IconUser } from "@tabler/icons-react";
 import { useState } from "react";
 
 interface Values {
-  name?: string;
+  name: string;
   email: string;
   password: string;
 }
@@ -34,14 +34,7 @@ export default function Home() {
     },
   });
 
-  const onSubmit = (values: Values) => {
-    if (login) {
-      values = {
-        email: values.email,
-        password: values.password,
-      };
-    }
-
+  const onSubmit = async (values: Values) => {
     console.log(values);
   };
 
