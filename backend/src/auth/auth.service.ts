@@ -43,7 +43,7 @@ export class AuthService {
   }
 
   async login(user: UserPayload) {
-    await this.serviceTokenService.deleteTokens(user.sub, 'REFRESH');
+    /*await this.serviceTokenService.deleteTokens(user.sub, 'REFRESH');
 
     const refreshToken = this.jwtService.sign(
       { sub: user.sub, isVerified: user.isVerified },
@@ -59,14 +59,23 @@ export class AuthService {
       token: refreshToken,
       user: user.sub,
       serviceType: 'REFRESH',
-    });
+    });*/
+
+    const userData = await this.usersService.showUser(user.sub as string);
 
     return {
-      accessToken: this.jwtService.sign({
-        sub: user.sub,
-        isVerified: user.isVerified,
-      }),
-      refreshToken,
+      user: {
+        userId: userData.id as string,
+        avatar: userData.avatar,
+        name: userData.name,
+        email: userData.email,
+        isVerified: userData.isVerified,
+        isGoogleAccount: userData.isGoogleAccount,
+        accessToken: this.jwtService.sign({
+          sub: user.sub,
+          isVerified: user.isVerified,
+        }),
+      },
     };
   }
 

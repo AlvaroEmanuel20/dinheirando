@@ -9,10 +9,10 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService);
   const PORT = configService.get<number>('PORT');
-  const CLIENT_URL = configService.get<string>('CLIENT_URL');
+  //const CLIENT_URL = configService.get<string>('CLIENT_URL');
 
+  app.enableCors();
   app.use(cookieParser());
-  app.enableCors({ origin: CLIENT_URL });
 
   const config = new DocumentBuilder()
     .setTitle('Dinheirando backend')
