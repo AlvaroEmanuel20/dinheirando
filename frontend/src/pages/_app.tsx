@@ -6,6 +6,7 @@ import {
   MantineProvider,
 } from "@mantine/core";
 import { useLocalStorage } from "@mantine/hooks";
+import { RouterTransition } from "@/components/shared/RouterTransition";
 
 export default function App({ Component, pageProps }: AppProps) {
   const [colorScheme, setColorScheme] = useLocalStorage<ColorScheme>({
@@ -38,6 +39,7 @@ export default function App({ Component, pageProps }: AppProps) {
           withNormalizeCSS
           theme={{ colorScheme }}
         >
+          <RouterTransition />
           <Component {...pageProps} />
         </MantineProvider>
       </ColorSchemeProvider>
