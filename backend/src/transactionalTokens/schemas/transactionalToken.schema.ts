@@ -1,13 +1,11 @@
-//Service token are tokens used in transactional operations, refresh auth...
-
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 import { User } from 'src/users/schemas/user.schema';
 
-export type ServiceTokenDocument = HydratedDocument<ServiceToken>;
+export type TransactionalTokenDocument = HydratedDocument<TransactionalToken>;
 
 @Schema()
-export class ServiceToken {
+export class TransactionalToken {
   @Prop({ required: true, unique: true })
   token: string;
 
@@ -16,9 +14,13 @@ export class ServiceToken {
 
   @Prop({
     required: true,
-    enum: ['REFRESH', 'TRANSACTIONAL_EMAIL', 'TRANSACTIONAL_PASSWORD'],
+    enum: ['EMAIL', 'PASSWORD'],
   })
-  serviceType: string;
+  scope: string;
+
+  @Prop({ required: true, default: false })
+  isInvalid: boolean;
 }
 
-export const ServiceTokenSchema = SchemaFactory.createForClass(ServiceToken);
+export const TransactionalTokenSchema =
+  SchemaFactory.createForClass(TransactionalToken);

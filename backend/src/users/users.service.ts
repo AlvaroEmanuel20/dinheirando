@@ -5,7 +5,7 @@ import { Model } from 'mongoose';
 import { CreateUserDto, UpdateUserDto } from './dto/users.dto';
 import { MailService } from 'src/mail/mail.service';
 import { hash } from 'bcryptjs';
-import { ServiceTokensService } from 'src/serviceTokens/serviceTokens.service';
+import { TransactionalTokensService } from 'src/transactionalTokens/transactionalTokens.service';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
@@ -13,7 +13,7 @@ export class UsersService {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<User>,
     private readonly mailService: MailService,
-    private readonly serviceTokenService: ServiceTokensService,
+    private readonly transactionalTokenService: TransactionalTokensService,
     private readonly configService: ConfigService,
   ) {}
 
@@ -36,15 +36,15 @@ export class UsersService {
   }
 
   async validateUserAccount(token: string) {
-    const payload = await this.serviceTokenService.verifyTransactional(token);
+    const storedEmailToken = await this.transactionalTokenService.find(token);
+    if (storedEmailToken.isInvalid) throw new Error('Blocked email token');
+
+    const payload = await this.transactionalTokenService.verify(token);
     await this.userModel
       .findByIdAndUpdate(payload.userId, { isVerified: true })
       .orFail();
 
-    await this.serviceTokenService.deleteTokens(
-      payload.userId,
-      'TRANSACTIONAL_EMAIL',
-    );
+    await this.transactionalTokenService.invalidateTokens(token, 'EMAIL');
   }
 
   async newConfirmEmail(userId: string) {
@@ -68,23 +68,13 @@ export class UsersService {
   }
 
   async deleteUser(userId: string) {
-    await this.serviceTokenService.deleteTokens(userId, 'REFRESH');
-    await this.serviceTokenService.deleteTokens(userId, 'TRANSACTIONAL_EMAIL');
-    await this.serviceTokenService.deleteTokens(
-      userId,
-      'TRANSACTIONAL_PASSWORD',
-    );
-
     await this.userModel.findByIdAndDelete(userId).orFail();
     return { userId };
   }
 
   private async sendConfirmEmail(userId: string, email: string, name: string) {
-    await this.serviceTokenService.deleteTokens(userId, 'TRANSACTIONAL_EMAIL');
-    const token = await this.serviceTokenService.createTransactional(
-      userId,
-      'TRANSACTIONAL_EMAIL',
-    );
+    await this.transactionalTokenService.invalidateTokens(userId, 'EMAIL');
+    const token = await this.transactionalTokenService.create(userId, 'EMAIL');
 
     const serverUrl = this.configService.get<string>('SERVER_URL');
     await this.mailService.sendMail({

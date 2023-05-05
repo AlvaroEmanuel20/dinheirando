@@ -81,6 +81,9 @@ export class UsersController {
       await this.usersService.validateUserAccount(token);
       return { url: this.configService.get<string>('CLIENT_URL') };
     } catch (error) {
+      if (error.message === 'Blocked email token')
+        throw new UnauthorizedException(error.message);
+
       if (error instanceof mongoose.Error.DocumentNotFoundError)
         throw new NotFoundException(error.message);
 

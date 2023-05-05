@@ -9,9 +9,9 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService);
   const PORT = configService.get<number>('PORT');
-  //const CLIENT_URL = configService.get<string>('CLIENT_URL');
+  const CLIENT_URL = configService.get<string>('CLIENT_URL');
 
-  app.enableCors();
+  app.enableCors({ credentials: true, origin: CLIENT_URL });
   app.use(cookieParser());
 
   const config = new DocumentBuilder()

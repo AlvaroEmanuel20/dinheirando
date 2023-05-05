@@ -21,4 +21,7 @@ export class LoginUserDto {
 
   @ApiProperty()
   accessToken: string;
+
+  @ApiProperty()
+  refreshToken: string;
 }

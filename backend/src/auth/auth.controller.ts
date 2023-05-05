@@ -43,7 +43,7 @@ export class AuthController {
     return user;
   }
 
-  @Public()
+  /*@Public()
   @Get('google')
   @UseGuards(GoogleAuthGuard)
   @ApiOkResponse({ description: 'Open OAuth google page' })
@@ -73,7 +73,7 @@ export class AuthController {
     });
 
     return { url: this.configService.get<string>('CLIENT_URL') };
-  }
+  }*/
 
   @UseGuards(RefreshJwtAuthGuard)
   @Public()
@@ -82,7 +82,7 @@ export class AuthController {
   @ApiOkResponse({ type: LoginUserDto })
   @ApiUnauthorizedResponse()
   async refresh(@Req() req: Request) {
-    const { user } = await this.authService.login(req.user as UserPayload);
+    const { user } = await this.authService.refresh(req.user as UserPayload);
     return user;
   }
 
@@ -93,6 +93,6 @@ export class AuthController {
   @ApiOkResponse()
   @ApiUnauthorizedResponse()
   async logout(@Req() req: Request) {
-    await this.authService.logout(req.user as UserPayload);
+    return await this.authService.logout(req.user as UserPayload);
   }
 }

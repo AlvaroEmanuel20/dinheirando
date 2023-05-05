@@ -8,15 +8,18 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { GoogleStrategy } from './strategies/google.strategy';
-import { ServiceTokensModule } from 'src/serviceTokens/serviceTokens.module';
 import { RefreshJwtStrategy } from './strategies/refreshJwt.strategy';
+import { MongooseModule } from '@nestjs/mongoose';
+import {
+  RefreshToken,
+  RefreshTokenSchema,
+} from './schemas/refreshToken.schema';
 
 @Module({
   imports: [
     ConfigModule,
     UsersModule,
     PassportModule,
-    ServiceTokensModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (config: ConfigService) => {
@@ -29,6 +32,9 @@ import { RefreshJwtStrategy } from './strategies/refreshJwt.strategy';
       },
       inject: [ConfigService],
     }),
+    MongooseModule.forFeature([
+      { name: RefreshToken.name, schema: RefreshTokenSchema },
+    ]),
   ],
   providers: [
     AuthService,

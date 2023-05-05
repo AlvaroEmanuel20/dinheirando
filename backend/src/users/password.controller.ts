@@ -2,7 +2,6 @@ import {
   Body,
   Controller,
   Get,
-  HttpCode,
   NotFoundException,
   Post,
   Put,
@@ -22,9 +21,9 @@ import { PutResetPasswordDto, ResetPasswordDto } from './dto/users.dto';
 import { PasswordService } from './password.service';
 import mongoose from 'mongoose';
 import {
+  ApiCreatedResponse,
   ApiFoundResponse,
   ApiNotFoundResponse,
-  ApiOkResponse,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
@@ -41,9 +40,8 @@ export class PasswordController {
   @Public()
   @Post('reset')
   @UsePipes(new JoiValidationPipe(resetPasswordSchema))
-  @HttpCode(200)
   @ApiNotFoundResponse()
-  @ApiOkResponse({ description: 'Send a reset password email' })
+  @ApiCreatedResponse({ description: 'Send a reset password email' })
   async resetPassword(@Body() data: ResetPasswordDto) {
     try {
       await this.passwordService.resetPassword(data);
@@ -68,6 +66,9 @@ export class PasswordController {
 
       return { url: `${clientUrl}/senha/nova?token=${tokenResult}` };
     } catch (error) {
+      if (error.message === 'Blocked password token')
+        throw new UnauthorizedException(error.message);
+
       if (error instanceof mongoose.Error.DocumentNotFoundError)
         throw new NotFoundException('User not found');
 
@@ -87,6 +88,9 @@ export class PasswordController {
       await this.passwordService.putResetPassword(data);
       return { url: this.configService.get<string>('CLIENT_URL') };
     } catch (error) {
+      if (error.message === 'Blocked password token')
+        throw new UnauthorizedException(error.message);
+
       if (error instanceof mongoose.Error.DocumentNotFoundError)
         throw new NotFoundException('User not found');
 
