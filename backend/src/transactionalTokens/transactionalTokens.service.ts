@@ -23,14 +23,6 @@ export class TransactionalTokensService {
     private readonly configService: ConfigService,
   ) {}
 
-  async findByUserAndScope(userId: string, scope: Scope) {
-    return await this.transactionalTokenModel.findOne({ user: userId, scope });
-  }
-
-  async find(token: string) {
-    return await this.transactionalTokenModel.findOne({ token });
-  }
-
   async create(userId: string, scope: Scope) {
     let token: string;
 
@@ -49,20 +41,6 @@ export class TransactionalTokensService {
     });
 
     return token;
-  }
-
-  async invalidateToken(token: string) {
-    await this.transactionalTokenModel.updateOne(
-      { token },
-      { isInvalid: true },
-    );
-  }
-
-  async invalidateTokens(userId: string, scope: Scope) {
-    await this.transactionalTokenModel.updateMany(
-      { user: userId, scope },
-      { isInvalid: true },
-    );
   }
 
   async verify(token: string): Promise<TransactionalTokenPayload> {

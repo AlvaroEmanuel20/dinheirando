@@ -8,10 +8,22 @@ import { TransactionalTokensModule } from 'src/transactionalTokens/transactional
 import { ConfigModule } from '@nestjs/config';
 import { PasswordService } from './password.service';
 import { PasswordController } from './password.controller';
+import {
+  RefreshToken,
+  RefreshTokenSchema,
+} from 'src/auth/schemas/refreshToken.schema';
+import {
+  TransactionalToken,
+  TransactionalTokenSchema,
+} from 'src/transactionalTokens/schemas/transactionalToken.schema';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    MongooseModule.forFeature([
+      { name: User.name, schema: UserSchema },
+      { name: RefreshToken.name, schema: RefreshTokenSchema },
+      { name: TransactionalToken.name, schema: TransactionalTokenSchema },
+    ]),
     MailModule,
     TransactionalTokensModule,
     ConfigModule,

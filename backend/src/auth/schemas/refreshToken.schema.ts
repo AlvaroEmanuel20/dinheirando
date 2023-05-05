@@ -11,9 +11,6 @@ export class RefreshToken {
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true })
   user: User;
-
-  @Prop({ required: true, default: false })
-  isInvalid: boolean;
 }
 
 export const RefreshTokenSchema = SchemaFactory.createForClass(RefreshToken);

@@ -7,11 +7,14 @@ import { TransactionalTokensService } from 'src/transactionalTokens/transactiona
 import { ConfigService } from '@nestjs/config';
 import { PutResetPasswordDto, ResetPasswordDto } from './dto/users.dto';
 import { hash } from 'bcryptjs';
+import { TransactionalToken } from 'src/transactionalTokens/schemas/transactionalToken.schema';
 
 @Injectable()
 export class PasswordService {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<User>,
+    @InjectModel(TransactionalToken.name)
+    private readonly transactionalTokenModel: Model<TransactionalToken>,
     private readonly mailService: MailService,
     private readonly transactionalTokenService: TransactionalTokensService,
     private readonly configService: ConfigService,
@@ -19,11 +22,8 @@ export class PasswordService {
 
   async resetPassword(data: ResetPasswordDto) {
     const user = await this.userModel.findOne({ email: data.email }).orFail();
-    await this.transactionalTokenService.invalidateTokens(
-      user.id as string,
-      'PASSWORD',
-    );
 
+    await this.transactionalTokenModel.deleteOne({ user: user._id });
     const passwordToken = await this.transactionalTokenService.create(
       user.id as string,
       'PASSWORD',
@@ -45,12 +45,11 @@ export class PasswordService {
   }
 
   async confirmResetPassword(token: string) {
-    const storedPasswordToken = await this.transactionalTokenService.find(
+    const storedPasswordToken = await this.transactionalTokenModel.findOne({
       token,
-    );
+    });
 
-    if (storedPasswordToken.isInvalid)
-      throw new Error('Blocked password token');
+    if (!storedPasswordToken) throw new Error('Blocked password token');
 
     const payload = await this.transactionalTokenService.verify(token);
     await this.userModel.findById(payload.userId).orFail();
@@ -58,23 +57,21 @@ export class PasswordService {
   }
 
   async putResetPassword(data: PutResetPasswordDto) {
-    const storedPasswordToken = await this.transactionalTokenService.find(
-      data.token,
-    );
+    const storedPasswordToken = await this.transactionalTokenModel.findOne({
+      token: data.token,
+    });
 
-    if (storedPasswordToken.isInvalid)
-      throw new Error('Blocked password token');
+    if (!storedPasswordToken) throw new Error('Blocked password token');
 
     const payload = await this.transactionalTokenService.verify(data.token);
-    await this.userModel
-      .findByIdAndUpdate(payload.userId, {
-        password: await hash(data.password, 10),
-      })
-      .orFail();
+    if (payload) {
+      await this.userModel
+        .findByIdAndUpdate(payload.userId, {
+          password: await hash(data.password, 10),
+        })
+        .orFail();
+    }
 
-    await this.transactionalTokenService.invalidateTokens(
-      payload.userId,
-      'PASSWORD',
-    );
+    await this.transactionalTokenModel.deleteOne({ token: data.token });
   }
 }

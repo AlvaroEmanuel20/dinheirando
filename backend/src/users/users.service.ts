@@ -7,11 +7,17 @@ import { MailService } from 'src/mail/mail.service';
 import { hash } from 'bcryptjs';
 import { TransactionalTokensService } from 'src/transactionalTokens/transactionalTokens.service';
 import { ConfigService } from '@nestjs/config';
+import { RefreshToken } from 'src/auth/schemas/refreshToken.schema';
+import { TransactionalToken } from 'src/transactionalTokens/schemas/transactionalToken.schema';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<User>,
+    @InjectModel(RefreshToken.name)
+    private readonly refreshTokenModel: Model<RefreshToken>,
+    @InjectModel(TransactionalToken.name)
+    private readonly transactionalTokenModel: Model<TransactionalToken>,
     private readonly mailService: MailService,
     private readonly transactionalTokenService: TransactionalTokensService,
     private readonly configService: ConfigService,
@@ -36,15 +42,20 @@ export class UsersService {
   }
 
   async validateUserAccount(token: string) {
-    const storedEmailToken = await this.transactionalTokenService.find(token);
-    if (storedEmailToken.isInvalid) throw new Error('Blocked email token');
+    const storedEmailToken = await this.transactionalTokenModel.findOne({
+      token,
+    });
+
+    if (!storedEmailToken) throw new Error('Blocked email token');
 
     const payload = await this.transactionalTokenService.verify(token);
-    await this.userModel
-      .findByIdAndUpdate(payload.userId, { isVerified: true })
-      .orFail();
+    if (payload) {
+      await this.userModel
+        .findByIdAndUpdate(payload.userId, { isVerified: true })
+        .orFail();
+    }
 
-    await this.transactionalTokenService.invalidateTokens(token, 'EMAIL');
+    await this.transactionalTokenModel.deleteOne({ token });
   }
 
   async newConfirmEmail(userId: string) {
@@ -68,12 +79,18 @@ export class UsersService {
   }
 
   async deleteUser(userId: string) {
+    await this.transactionalTokenModel.deleteMany({ user: userId });
+    await this.refreshTokenModel.deleteOne({ user: userId });
     await this.userModel.findByIdAndDelete(userId).orFail();
     return { userId };
   }
 
   private async sendConfirmEmail(userId: string, email: string, name: string) {
-    await this.transactionalTokenService.invalidateTokens(userId, 'EMAIL');
+    await this.transactionalTokenModel.deleteOne({
+      user: userId,
+      scope: 'EMAIL',
+    });
+
     const token = await this.transactionalTokenService.create(userId, 'EMAIL');
 
     const serverUrl = this.configService.get<string>('SERVER_URL');

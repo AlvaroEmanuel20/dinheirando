@@ -38,9 +38,7 @@ export class RefreshJwtStrategy extends PassportStrategy(
       user: payload.sub,
     });
 
-    if (refreshToken.isInvalid)
-      throw new UnauthorizedException('Blocked refresh token');
-
+    if (!refreshToken) throw new UnauthorizedException('Blocked refresh token');
     return payload;
   }
 }

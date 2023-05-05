@@ -53,22 +53,17 @@ export class AuthService {
     });
 
     if (existsRefreshToken) {
-      if (!existsRefreshToken.isInvalid) {
-        try {
-          await this.jwtService.verifyAsync(existsRefreshToken.token, {
-            secret: this.configService.get<string>('REFRESH_JWT_SECRET'),
-          });
+      try {
+        await this.jwtService.verifyAsync(existsRefreshToken.token, {
+          secret: this.configService.get<string>('REFRESH_JWT_SECRET'),
+        });
 
-          refreshToken = existsRefreshToken.token;
-        } catch (error) {
-          await this.refreshTokenModel.updateOne(
-            { token: existsRefreshToken.token },
-            { isInvalid: true },
-          );
+        refreshToken = existsRefreshToken.token;
+      } catch (error) {
+        await this.refreshTokenModel.deleteOne({
+          token: existsRefreshToken.token,
+        });
 
-          refreshToken = await this.generateRefreshToken(user);
-        }
-      } else {
         refreshToken = await this.generateRefreshToken(user);
       }
     } else {
@@ -116,13 +111,10 @@ export class AuthService {
   }
 
   async logout(user: UserPayload) {
-    await this.refreshTokenModel.updateOne(
-      { user: user.sub },
-      { isInvalid: true },
-    );
+    await this.refreshTokenModel.deleteOne({ user: user.sub });
   }
 
-  async googleLogin(user: GoogleUserProfile) {
+  /*async googleLogin(user: GoogleUserProfile) {
     const findUser = await this.usersService.showUserByEmail(user.email);
     if (!findUser) {
       const createdUser = await this.usersService.createUser({
@@ -138,7 +130,7 @@ export class AuthService {
     }
 
     return { ...user, userId: findUser._id };
-  }
+  }*/
 
   private async generateRefreshToken(user: UserPayload) {
     const refreshToken = this.jwtService.sign(

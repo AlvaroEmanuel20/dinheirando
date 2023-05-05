@@ -17,9 +17,6 @@ export class TransactionalToken {
     enum: ['EMAIL', 'PASSWORD'],
   })
   scope: string;
-
-  @Prop({ required: true, default: false })
-  isInvalid: boolean;
 }
 
 export const TransactionalTokenSchema =
