@@ -1,4 +1,4 @@
-import { TextInput, TextInputProps } from "@mantine/core";
+import { TextInput, TextInputProps } from '@mantine/core';
 
 export default function TextCustomInput(props: TextInputProps) {
   return (
@@ -6,7 +6,7 @@ export default function TextCustomInput(props: TextInputProps) {
       {...props}
       styles={(theme) => ({
         input: {
-          "&:focus-within": {
+          '&:focus-within': {
             borderColor: theme.colors.yellow[5],
           },
         },

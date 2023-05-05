@@ -1,7 +1,7 @@
-import GoogleIcon from "@/components/auth/GoogleIcon";
-import TextCustomInput from "@/components/shared/TextCustomInput";
-import AuthLayout from "@/layouts/AuthLayout";
-import { loginSchema } from "@/lib/schemas/auth";
+import GoogleIcon from '@/components/auth/GoogleIcon';
+import TextCustomInput from '@/components/shared/TextCustomInput';
+import AuthLayout from '@/layouts/AuthLayout';
+import { loginSchema } from '@/lib/schemas/auth';
 import {
   Container,
   Stack,
@@ -12,12 +12,14 @@ import {
   Text,
   Anchor,
   Loader,
-} from "@mantine/core";
-import { useForm, zodResolver } from "@mantine/form";
-import { IconLock, IconMail } from "@tabler/icons-react";
-import Link from "next/link";
-import { useRouter } from "next/router";
-import { useState } from "react";
+} from '@mantine/core';
+import { useForm, zodResolver } from '@mantine/form';
+import { IconLock, IconMail } from '@tabler/icons-react';
+import Link from 'next/link';
+import { useState } from 'react';
+import axios, { AxiosError } from 'axios';
+import { useRouter } from 'next/router';
+import { signIn } from 'next-auth/react';
 
 interface Values {
   email: string;
@@ -25,16 +27,38 @@ interface Values {
 }
 
 export default function Login() {
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
 
   const form = useForm({
     validate: zodResolver(loginSchema),
     initialValues: {
-      email: "",
-      password: "",
+      email: '',
+      password: '',
     },
   });
+
+  const signInAndRedirect = async (values: Values) => {
+    setIsLoading(true);
+    const result = await signIn('credentials', {
+      email: values.email,
+      password: values.password,
+      redirect: false,
+      callbackUrl: '/',
+    });
+
+    if (result?.error) {
+      if (result.status === 401) {
+        setError('Email ou senha incorretos');
+      } else {
+        setError('Erro interno no servidor');
+      }
+    }
+
+    setIsLoading(false);
+    if (result?.url) router.push(result.url);
+  };
 
   return (
     <>
@@ -44,14 +68,14 @@ export default function Login() {
             Login
           </Title>
 
-          <form onSubmit={form.onSubmit((values) => console.log(values))}>
+          <form onSubmit={form.onSubmit((values) => signInAndRedirect(values))}>
             <Stack spacing="sm">
               <TextCustomInput
                 icon={<IconMail size="0.8rem" />}
                 placeholder="exemplo@gmail.com"
                 label="Email"
                 withAsterisk
-                {...form.getInputProps("email")}
+                {...form.getInputProps('email')}
               />
 
               <PasswordInput
@@ -61,19 +85,19 @@ export default function Login() {
                 withAsterisk
                 styles={(theme) => ({
                   input: {
-                    "&:focus-within": {
+                    '&:focus-within': {
                       borderColor: theme.colors.yellow[5],
                     },
                   },
                 })}
-                {...form.getInputProps("password")}
+                {...form.getInputProps('password')}
               />
 
               <Button type="submit" color="yellow.6">
                 {isLoading ? (
                   <Loader size="xs" variant="dots" color="white" />
                 ) : (
-                  "Entrar"
+                  'Entrar'
                 )}
               </Button>
 
@@ -101,7 +125,7 @@ export default function Login() {
           </Button>
 
           <Text mt={15} size="sm" color="dimmed">
-            Não tem uma conta?{" "}
+            Não tem uma conta?{' '}
             <Anchor
               component={Link}
               weight="bold"

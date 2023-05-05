@@ -1,8 +1,8 @@
-import GoogleIcon from "@/components/auth/GoogleIcon";
-import TextCustomInput from "@/components/shared/TextCustomInput";
-import AuthLayout from "@/layouts/AuthLayout";
-import { apiInstance } from "@/lib/apiInstance";
-import { signUpSchema } from "@/lib/schemas/auth";
+import GoogleIcon from '@/components/auth/GoogleIcon';
+import TextCustomInput from '@/components/shared/TextCustomInput';
+import AuthLayout from '@/layouts/AuthLayout';
+import { apiInstance } from '@/lib/apiInstance';
+import { signUpSchema } from '@/lib/schemas/auth';
 import {
   Container,
   Stack,
@@ -13,13 +13,13 @@ import {
   Text,
   Loader,
   Anchor,
-} from "@mantine/core";
-import { useForm, zodResolver } from "@mantine/form";
-import { IconLock, IconMail, IconUser } from "@tabler/icons-react";
-import { AxiosError } from "axios";
-import Link from "next/link";
-import { useRouter } from "next/router";
-import { useState } from "react";
+} from '@mantine/core';
+import { useForm, zodResolver } from '@mantine/form';
+import { IconLock, IconMail, IconUser } from '@tabler/icons-react';
+import { AxiosError } from 'axios';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
 
 interface Values {
   name: string;
@@ -30,14 +30,14 @@ interface Values {
 export default function SignUp() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
 
   const form = useForm({
     validate: zodResolver(signUpSchema),
     initialValues: {
-      name: "",
-      email: "",
-      password: "",
+      name: '',
+      email: '',
+      password: '',
     },
   });
 
@@ -45,15 +45,15 @@ export default function SignUp() {
     setIsLoading(true);
 
     try {
-      await apiInstance.post("/users", values);
+      await apiInstance.post('/users', values);
       setIsLoading(false);
-      router.push("/login");
+      router.push('/login');
     } catch (error) {
       if (error instanceof AxiosError) {
         if (error.response?.status === 409) {
-          setError("Email já cadastrado");
+          setError('Email já cadastrado');
         } else {
-          setError("Erro interno no servidor");
+          setError('Erro interno no servidor');
         }
       }
 
@@ -76,7 +76,7 @@ export default function SignUp() {
                 placeholder="Seu nome"
                 label="Nome"
                 withAsterisk
-                {...form.getInputProps("name")}
+                {...form.getInputProps('name')}
               />
 
               <TextCustomInput
@@ -84,7 +84,7 @@ export default function SignUp() {
                 placeholder="exemplo@gmail.com"
                 label="Email"
                 withAsterisk
-                {...form.getInputProps("email")}
+                {...form.getInputProps('email')}
               />
 
               <PasswordInput
@@ -94,19 +94,19 @@ export default function SignUp() {
                 withAsterisk
                 styles={(theme) => ({
                   input: {
-                    "&:focus-within": {
+                    '&:focus-within': {
                       borderColor: theme.colors.yellow[5],
                     },
                   },
                 })}
-                {...form.getInputProps("password")}
+                {...form.getInputProps('password')}
               />
 
               <Button type="submit" color="yellow.6">
                 {isLoading ? (
                   <Loader size="xs" variant="dots" color="white" />
                 ) : (
-                  "Criar Conta"
+                  'Criar Conta'
                 )}
               </Button>
 
@@ -134,7 +134,7 @@ export default function SignUp() {
           </Button>
 
           <Text mt={15} size="sm" color="dimmed">
-            Já tem uma conta?{" "}
+            Já tem uma conta?{' '}
             <Anchor component={Link} weight="bold" color="dimmed" href="/">
               Entre
             </Anchor>
