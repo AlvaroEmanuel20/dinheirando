@@ -2,13 +2,13 @@ import { Button } from '@mantine/core';
 import { GetServerSideProps } from 'next';
 import { getServerSession } from 'next-auth';
 import { authOptions } from './api/auth/[...nextauth]';
-import { signOut, useSession } from 'next-auth/react';
+import { signIn, signOut, useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
+import { useEffect } from 'react';
 
 export default function Home() {
   const router = useRouter();
   const { data: session } = useSession();
-  console.log(session);
 
   const signOutAndRedirect = async () => {
     const result = await signOut({
@@ -18,6 +18,10 @@ export default function Home() {
 
     router.push(result.url);
   };
+
+  useEffect(() => {
+    if (session?.error === 'RefreshAccessTokenError') signIn();
+  }, [session]);
 
   if (session?.user) {
     return (
@@ -34,6 +38,15 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const session = await getServerSession(ctx.req, ctx.res, authOptions);
 
   if (!session) {
+    return {
+      redirect: {
+        destination: '/login',
+        permanent: false,
+      },
+    };
+  }
+
+  if (session.error === 'RefreshAccessTokenError') {
     return {
       redirect: {
         destination: '/login',

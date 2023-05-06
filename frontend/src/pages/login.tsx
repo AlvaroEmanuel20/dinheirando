@@ -17,7 +17,6 @@ import { useForm, zodResolver } from '@mantine/form';
 import { IconLock, IconMail } from '@tabler/icons-react';
 import Link from 'next/link';
 import { useState } from 'react';
-import axios, { AxiosError } from 'axios';
 import { useRouter } from 'next/router';
 import { signIn } from 'next-auth/react';
 
@@ -120,6 +119,9 @@ export default function Login() {
             leftIcon={<GoogleIcon />}
             variant="default"
             color="gray"
+            onClick={() =>
+              signIn('google', { redirect: false, callbackUrl: '/' })
+            }
           >
             Google
           </Button>

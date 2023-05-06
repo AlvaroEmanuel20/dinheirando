@@ -13,6 +13,7 @@ declare module 'next-auth' {
       isGoogleAccount: boolean;
       avatar?: string;
     } & DefaultSession['user'];
+    error?: 'RefreshAccessTokenError';
   }
 
   /**
@@ -39,5 +40,6 @@ declare module 'next-auth/jwt' {
     accessToken: string;
     refreshToken: string;
     oauth_accessToken;
+    error?: 'RefreshAccessTokenError';
   }
 }
