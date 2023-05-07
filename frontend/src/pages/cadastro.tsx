@@ -1,7 +1,7 @@
 import GoogleIcon from '@/components/auth/GoogleIcon';
 import TextCustomInput from '@/components/shared/TextCustomInput';
+import useAuth from '@/hooks/useAuth';
 import AuthLayout from '@/layouts/AuthLayout';
-import { apiInstance } from '@/lib/apiInstance';
 import { signUpSchema } from '@/lib/schemas/auth';
 import {
   Container,
@@ -16,21 +16,10 @@ import {
 } from '@mantine/core';
 import { useForm, zodResolver } from '@mantine/form';
 import { IconLock, IconMail, IconUser } from '@tabler/icons-react';
-import { AxiosError } from 'axios';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
-import { useState } from 'react';
-
-interface Values {
-  name: string;
-  email: string;
-  password: string;
-}
 
 export default function SignUp() {
-  const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const { signUpAndRedirect, isLoadingSignUp, errorSignUp } = useAuth();
 
   const form = useForm({
     validate: zodResolver(signUpSchema),
@@ -41,26 +30,6 @@ export default function SignUp() {
     },
   });
 
-  const signUp = async (values: Values) => {
-    setIsLoading(true);
-
-    try {
-      await apiInstance.post('/users', values);
-      setIsLoading(false);
-      router.push('/login');
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        if (error.response?.status === 409) {
-          setError('Email já cadastrado');
-        } else {
-          setError('Erro interno no servidor');
-        }
-      }
-
-      setIsLoading(false);
-    }
-  };
-
   return (
     <>
       <AuthLayout>
@@ -69,7 +38,7 @@ export default function SignUp() {
             Cadastro
           </Title>
 
-          <form onSubmit={form.onSubmit((values) => signUp(values))}>
+          <form onSubmit={form.onSubmit((values) => signUpAndRedirect(values))}>
             <Stack spacing="sm">
               <TextCustomInput
                 icon={<IconUser size="0.8rem" />}
@@ -103,16 +72,16 @@ export default function SignUp() {
               />
 
               <Button type="submit" color="yellow.6">
-                {isLoading ? (
+                {isLoadingSignUp ? (
                   <Loader size="xs" variant="dots" color="white" />
                 ) : (
                   'Criar Conta'
                 )}
               </Button>
 
-              {error && (
+              {errorSignUp && (
                 <Text size="sm" color="red">
-                  {error}
+                  {errorSignUp.message}
                 </Text>
               )}
             </Stack>

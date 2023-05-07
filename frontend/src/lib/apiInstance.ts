@@ -9,9 +9,8 @@ apiInstance.interceptors.request.use(
   async (config) => {
     const session = await getSession();
 
-    if (session) {
+    if (session)
       config.headers.Authorization = `Bearer ${session.user.accessToken}`;
-    }
 
     return config;
   },

@@ -1,10 +1,15 @@
-import { Container, Group, Burger } from '@mantine/core';
+import {
+  Container,
+  Group,
+  Burger,
+} from '@mantine/core';
 import { ReactNode } from 'react';
 import ThemeToggle from '@/components/shared/ThemeToggle';
 import { useDisclosure } from '@mantine/hooks';
+import AppDrawer from '@/components/shared/AppDrawer';
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
-  const [opened, { toggle }] = useDisclosure(false);
+  const [opened, { toggle, open, close }] = useDisclosure(false);
   const label = opened ? 'Close navigation' : 'Open navigation';
 
   return (
@@ -20,6 +25,8 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
           <ThemeToggle />
         </Group>
       </Container>
+
+      <AppDrawer opened={opened} close={close} />
 
       {children}
     </>

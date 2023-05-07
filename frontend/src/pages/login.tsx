@@ -16,19 +16,11 @@ import {
 import { useForm, zodResolver } from '@mantine/form';
 import { IconLock, IconMail } from '@tabler/icons-react';
 import Link from 'next/link';
-import { useState } from 'react';
-import { useRouter } from 'next/router';
 import { signIn } from 'next-auth/react';
-
-interface Values {
-  email: string;
-  password: string;
-}
+import useAuth from '@/hooks/useAuth';
 
 export default function Login() {
-  const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const { signInAndRedirect, isLoadingSignIn, errorSignIn } = useAuth();
 
   const form = useForm({
     validate: zodResolver(loginSchema),
@@ -37,27 +29,6 @@ export default function Login() {
       password: '',
     },
   });
-
-  const signInAndRedirect = async (values: Values) => {
-    setIsLoading(true);
-    const result = await signIn('credentials', {
-      email: values.email,
-      password: values.password,
-      redirect: false,
-      callbackUrl: '/',
-    });
-
-    if (result?.error) {
-      if (result.status === 401) {
-        setError('Email ou senha incorretos');
-      } else {
-        setError('Erro interno no servidor');
-      }
-    }
-
-    setIsLoading(false);
-    if (result?.url) router.push(result.url);
-  };
 
   return (
     <>
@@ -93,16 +64,16 @@ export default function Login() {
               />
 
               <Button type="submit" color="yellow.6">
-                {isLoading ? (
+                {isLoadingSignIn ? (
                   <Loader size="xs" variant="dots" color="white" />
                 ) : (
                   'Entrar'
                 )}
               </Button>
 
-              {error && (
+              {errorSignIn && (
                 <Text size="sm" color="red">
-                  {error}
+                  {errorSignIn.message}
                 </Text>
               )}
             </Stack>
@@ -119,9 +90,7 @@ export default function Login() {
             leftIcon={<GoogleIcon />}
             variant="default"
             color="gray"
-            onClick={() =>
-              signIn('google', { callbackUrl: '/' })
-            }
+            onClick={() => signIn('google', { callbackUrl: '/' })}
           >
             Google
           </Button>
