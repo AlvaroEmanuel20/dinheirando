@@ -120,7 +120,7 @@ export default function Login() {
             variant="default"
             color="gray"
             onClick={() =>
-              signIn('google', { redirect: false, callbackUrl: '/' })
+              signIn('google', { callbackUrl: '/' })
             }
           >
             Google

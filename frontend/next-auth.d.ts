@@ -1,5 +1,6 @@
 import NextAuth, { DefaultSession } from 'next-auth';
 import { JWT } from 'next-auth/jwt';
+import { ProviderType } from 'next-auth/providers';
 
 declare module 'next-auth' {
   /**
@@ -9,11 +10,14 @@ declare module 'next-auth' {
     user: {
       accessToken: string;
       refreshToken: string;
+      oauth_accessToken?: string;
+      oauth_refreshToken?: string;
       isVerified: boolean;
       isGoogleAccount: boolean;
       avatar?: string;
     } & DefaultSession['user'];
     error?: 'RefreshAccessTokenError';
+    authType: ProviderType;
   }
 
   /**
@@ -28,6 +32,10 @@ declare module 'next-auth' {
     accessToken: string;
     refreshToken: string;
   }
+
+  interface Profile {
+    email_verified: boolean;
+  }
 }
 
 declare module 'next-auth/jwt' {
@@ -39,7 +47,10 @@ declare module 'next-auth/jwt' {
     isGoogleAccount: boolean;
     accessToken: string;
     refreshToken: string;
-    oauth_accessToken;
+    oauth_accessToken?: string;
+    oauth_refreshToken?: string;
+    authType: ProviderType;
     error?: 'RefreshAccessTokenError';
+    oauth_expires_at: number;
   }
 }

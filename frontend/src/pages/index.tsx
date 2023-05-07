@@ -5,6 +5,7 @@ import { authOptions } from './api/auth/[...nextauth]';
 import { signIn, signOut, useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
+import { apiInstance } from '@/lib/apiInstance';
 
 export default function Home() {
   const router = useRouter();
@@ -19,6 +20,15 @@ export default function Home() {
     router.push(result.url);
   };
 
+  const getUser = async () => {
+    try {
+      const res = await apiInstance.get('/users');
+      console.log(res.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
     if (session?.error === 'RefreshAccessTokenError') signIn();
   }, [session]);
@@ -28,7 +38,7 @@ export default function Home() {
       <>
         Você está logado em {session.user.email} <br />
         <Button onClick={signOutAndRedirect}>Sign out</Button>
-        <Button>Get user</Button>
+        <Button onClick={getUser}>Get user</Button>
       </>
     );
   }
