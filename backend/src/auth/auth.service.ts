@@ -6,6 +6,7 @@ import { ConfigService } from '@nestjs/config';
 import { Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { RefreshToken } from './schemas/refreshToken.schema';
+import { GoogleLoginDto } from './dto/auth.dto';
 
 export interface UserPayload {
   sub: string | Types.ObjectId;
@@ -131,6 +132,24 @@ export class AuthService {
 
     return { ...user, userId: findUser._id };
   }*/
+
+  async googleLoginVerify(data: GoogleLoginDto) {
+    const findUser = await this.usersService.showUserByEmail(data.email);
+    if (!findUser) {
+      const createdUser = await this.usersService.createUser({
+        name: data.name,
+        email: data.email,
+        avatar: data.avatar,
+        isVerified: data.email_verified,
+        isGoogleAccount: true,
+        password: '',
+      });
+
+      return { userId: createdUser.userId, ...data };
+    }
+
+    return { ...data, userId: findUser._id };
+  }
 
   private async generateRefreshToken(user: UserPayload) {
     const refreshToken = this.jwtService.sign(

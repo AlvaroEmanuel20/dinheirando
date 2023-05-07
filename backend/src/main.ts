@@ -11,7 +11,7 @@ async function bootstrap() {
   const PORT = configService.get<number>('PORT');
   const CLIENT_URL = configService.get<string>('CLIENT_URL');
 
-  app.enableCors({ credentials: true, origin: CLIENT_URL });
+  app.enableCors({ origin: CLIENT_URL });
   app.use(cookieParser());
 
   const config = new DocumentBuilder()

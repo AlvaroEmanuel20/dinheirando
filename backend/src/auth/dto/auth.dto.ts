@@ -25,3 +25,20 @@ export class LoginUserDto {
   @ApiProperty()
   refreshToken: string;
 }
+
+export class GoogleLoginDto {
+  @ApiProperty()
+  avatar: string;
+
+  @ApiProperty()
+  name: string;
+
+  @ApiProperty()
+  email: string;
+
+  @ApiProperty()
+  email_verified: boolean;
+
+  @ApiProperty()
+  idToken: string;
+}

@@ -7,6 +7,8 @@ import {
   HttpCode,
   Get,
   Redirect,
+  Body,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { Request } from 'express';
 import { LocalAuthGuard } from './guards/localAuth.guard';
@@ -16,13 +18,15 @@ import { GoogleAuthGuard } from './guards/googleAuth.guard';
 import { ConfigService } from '@nestjs/config';
 import { RefreshJwtAuthGuard } from './guards/refreshJwtAuth.guard';
 import {
+  ApiCreatedResponse,
   ApiFoundResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { LoginUserDto } from './dto/auth.dto';
+import { GoogleLoginDto, LoginUserDto } from './dto/auth.dto';
+import { OAuth2Client } from 'google-auth-library';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -74,6 +78,31 @@ export class AuthController {
 
     return { url: this.configService.get<string>('CLIENT_URL') };
   }*/
+
+  @Public()
+  @Post('google/login')
+  @ApiUnauthorizedResponse()
+  @ApiCreatedResponse()
+  async googleLogin(@Body() data: GoogleLoginDto) {
+    try {
+      const googleClientId = this.configService.get<string>('GOOGLE_CLIENT_ID');
+      const googleClient = new OAuth2Client(googleClientId);
+      await googleClient.verifyIdToken({
+        idToken: data.idToken,
+        audience: googleClientId,
+      });
+    } catch (error) {
+      throw new UnauthorizedException('Invalid idToken');
+    }
+
+    const user = await this.authService.googleLoginVerify(data);
+    const { user: userData } = await this.authService.login({
+      sub: user.userId,
+      isVerified: user.email_verified,
+    });
+
+    return userData;
+  }
 
   @UseGuards(RefreshJwtAuthGuard)
   @Public()
