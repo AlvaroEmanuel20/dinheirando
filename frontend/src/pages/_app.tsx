@@ -38,7 +38,17 @@ export default function App({ Component, pageProps }: AppProps) {
         <MantineProvider
           withGlobalStyles
           withNormalizeCSS
-          theme={{ colorScheme }}
+          theme={{
+            colorScheme,
+            globalStyles: (theme) => ({
+              body: {
+                backgroundColor:
+                  theme.colorScheme === 'dark'
+                    ? theme.colors.gray[9]
+                    : theme.white,
+              },
+            }),
+          }}
         >
           <RouterTransition />
           <SessionProvider session={pageProps.session}>

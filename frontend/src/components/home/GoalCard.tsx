@@ -1,5 +1,5 @@
 import { formatMoney } from '@/lib/formatMoney';
-import { Card, Progress, Text } from '@mantine/core';
+import { Card, Progress, Text, useMantineColorScheme } from '@mantine/core';
 
 interface GoalCard {
   bg: string;
@@ -12,12 +12,14 @@ interface GoalCard {
 }
 
 export default function GoalCard({ bg, label, value, progress }: GoalCard) {
+  const { colorScheme } = useMantineColorScheme();
+
   return (
-    <Card padding="sm" bg={bg} w={150} h={120}>
-      <Text size="sm" color="dark">
+    <Card padding="sm" bg={bg} h={120}>
+      <Text size="sm" color={colorScheme === 'dark' ? 'white' : 'dark'}>
         {label}
       </Text>
-      <Text weight="bold" color="dark">
+      <Text weight="bold" color={colorScheme === 'dark' ? 'white' : 'dark'}>
         R${formatMoney.format(value)}
       </Text>
 

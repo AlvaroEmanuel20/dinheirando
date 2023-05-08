@@ -2331,6 +2331,11 @@ optionator@^0.9.1:
     type-check "^0.4.0"
     word-wrap "^1.2.3"
 
+our-dates@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/our-dates/-/our-dates-1.0.3.tgz#2543f36076978ecfa9fa8b230f5a1d793a0425c1"
+  integrity sha512-Mlsb593g0Jdejxh5yQxgbxQYp/pvyRAu7wSOeIqyhs7uVhsLRiSNlgUesckNiQBeuKMOt2JRs0EzSQMlJdWVaQ==
+
 p-limit@^3.0.2:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/p-limit/-/p-limit-3.1.0.tgz#e1daccbe78d0d1388ca18c64fea38e3e57e3706b"

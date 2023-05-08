@@ -8,6 +8,7 @@ import {
   Loader,
   Stack,
   Text,
+  useMantineColorScheme,
 } from '@mantine/core';
 import {
   IconArrowsTransferUp,
@@ -28,6 +29,40 @@ interface AppDrawer {
 export default function AppDrawer({ opened, close }: AppDrawer) {
   const { data: session } = useSession();
   const { signOutAndRedirect, isLoadingSignOut } = useAuth();
+  const { colorScheme } = useMantineColorScheme();
+
+  const links = [
+    {
+      href: '/',
+      icon: <IconHome2 />,
+      label: 'Home',
+    },
+    {
+      href: '/transacoes',
+      icon: <IconCreditCard />,
+      label: 'Transações',
+    },
+    {
+      href: '/categorias',
+      icon: <IconTags />,
+      label: 'Categorias',
+    },
+    {
+      href: '/contas',
+      icon: <IconWallet />,
+      label: 'Contas',
+    },
+    {
+      href: '/transferencias',
+      icon: <IconArrowsTransferUp />,
+      label: 'Transferências',
+    },
+    {
+      href: '/preferencias',
+      icon: <IconSettings2 />,
+      label: 'Preferências',
+    },
+  ];
 
   return (
     <Drawer
@@ -37,47 +72,19 @@ export default function AppDrawer({ opened, close }: AppDrawer) {
       overlayProps={{ opacity: 0.5, blur: 4 }}
     >
       <Stack>
-        <Anchor component={Link} color="dark" href="/">
-          <Group>
-            <IconHome2 />
-            <Text>Home</Text>
-          </Group>
-        </Anchor>
-
-        <Anchor component={Link} color="dark" href="/transacoes">
-          <Group>
-            <IconCreditCard />
-            <Text>Transações</Text>
-          </Group>
-        </Anchor>
-
-        <Anchor component={Link} color="dark" href="/categorias">
-          <Group>
-            <IconTags />
-            <Text>Categorias</Text>
-          </Group>
-        </Anchor>
-
-        <Anchor component={Link} color="dark" href="/contas">
-          <Group>
-            <IconWallet />
-            <Text>Contas</Text>
-          </Group>
-        </Anchor>
-
-        <Anchor component={Link} color="dark" href="/transferencias">
-          <Group>
-            <IconArrowsTransferUp />
-            <Text>Transferências</Text>
-          </Group>
-        </Anchor>
-
-        <Anchor component={Link} color="dark" href="/preferencias">
-          <Group>
-            <IconSettings2 />
-            <Text>Preferências</Text>
-          </Group>
-        </Anchor>
+        {links.map((link) => (
+          <Anchor
+            key={link.href}
+            component={Link}
+            color={colorScheme === 'dark' ? 'white' : 'dark'}
+            href={link.href}
+          >
+            <Group>
+              {link.icon}
+              <Text>{link.label}</Text>
+            </Group>
+          </Anchor>
+        ))}
       </Stack>
 
       <Divider mt={30} mb={15} />

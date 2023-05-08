@@ -9,7 +9,7 @@ interface TotalCard {
 
 export default function TotalCard({ bg, label, value }: TotalCard) {
   return (
-    <Card padding="sm" bg={bg} w={150} h={80}>
+    <Card padding="sm" bg={bg} h={80}>
       <Text size="sm" color="white">
         {label}
       </Text>

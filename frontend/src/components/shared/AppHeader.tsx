@@ -1,17 +1,26 @@
-import { ActionIcon, Avatar, Burger, Container, Group } from '@mantine/core';
-import ThemeToggle from '../shared/ThemeToggle';
+import {
+  ActionIcon,
+  Avatar,
+  Burger,
+  Container,
+  Group,
+  useMantineColorScheme,
+} from '@mantine/core';
+import ThemeToggle from './ThemeToggle';
 import { useDisclosure } from '@mantine/hooks';
-import AppDrawer from '../shared/AppDrawer';
+import AppDrawer from './AppDrawer';
 import { IconBell } from '@tabler/icons-react';
 import { ReactNode } from 'react';
+import Link from 'next/link';
 
-export default function HomeHeader({ children }: { children: ReactNode }) {
+export default function AppHeader({ children }: { children: ReactNode }) {
   const [opened, { toggle, open, close }] = useDisclosure(false);
   const label = opened ? 'Close navigation' : 'Open navigation';
+  const { colorScheme } = useMantineColorScheme();
 
   return (
     <>
-      <Container py={30} bg="gray.8">
+      <Container py={30} bg={colorScheme === 'dark' ? 'gray.9' : 'gray.8'}>
         <Group position="apart">
           <Burger
             color="white"
@@ -27,7 +36,9 @@ export default function HomeHeader({ children }: { children: ReactNode }) {
 
             <ThemeToggle />
 
-            <Avatar src="/profile.jpg" color="yellow.6" radius="xl" />
+            <Link href="/preferencias">
+              <Avatar src="/profile.jpg" color="yellow.6" radius="xl" />
+            </Link>
           </Group>
         </Group>
 
