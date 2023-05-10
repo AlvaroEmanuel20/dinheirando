@@ -1,5 +1,13 @@
-import { ActionIcon, Center, Container, Menu, useMantineColorScheme } from '@mantine/core';
+import {
+  ActionIcon,
+  Anchor,
+  Center,
+  Container,
+  Menu,
+  useMantineColorScheme,
+} from '@mantine/core';
 import { IconPlus } from '@tabler/icons-react';
+import Link from 'next/link';
 
 export default function AppFooter() {
   const { colorScheme } = useMantineColorScheme();
@@ -21,10 +29,34 @@ export default function AppFooter() {
           </Menu.Target>
 
           <Menu.Dropdown>
-            <Menu.Item icon={<IconPlus size={14} />}>Transação</Menu.Item>
-            <Menu.Item icon={<IconPlus size={14} />}>Categoria</Menu.Item>
-            <Menu.Item icon={<IconPlus size={14} />}>Conta</Menu.Item>
-            <Menu.Item icon={<IconPlus size={14} />}>Transferência</Menu.Item>
+            <Anchor
+              underline={false}
+              component={Link}
+              href="/adicionar/transacao"
+            >
+              <Menu.Item icon={<IconPlus size={14} />}>Transação</Menu.Item>
+            </Anchor>
+            <Anchor
+              underline={false}
+              component={Link}
+              href="/adicionar/categoria"
+            >
+              <Menu.Item icon={<IconPlus size={14} />}>Categoria</Menu.Item>
+            </Anchor>
+            <Anchor
+              underline={false}
+              component={Link}
+              href="/adicionar/conta"
+            >
+              <Menu.Item icon={<IconPlus size={14} />}>Conta</Menu.Item>
+            </Anchor>
+            <Anchor
+              underline={false}
+              component={Link}
+              href="/adicionar/transferencia"
+            >
+              <Menu.Item icon={<IconPlus size={14} />}>Transferência</Menu.Item>
+            </Anchor>
           </Menu.Dropdown>
         </Menu>
       </Center>

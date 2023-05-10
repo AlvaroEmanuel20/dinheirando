@@ -50,12 +50,7 @@ export default function AppDrawer({ opened, close }: AppDrawer) {
     {
       href: '/carteira',
       icon: <IconWallet />,
-      label: 'Contas',
-    },
-    {
-      href: '/carteira',
-      icon: <IconArrowsTransferUp />,
-      label: 'Transferências',
+      label: 'Carteira',
     },
     {
       href: '/preferencias',
