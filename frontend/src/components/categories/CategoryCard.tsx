@@ -1,14 +1,15 @@
+import { formatMoney } from '@/lib/formatMoney';
 import { Card, Group, Text, useMantineColorScheme } from '@mantine/core';
 
 interface CategoryCard {
   name: string;
-  qtyTransactions: number;
+  totalOfTransactions: number;
   type: 'income' | 'expense';
 }
 
 export default function CategoryCard({
   name,
-  qtyTransactions,
+  totalOfTransactions,
   type,
 }: CategoryCard) {
   const { colorScheme } = useMantineColorScheme();
@@ -21,7 +22,7 @@ export default function CategoryCard({
         </Text>
 
         <Text color={type === 'income' ? 'green' : 'red'} size="sm">
-          {qtyTransactions}
+          R${formatMoney.format(totalOfTransactions)}
         </Text>
       </Group>
     </Card>

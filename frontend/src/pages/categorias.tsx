@@ -56,10 +56,10 @@ export default function Transactions() {
           <CategoryCard
             name="Investimentos"
             type="income"
-            qtyTransactions={6}
+            totalOfTransactions={1000}
           />
-          <CategoryCard name="Salário" type="income" qtyTransactions={4} />
-          <CategoryCard name="Cashback" type="income" qtyTransactions={8} />
+          <CategoryCard name="Salário" type="income" totalOfTransactions={450} />
+          <CategoryCard name="Cashback" type="income" totalOfTransactions={800} />
         </Stack>
       </Container>
 
@@ -69,9 +69,9 @@ export default function Transactions() {
         </Text>
 
         <Stack spacing={10}>
-          <CategoryCard name="Compras" type="expense" qtyTransactions={6} />
-          <CategoryCard name="Viagens" type="expense" qtyTransactions={4} />
-          <CategoryCard name="Lazer" type="expense" qtyTransactions={8} />
+          <CategoryCard name="Compras" type="expense" totalOfTransactions={600} />
+          <CategoryCard name="Viagens" type="expense" totalOfTransactions={490} />
+          <CategoryCard name="Lazer" type="expense" totalOfTransactions={800} />
         </Stack>
       </Container>
 
