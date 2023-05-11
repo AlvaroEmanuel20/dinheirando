@@ -9,6 +9,7 @@ import { JwtAuthGuard } from './auth/guards/jwtAuth.guard';
 import { TransactionalTokensModule } from './transactionalTokens/transactionalTokens.module';
 import { CategoriesController } from './categories/categories.controller';
 import { CategoriesModule } from './categories/categories.module';
+import { AccountsModule } from './accounts/accounts.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { CategoriesModule } from './categories/categories.module';
     AuthModule,
     TransactionalTokensModule,
     CategoriesModule,
+    AccountsModule,
   ],
   providers: [
     {

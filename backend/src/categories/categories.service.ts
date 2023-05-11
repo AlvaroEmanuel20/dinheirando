@@ -5,7 +5,6 @@ import { Model } from 'mongoose';
 import { CreateCategoryDto, UpdateCategoryDto } from './dto/categories.dto';
 
 export interface CategoriesQuery {
-  sort?: 'asc' | 'desc';
   limit?: number;
   type?: 'income' | 'expense';
 }
@@ -18,7 +17,6 @@ export class CategoriesService {
 
   async showCategories(userId: string, query: CategoriesQuery) {
     return await this.Category.find({ user: userId })
-      .sort(query.sort)
       .limit(query.limit)
       .where({ type: query.type });
   }
