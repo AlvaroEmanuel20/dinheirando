@@ -10,6 +10,7 @@ import { TransactionalTokensModule } from './transactionalTokens/transactionalTo
 import { CategoriesController } from './categories/categories.controller';
 import { CategoriesModule } from './categories/categories.module';
 import { AccountsModule } from './accounts/accounts.module';
+import { TransactionsModule } from './transactions/transactions.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { AccountsModule } from './accounts/accounts.module';
     TransactionalTokensModule,
     CategoriesModule,
     AccountsModule,
+    TransactionsModule,
   ],
   providers: [
     {
