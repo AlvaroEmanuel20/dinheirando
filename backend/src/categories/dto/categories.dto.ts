@@ -29,11 +29,11 @@ export class CreateCategoryDto {
 
 export class UpdateCategoryDto {
   @ApiPropertyOptional()
-  name: string;
+  name?: string;
 
   @ApiPropertyOptional()
-  type: 'income' | 'expense';
+  type?: 'income' | 'expense';
 
   @ApiPropertyOptional()
-  totalOfTransactions: number;
+  totalOfTransactions?: number;
 }

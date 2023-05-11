@@ -26,8 +26,8 @@ export class CreateAccountDto {
 
 export class UpdateAccountDto {
   @ApiPropertyOptional()
-  name: string;
+  name?: string;
 
   @ApiPropertyOptional()
-  amount: number;
+  amount?: number;
 }

@@ -1,5 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Types } from 'mongoose';
+import { Account } from 'src/accounts/schemas/account.schema';
+import { Category } from 'src/categories/schemas/category.schema';
 
 export class TransactionDto {
   @ApiProperty()
@@ -18,10 +20,10 @@ export class TransactionDto {
   type: 'income' | 'expense';
 
   @ApiProperty()
-  category: string | Types.ObjectId;
+  category: string | Types.ObjectId | Category;
 
   @ApiProperty()
-  account: string | Types.ObjectId;
+  account: string | Types.ObjectId | Account;
 }
 
 export class TransactionIdDto {
@@ -43,28 +45,28 @@ export class CreateTransactionDto {
   type: 'income' | 'expense';
 
   @ApiProperty()
-  category: string | Types.ObjectId;
+  category: string | Types.ObjectId | Category;
 
   @ApiProperty()
-  account: string | Types.ObjectId;
+  account: string | Types.ObjectId | Account;
 }
 
 export class UpdateTransactionDto {
   @ApiPropertyOptional()
-  name: string;
+  name?: string;
 
   @ApiPropertyOptional()
-  value: number;
+  value?: number;
 
   @ApiPropertyOptional()
-  createdAt: Date;
+  createdAt?: Date;
 
   @ApiPropertyOptional()
-  type: 'income' | 'expense';
+  type?: 'income' | 'expense';
 
   @ApiPropertyOptional()
-  category: string | Types.ObjectId;
+  category?: string | Types.ObjectId | Category;
 
   @ApiPropertyOptional()
-  account: string | Types.ObjectId;
+  account?: string | Types.ObjectId | Account;
 }

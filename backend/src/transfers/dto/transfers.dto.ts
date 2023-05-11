@@ -1,15 +1,16 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Types } from 'mongoose';
+import { Account } from 'src/accounts/schemas/account.schema';
 
 export class TransferDto {
   @ApiProperty()
   _id: string;
 
   @ApiProperty()
-  fromAccount: string | Types.ObjectId;
+  fromAccount: string | Types.ObjectId | Account;
 
   @ApiProperty()
-  toAccount: string | Types.ObjectId;
+  toAccount: string | Types.ObjectId | Account;
 
   @ApiProperty()
   value: number;
@@ -25,10 +26,10 @@ export class TransferIdDto {
 
 export class CreateTransferDto {
   @ApiProperty()
-  fromAccount: string | Types.ObjectId;
+  fromAccount: string | Types.ObjectId | Account;
 
   @ApiProperty()
-  toAccount: string | Types.ObjectId;
+  toAccount: string | Types.ObjectId | Account;
 
   @ApiProperty()
   value: number;
@@ -39,14 +40,14 @@ export class CreateTransferDto {
 
 export class UpdateTransferDto {
   @ApiPropertyOptional()
-  fromAccount: string | Types.ObjectId;
+  fromAccount?: string | Types.ObjectId | Account;
 
   @ApiPropertyOptional()
-  toAccount: string | Types.ObjectId;
+  toAccount?: string | Types.ObjectId | Account;
 
   @ApiPropertyOptional()
-  value: number;
+  value?: number;
 
   @ApiPropertyOptional()
-  createdAt: Date;
+  createdAt?: Date;
 }

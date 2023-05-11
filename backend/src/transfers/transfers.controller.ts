@@ -9,6 +9,7 @@ import {
   NotFoundException,
   UsePipes,
   Query,
+  ConflictException,
 } from '@nestjs/common';
 import { User } from 'src/users/decorators/user.decorator';
 import { JoiValidationPipe } from 'src/shared/pipes/joiValidation.pipe';
@@ -60,7 +61,16 @@ export class TransfersController {
     @Body() data: CreateTransferDto,
     @User('sub') userId: string,
   ) {
-    return await this.transfersService.createTransfer(data, userId);
+    try {
+      return await this.transfersService.createTransfer(data, userId);
+    } catch (error) {
+      if (
+        error.message === 'From account not found' ||
+        error.message === 'To account not found'
+      ) {
+        throw new NotFoundException(error.message);
+      }
+    }
   }
 
   @Patch(':transferId')
@@ -75,7 +85,20 @@ export class TransfersController {
     try {
       return this.transfersService.updateTransfer(data, transferId);
     } catch (error) {
-      throw new NotFoundException('Transfer not found');
+      if (
+        error.message === 'Transfer not found' ||
+        error.message === 'New from account not found' ||
+        error.message === 'New to account not found'
+      ) {
+        throw new NotFoundException(error.message);
+      }
+
+      if (
+        error.message === 'From account is equals to account' ||
+        error.message === 'To account is equals from account'
+      ) {
+        throw new ConflictException(error.message);
+      }
     }
   }
 

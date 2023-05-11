@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Category } from './schemas/category.schema';
 import { Model } from 'mongoose';
 import { CreateCategoryDto, UpdateCategoryDto } from './dto/categories.dto';
+import { Transaction } from 'src/transactions/schemas/transaction.schema';
 
 export interface CategoriesQuery {
   limit?: number;
@@ -13,6 +14,8 @@ export interface CategoriesQuery {
 export class CategoriesService {
   constructor(
     @InjectModel(Category.name) private readonly Category: Model<Category>,
+    @InjectModel(Transaction.name)
+    private readonly Transaction: Model<Transaction>,
   ) {}
 
   async showCategories(userId: string, query: CategoriesQuery) {
@@ -40,6 +43,13 @@ export class CategoriesService {
   }
 
   async deleteCategory(categoryId: string) {
+    const transactionsUsedCategory = await this.Transaction.find({
+      category: categoryId,
+    });
+
+    if (transactionsUsedCategory.length > 0)
+      throw new Error('There are transactions using this category');
+
     await this.Category.findByIdAndDelete(categoryId).orFail();
     return { categoryId };
   }

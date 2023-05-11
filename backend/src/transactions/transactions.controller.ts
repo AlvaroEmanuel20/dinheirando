@@ -63,7 +63,16 @@ export class TransactionsController {
     @Body() data: CreateTransactionDto,
     @User('sub') userId: string,
   ) {
-    return await this.transactionsService.createTransaction(data, userId);
+    try {
+      return await this.transactionsService.createTransaction(data, userId);
+    } catch (error) {
+      if (
+        error.message === 'Category not found' ||
+        error.message === 'Account not found'
+      ) {
+        throw new NotFoundException(error.message);
+      }
+    }
   }
 
   @Patch(':transactionId')
@@ -78,7 +87,13 @@ export class TransactionsController {
     try {
       return this.transactionsService.updateTransaction(data, transactionId);
     } catch (error) {
-      throw new NotFoundException('Transaction not found');
+      if (
+        error.message === 'Transaction not found' ||
+        error.message === 'New category not found' ||
+        error.message === 'New account not found'
+      ) {
+        throw new NotFoundException(error.message);
+      }
     }
   }
 
