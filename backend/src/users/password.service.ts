@@ -12,18 +12,18 @@ import { TransactionalToken } from 'src/transactionalTokens/schemas/transactiona
 @Injectable()
 export class PasswordService {
   constructor(
-    @InjectModel(User.name) private readonly userModel: Model<User>,
+    @InjectModel(User.name) private readonly User: Model<User>,
     @InjectModel(TransactionalToken.name)
-    private readonly transactionalTokenModel: Model<TransactionalToken>,
+    private readonly TransactionalToken: Model<TransactionalToken>,
     private readonly mailService: MailService,
     private readonly transactionalTokenService: TransactionalTokensService,
     private readonly configService: ConfigService,
   ) {}
 
   async resetPassword(data: ResetPasswordDto) {
-    const user = await this.userModel.findOne({ email: data.email }).orFail();
+    const user = await this.User.findOne({ email: data.email }).orFail();
 
-    await this.transactionalTokenModel.deleteOne({ user: user._id });
+    await this.TransactionalToken.deleteOne({ user: user._id });
     const passwordToken = await this.transactionalTokenService.create(
       user.id as string,
       'PASSWORD',
@@ -45,19 +45,19 @@ export class PasswordService {
   }
 
   async confirmResetPassword(token: string) {
-    const storedPasswordToken = await this.transactionalTokenModel.findOne({
+    const storedPasswordToken = await this.TransactionalToken.findOne({
       token,
     });
 
     if (!storedPasswordToken) throw new Error('Blocked password token');
 
     const payload = await this.transactionalTokenService.verify(token);
-    await this.userModel.findById(payload.userId).orFail();
+    await this.User.findById(payload.userId).orFail();
     return token;
   }
 
   async putResetPassword(data: PutResetPasswordDto) {
-    const storedPasswordToken = await this.transactionalTokenModel.findOne({
+    const storedPasswordToken = await this.TransactionalToken.findOne({
       token: data.token,
     });
 
@@ -65,13 +65,11 @@ export class PasswordService {
 
     const payload = await this.transactionalTokenService.verify(data.token);
     if (payload) {
-      await this.userModel
-        .findByIdAndUpdate(payload.userId, {
-          password: await hash(data.password, 10),
-        })
-        .orFail();
+      await this.User.findByIdAndUpdate(payload.userId, {
+        password: await hash(data.password, 10),
+      }).orFail();
     }
 
-    await this.transactionalTokenModel.deleteOne({ token: data.token });
+    await this.TransactionalToken.deleteOne({ token: data.token });
   }
 }

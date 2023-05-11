@@ -29,7 +29,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     @InjectModel(RefreshToken.name)
-    private readonly refreshTokenModel: Model<RefreshToken>,
+    private readonly RefreshToken: Model<RefreshToken>,
   ) {}
 
   async validateUser(email: string, password: string) {
@@ -49,7 +49,7 @@ export class AuthService {
     const userData = await this.usersService.showUser(user.sub as string);
 
     let refreshToken: string;
-    const existsRefreshToken = await this.refreshTokenModel.findOne({
+    const existsRefreshToken = await this.RefreshToken.findOne({
       user: user.sub,
     });
 
@@ -61,7 +61,7 @@ export class AuthService {
 
         refreshToken = existsRefreshToken.token;
       } catch (error) {
-        await this.refreshTokenModel.deleteOne({
+        await this.RefreshToken.deleteOne({
           token: existsRefreshToken.token,
         });
 
@@ -90,7 +90,7 @@ export class AuthService {
 
   async refresh(user: UserPayload) {
     const userData = await this.usersService.showUser(user.sub as string);
-    const storedRefreshToken = await this.refreshTokenModel.findOne({
+    const storedRefreshToken = await this.RefreshToken.findOne({
       user: user.sub,
     });
 
@@ -112,7 +112,7 @@ export class AuthService {
   }
 
   async logout(user: UserPayload) {
-    await this.refreshTokenModel.deleteOne({ user: user.sub });
+    await this.RefreshToken.deleteOne({ user: user.sub });
   }
 
   /*async googleLogin(user: GoogleUserProfile) {
@@ -160,7 +160,7 @@ export class AuthService {
       },
     );
 
-    await this.refreshTokenModel.create({
+    await this.RefreshToken.create({
       token: refreshToken,
       user: user.sub,
     });

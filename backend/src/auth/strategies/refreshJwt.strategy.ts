@@ -21,7 +21,7 @@ export class RefreshJwtStrategy extends PassportStrategy(
     private readonly configService: ConfigService,
     private readonly usersService: UsersService,
     @InjectModel(RefreshToken.name)
-    private readonly refreshTokenModel: Model<RefreshToken>,
+    private readonly RefreshToken: Model<RefreshToken>,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -34,7 +34,7 @@ export class RefreshJwtStrategy extends PassportStrategy(
     const user = await this.usersService.showUser(payload.sub as string);
     if (!user) throw new NotFoundException('User not found');
 
-    const refreshToken = await this.refreshTokenModel.findOne({
+    const refreshToken = await this.RefreshToken.findOne({
       user: payload.sub,
     });
 

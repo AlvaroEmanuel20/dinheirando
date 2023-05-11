@@ -16,6 +16,10 @@ import {
   TransactionalToken,
   TransactionalTokenSchema,
 } from 'src/transactionalTokens/schemas/transactionalToken.schema';
+import {
+  Category,
+  CategorySchema,
+} from 'src/categories/schemas/category.schema';
 
 @Module({
   imports: [
@@ -23,6 +27,7 @@ import {
       { name: User.name, schema: UserSchema },
       { name: RefreshToken.name, schema: RefreshTokenSchema },
       { name: TransactionalToken.name, schema: TransactionalTokenSchema },
+      { name: Category.name, schema: CategorySchema },
     ]),
     MailModule,
     TransactionalTokensModule,

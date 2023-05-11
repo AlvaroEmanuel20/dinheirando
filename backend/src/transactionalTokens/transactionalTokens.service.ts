@@ -18,7 +18,7 @@ export interface TransactionalTokenPayload {
 export class TransactionalTokensService {
   constructor(
     @InjectModel(TransactionalToken.name)
-    private readonly transactionalTokenModel: Model<TransactionalToken>,
+    private readonly TransactionalToken: Model<TransactionalToken>,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
   ) {}
@@ -34,7 +34,7 @@ export class TransactionalTokensService {
       },
     );
 
-    await this.transactionalTokenModel.create({
+    await this.TransactionalToken.create({
       token: newToken,
       user: userId,
       scope,

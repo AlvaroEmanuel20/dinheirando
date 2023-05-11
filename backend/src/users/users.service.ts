@@ -9,31 +9,34 @@ import { TransactionalTokensService } from 'src/transactionalTokens/transactiona
 import { ConfigService } from '@nestjs/config';
 import { RefreshToken } from 'src/auth/schemas/refreshToken.schema';
 import { TransactionalToken } from 'src/transactionalTokens/schemas/transactionalToken.schema';
+import { Category } from 'src/categories/schemas/category.schema';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectModel(User.name) private readonly userModel: Model<User>,
+    @InjectModel(User.name) private readonly User: Model<User>,
     @InjectModel(RefreshToken.name)
-    private readonly refreshTokenModel: Model<RefreshToken>,
+    private readonly RefreshToken: Model<RefreshToken>,
     @InjectModel(TransactionalToken.name)
-    private readonly transactionalTokenModel: Model<TransactionalToken>,
+    private readonly TransactionalToken: Model<TransactionalToken>,
+    @InjectModel(Category.name)
+    private readonly Category: Model<Category>,
     private readonly mailService: MailService,
     private readonly transactionalTokenService: TransactionalTokensService,
     private readonly configService: ConfigService,
   ) {}
 
   async showUser(userId: string) {
-    return await this.userModel.findById(userId).select('-password');
+    return await this.User.findById(userId).select('-password');
   }
 
   async showUserByEmail(email: string) {
-    return await this.userModel.findOne({ email });
+    return await this.User.findOne({ email });
   }
 
   async createUser(data: CreateUserDto) {
     data.password = await hash(data.password, 10);
-    const newUser = await this.userModel.create(data);
+    const newUser = await this.User.create(data);
 
     if (!data.isVerified)
       await this.sendConfirmEmail(newUser.id, data.email, data.name);
@@ -42,7 +45,7 @@ export class UsersService {
   }
 
   async validateUserAccount(token: string) {
-    const storedEmailToken = await this.transactionalTokenModel.findOne({
+    const storedEmailToken = await this.TransactionalToken.findOne({
       token,
     });
 
@@ -50,25 +53,25 @@ export class UsersService {
 
     const payload = await this.transactionalTokenService.verify(token);
     if (payload) {
-      await this.userModel
-        .findByIdAndUpdate(payload.userId, { isVerified: true })
-        .orFail();
+      await this.User.findByIdAndUpdate(payload.userId, {
+        isVerified: true,
+      }).orFail();
     }
 
-    await this.transactionalTokenModel.deleteOne({ token });
+    await this.TransactionalToken.deleteOne({ token });
   }
 
   async newConfirmEmail(userId: string) {
-    const user = await this.userModel.findById(userId).orFail();
+    const user = await this.User.findById(userId).orFail();
     await this.sendConfirmEmail(userId, user.email, user.name);
   }
 
   async updateUser(data: UpdateUserDto, userId: string) {
     if (data.password) data.password = await hash(data.password, 10);
-    await this.userModel.findByIdAndUpdate(userId, data).orFail();
+    await this.User.findByIdAndUpdate(userId, data).orFail();
 
     if (data.email) {
-      await this.userModel.findByIdAndUpdate(userId, {
+      await this.User.findByIdAndUpdate(userId, {
         isVerified: false,
       });
 
@@ -79,14 +82,15 @@ export class UsersService {
   }
 
   async deleteUser(userId: string) {
-    await this.transactionalTokenModel.deleteMany({ user: userId });
-    await this.refreshTokenModel.deleteOne({ user: userId });
-    await this.userModel.findByIdAndDelete(userId).orFail();
+    await this.Category.deleteMany({ user: userId });
+    await this.TransactionalToken.deleteMany({ user: userId });
+    await this.RefreshToken.deleteOne({ user: userId });
+    await this.User.findByIdAndDelete(userId).orFail();
     return { userId };
   }
 
   private async sendConfirmEmail(userId: string, email: string, name: string) {
-    await this.transactionalTokenModel.deleteOne({
+    await this.TransactionalToken.deleteOne({
       user: userId,
       scope: 'EMAIL',
     });
