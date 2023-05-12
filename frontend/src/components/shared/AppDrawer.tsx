@@ -11,7 +11,6 @@ import {
   useMantineColorScheme,
 } from '@mantine/core';
 import {
-  IconArrowsTransferUp,
   IconCreditCard,
   IconHome2,
   IconSettings2,
@@ -28,7 +27,7 @@ interface AppDrawer {
 
 export default function AppDrawer({ opened, close }: AppDrawer) {
   const { data: session } = useSession();
-  const { signOutAndRedirect, isLoadingSignOut } = useAuth();
+  const { signOutAndRedirect, isLoadingSignOut, errorSignOut } = useAuth();
   const { colorScheme } = useMantineColorScheme();
 
   const links = [
@@ -73,6 +72,7 @@ export default function AppDrawer({ opened, close }: AppDrawer) {
             component={Link}
             color={colorScheme === 'dark' ? 'white' : 'dark'}
             href={link.href}
+            onClick={close}
           >
             <Group>
               {link.icon}

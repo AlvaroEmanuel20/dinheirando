@@ -1,14 +1,7 @@
 import {
-  ActionIcon,
   Anchor,
-  Burger,
-  Button,
-  Card,
-  Center,
   Container,
   Group,
-  Menu,
-  Progress,
   Stack,
   Text,
   useMantineColorScheme,
@@ -18,37 +11,20 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from './api/auth/[...nextauth]';
 import { signIn, useSession } from 'next-auth/react';
 import { useEffect } from 'react';
-import { apiInstance } from '@/lib/apiInstance';
-import useAuth from '@/hooks/useAuth';
-import ThemeToggle from '@/components/shared/ThemeToggle';
 import AppHeader from '@/components/shared/AppHeader';
 import Link from 'next/link';
 import TotalCard from '@/components/home/TotalCard';
 import GoalCard from '@/components/home/GoalCard';
 import TransactionCard from '@/components/shared/TransactionCard';
-import {
-  IconArrowsLeftRight,
-  IconPlus,
-  IconSettings,
-  IconTrash,
-} from '@tabler/icons-react';
 import AppFooter from '@/components/shared/AppFooter';
 
 export default function Home() {
   const { colorScheme } = useMantineColorScheme();
-  /*const { signOutAndRedirect, isLoadingSignOut, errorSignOut } = useAuth();
   const { data: session } = useSession();
 
   useEffect(() => {
     if (session?.error === 'RefreshAccessTokenError') signIn();
   }, [session]);
-
-  return (
-    <>
-      Você está logado em {session?.user.email} <br />
-      <Button onClick={signOutAndRedirect}>Sign out</Button>
-    </>
-  );*/
 
   return (
     <>
@@ -141,7 +117,7 @@ export default function Home() {
 }
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  /*const session = await getServerSession(ctx.req, ctx.res, authOptions);
+  const session = await getServerSession(ctx.req, ctx.res, authOptions);
 
   if (!session) {
     return {
@@ -159,7 +135,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
         permanent: false,
       },
     };
-  }*/
+  }
 
   return {
     props: {},

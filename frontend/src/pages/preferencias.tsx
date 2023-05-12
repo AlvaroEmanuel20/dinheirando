@@ -22,24 +22,19 @@ import {
   IconUser,
 } from '@tabler/icons-react';
 import { GetServerSideProps } from 'next';
+import { getServerSession } from 'next-auth';
+import { signIn, useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
+import { useEffect } from 'react';
+import { authOptions } from './api/auth/[...nextauth]';
 
 export default function Preferences() {
   const router = useRouter();
-
-  /*const { signOutAndRedirect, isLoadingSignOut, errorSignOut } = useAuth();
   const { data: session } = useSession();
 
   useEffect(() => {
     if (session?.error === 'RefreshAccessTokenError') signIn();
   }, [session]);
-
-  return (
-    <>
-      Você está logado em {session?.user.email} <br />
-      <Button onClick={signOutAndRedirect}>Sign out</Button>
-    </>
-  );*/
 
   return (
     <>
@@ -187,7 +182,7 @@ export default function Preferences() {
 }
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  /*const session = await getServerSession(ctx.req, ctx.res, authOptions);
+  const session = await getServerSession(ctx.req, ctx.res, authOptions);
 
   if (!session) {
     return {
@@ -205,7 +200,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
         permanent: false,
       },
     };
-  }*/
+  }
 
   return {
     props: {},

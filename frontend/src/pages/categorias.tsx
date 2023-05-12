@@ -1,33 +1,22 @@
 import CategoryCard from '@/components/categories/CategoryCard';
 import AppFooter from '@/components/shared/AppFooter';
 import AppHeader from '@/components/shared/AppHeader';
-import {
-  ActionIcon,
-  Container,
-  Group,
-  Stack,
-  Text,
-} from '@mantine/core';
+import { ActionIcon, Container, Group, Stack, Text } from '@mantine/core';
 import { IconArrowLeft } from '@tabler/icons-react';
 import { GetServerSideProps } from 'next';
+import { getServerSession } from 'next-auth';
+import { signIn, useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
+import { useEffect } from 'react';
+import { authOptions } from './api/auth/[...nextauth]';
 
-export default function Transactions() {
+export default function Categories() {
   const router = useRouter();
-
-  /*const { signOutAndRedirect, isLoadingSignOut, errorSignOut } = useAuth();
   const { data: session } = useSession();
 
   useEffect(() => {
     if (session?.error === 'RefreshAccessTokenError') signIn();
   }, [session]);
-
-  return (
-    <>
-      Você está logado em {session?.user.email} <br />
-      <Button onClick={signOutAndRedirect}>Sign out</Button>
-    </>
-  );*/
 
   return (
     <>
@@ -58,8 +47,16 @@ export default function Transactions() {
             type="income"
             totalOfTransactions={1000}
           />
-          <CategoryCard name="Salário" type="income" totalOfTransactions={450} />
-          <CategoryCard name="Cashback" type="income" totalOfTransactions={800} />
+          <CategoryCard
+            name="Salário"
+            type="income"
+            totalOfTransactions={450}
+          />
+          <CategoryCard
+            name="Cashback"
+            type="income"
+            totalOfTransactions={800}
+          />
         </Stack>
       </Container>
 
@@ -69,8 +66,16 @@ export default function Transactions() {
         </Text>
 
         <Stack spacing={10}>
-          <CategoryCard name="Compras" type="expense" totalOfTransactions={600} />
-          <CategoryCard name="Viagens" type="expense" totalOfTransactions={490} />
+          <CategoryCard
+            name="Compras"
+            type="expense"
+            totalOfTransactions={600}
+          />
+          <CategoryCard
+            name="Viagens"
+            type="expense"
+            totalOfTransactions={490}
+          />
           <CategoryCard name="Lazer" type="expense" totalOfTransactions={800} />
         </Stack>
       </Container>
@@ -81,7 +86,7 @@ export default function Transactions() {
 }
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  /*const session = await getServerSession(ctx.req, ctx.res, authOptions);
+  const session = await getServerSession(ctx.req, ctx.res, authOptions);
 
   if (!session) {
     return {
@@ -99,7 +104,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
         permanent: false,
       },
     };
-  }*/
+  }
 
   return {
     props: {},

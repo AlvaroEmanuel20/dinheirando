@@ -21,24 +21,19 @@ import {
   IconWallet,
 } from '@tabler/icons-react';
 import { GetServerSideProps } from 'next';
+import { getServerSession } from 'next-auth';
 import { useRouter } from 'next/router';
+import { authOptions } from '../api/auth/[...nextauth]';
+import { useEffect } from 'react';
+import { signIn, useSession } from 'next-auth/react';
 
 export default function AddTransaction() {
   const router = useRouter();
-
-  /*const { signOutAndRedirect, isLoadingSignOut, errorSignOut } = useAuth();
   const { data: session } = useSession();
 
   useEffect(() => {
     if (session?.error === 'RefreshAccessTokenError') signIn();
   }, [session]);
-
-  return (
-    <>
-      Você está logado em {session?.user.email} <br />
-      <Button onClick={signOutAndRedirect}>Sign out</Button>
-    </>
-  );*/
 
   return (
     <>
@@ -192,7 +187,7 @@ export default function AddTransaction() {
 }
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  /*const session = await getServerSession(ctx.req, ctx.res, authOptions);
+  const session = await getServerSession(ctx.req, ctx.res, authOptions);
 
   if (!session) {
     return {
@@ -210,7 +205,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
         permanent: false,
       },
     };
-  }*/
+  }
 
   return {
     props: {},
