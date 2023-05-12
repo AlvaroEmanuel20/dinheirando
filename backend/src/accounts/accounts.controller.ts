@@ -31,6 +31,7 @@ import {
   createAccountSchema,
   updateAccountSchema,
 } from './validations/accounts.validation';
+import { ObjectIdValidationPipe } from 'src/shared/pipes/objectIdValidation.pipe';
 
 @ApiTags('accounts')
 @Controller('accounts')
@@ -46,8 +47,11 @@ export class AccountsController {
   @Get(':accountId')
   @ApiOkResponse({ type: AccountDto })
   @ApiNotFoundResponse()
-  async showAccount(@Param('accountId') accountId: string) {
-    const account = await this.accountsService.showAccount(accountId);
+  async showAccount(
+    @Param('accountId', ObjectIdValidationPipe) accountId: string,
+    @User('sub') userId: string,
+  ) {
+    const account = await this.accountsService.showAccount(accountId, userId);
     if (!account) throw new NotFoundException('Account not found');
     return account;
   }
@@ -74,10 +78,11 @@ export class AccountsController {
   @ApiConflictResponse()
   async updateAccount(
     @Body() data: UpdateAccountDto,
-    @Param('accountId') accountId: string,
+    @Param('accountId', ObjectIdValidationPipe) accountId: string,
+    @User('sub') userId: string,
   ) {
     try {
-      return this.accountsService.updateAccount(data, accountId);
+      return this.accountsService.updateAccount(data, accountId, userId);
     } catch (error) {
       if (error instanceof mongoose.Error.DocumentNotFoundError) {
         throw new NotFoundException('Account not found');
@@ -91,9 +96,12 @@ export class AccountsController {
   @ApiOkResponse({ type: AccountIdDto })
   @ApiNotFoundResponse()
   @ApiConflictResponse()
-  async deleteAccount(@Param('accountId') accountId: string) {
+  async deleteAccount(
+    @Param('accountId', ObjectIdValidationPipe) accountId: string,
+    @User('sub') userId: string,
+  ) {
     try {
-      return this.accountsService.deleteAccount(accountId);
+      return this.accountsService.deleteAccount(accountId, userId);
     } catch (error) {
       if (error instanceof mongoose.Error.DocumentNotFoundError) {
         throw new NotFoundException('Account not found');

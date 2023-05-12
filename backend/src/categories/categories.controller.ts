@@ -32,6 +32,7 @@ import {
   ApiOkResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { ObjectIdValidationPipe } from 'src/shared/pipes/objectIdValidation.pipe';
 
 @ApiTags('categories')
 @Controller('categories')
@@ -42,7 +43,7 @@ export class CategoriesController {
   @ApiOkResponse({ type: [CategoryDto] })
   async showCategories(
     @User('sub') userId: string,
-    @Query('query') query: CategoriesQuery,
+    @Query() query: CategoriesQuery,
   ) {
     return await this.categoriesService.showCategories(userId, query);
   }
@@ -50,8 +51,14 @@ export class CategoriesController {
   @Get(':categoryId')
   @ApiOkResponse({ type: CategoryDto })
   @ApiNotFoundResponse()
-  async showCategory(@Param('categoryId') categoryId: string) {
-    const category = await this.categoriesService.showCategory(categoryId);
+  async showCategory(
+    @Param('categoryId', ObjectIdValidationPipe) categoryId: string,
+    @User('sub') userId: string,
+  ) {
+    const category = await this.categoriesService.showCategory(
+      categoryId,
+      userId,
+    );
     if (!category) throw new NotFoundException('Category not found');
     return category;
   }
@@ -78,10 +85,11 @@ export class CategoriesController {
   @ApiConflictResponse()
   async updateCategory(
     @Body() data: UpdateCategoryDto,
-    @Param('categoryId') categoryId: string,
+    @Param('categoryId', ObjectIdValidationPipe) categoryId: string,
+    @User('sub') userId: string,
   ) {
     try {
-      return this.categoriesService.updateCategory(data, categoryId);
+      return this.categoriesService.updateCategory(data, categoryId, userId);
     } catch (error) {
       if (error instanceof mongoose.Error.DocumentNotFoundError) {
         throw new NotFoundException('Category not found');
@@ -95,9 +103,12 @@ export class CategoriesController {
   @ApiOkResponse({ type: CategoryIdDto })
   @ApiNotFoundResponse()
   @ApiConflictResponse()
-  async deleteCategory(@Param('categoryId') categoryId: string) {
+  async deleteCategory(
+    @Param('categoryId', ObjectIdValidationPipe) categoryId: string,
+    @User('sub') userId: string,
+  ) {
     try {
-      return this.categoriesService.deleteCategory(categoryId);
+      return this.categoriesService.deleteCategory(categoryId, userId);
     } catch (error) {
       if (error instanceof mongoose.Error.DocumentNotFoundError) {
         throw new NotFoundException('Category not found');

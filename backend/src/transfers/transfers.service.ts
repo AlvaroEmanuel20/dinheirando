@@ -27,8 +27,8 @@ export class TransfersService {
       .populate('toAccount', 'name');
   }
 
-  async showTransfer(transferId: string) {
-    return await this.Transfer.findById(transferId)
+  async showTransfer(transferId: string, userId: string) {
+    return await this.Transfer.findOne({ _id: transferId, user: userId })
       .populate('fromAccount', 'name')
       .populate('toAccount', 'name');
   }
@@ -61,7 +61,11 @@ export class TransfersService {
     return { transferId: newTransfer._id };
   }
 
-  async updateTransfer(data: UpdateTransferDto, transferId: string) {
+  async updateTransfer(
+    data: UpdateTransferDto,
+    transferId: string,
+    userId: string,
+  ) {
     const { value, fromAccount, toAccount, createdAt } = data;
 
     const transfer = await this.Transfer.findById(transferId);
@@ -105,16 +109,19 @@ export class TransfersService {
       }
     }
 
-    await this.Transfer.findByIdAndUpdate(transferId, {
-      value,
-      createdAt,
-      fromAccount,
-      toAccount,
-    }).orFail();
+    await this.Transfer.updateOne(
+      { _id: transferId, user: userId },
+      {
+        value,
+        createdAt,
+        fromAccount,
+        toAccount,
+      },
+    ).orFail();
     return { transferId };
   }
 
-  async deleteTransfer(transferId: string) {
+  async deleteTransfer(transferId: string, userId: string) {
     const transfer = await this.Transfer.findById(transferId);
     if (!transfer) throw new Error('Transfer not found');
 
@@ -128,7 +135,7 @@ export class TransfersService {
       await toAccount.save();
     }
 
-    await this.Transfer.findByIdAndDelete(transferId).orFail();
+    await this.Transfer.deleteOne({ _id: transferId, user: userId }).orFail();
     return { transferId };
   }
 }

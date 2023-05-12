@@ -35,10 +35,26 @@ export class TransactionsService {
       .populate('account', 'name');
   }
 
-  async showTransaction(transactionId: string) {
-    return await this.Transaction.findById(transactionId)
+  async showTransaction(transactionId: string, userId: string) {
+    return await this.Transaction.findOne({ _id: transactionId, user: userId })
       .populate('category', 'name')
       .populate('account', 'name');
+  }
+
+  async showTotal(userId: string) {
+    const transactions = await this.Transaction.find({
+      user: userId,
+    });
+
+    const total = transactions.reduce((acc, value) => (acc += value.value), 0);
+    const totalIncome = transactions
+      .filter((value) => value.type === 'income')
+      .reduce((acc, value) => (acc += value.value), 0);
+    const totalExpense = transactions
+      .filter((value) => value.type === 'expense')
+      .reduce((acc, value) => (acc += value.value), 0);
+
+    return { total, totalIncome, totalExpense };
   }
 
   async createTransaction(data: CreateTransactionDto, userId: string) {
@@ -75,7 +91,11 @@ export class TransactionsService {
     return { transactionId: newTransaction._id };
   }
 
-  async updateTransaction(data: UpdateTransactionDto, transactionId: string) {
+  async updateTransaction(
+    data: UpdateTransactionDto,
+    transactionId: string,
+    userId: string,
+  ) {
     const { name, createdAt, value, type, category, account } = data;
 
     const transaction = await this.Transaction.findById(transactionId);
@@ -139,18 +159,21 @@ export class TransactionsService {
       }
     }
 
-    await this.Transaction.findByIdAndUpdate(transactionId, {
-      name,
-      createdAt,
-      type,
-      value,
-      category,
-      account,
-    }).orFail();
+    await this.Transaction.updateOne(
+      { _id: transactionId, user: userId },
+      {
+        name,
+        createdAt,
+        type,
+        value,
+        category,
+        account,
+      },
+    ).orFail();
     return { transactionId };
   }
 
-  async deleteTransaction(transactionId: string) {
+  async deleteTransaction(transactionId: string, userId: string) {
     const transaction = await this.Transaction.findById(transactionId);
     if (!transaction) throw new Error('Transaction not found');
 
@@ -165,7 +188,10 @@ export class TransactionsService {
       }
     }
 
-    await this.Transaction.findByIdAndDelete(transactionId).orFail();
+    await this.Transaction.deleteOne({
+      _id: transactionId,
+      user: userId,
+    }).orFail();
     return { transactionId };
   }
 }

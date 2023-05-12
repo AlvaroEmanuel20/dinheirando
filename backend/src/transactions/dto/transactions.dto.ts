@@ -70,3 +70,14 @@ export class UpdateTransactionDto {
   @ApiPropertyOptional()
   account?: string | Types.ObjectId | Account;
 }
+
+export class TransactionsTotalDto {
+  @ApiProperty()
+  total: number;
+
+  @ApiProperty()
+  totalIncome: number;
+
+  @ApiProperty()
+  totalExpense: number;
+}

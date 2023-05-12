@@ -31,6 +31,7 @@ import {
   createTransferSchema,
   updateTransferSchema,
 } from './validations/transfers.validations';
+import { ObjectIdValidationPipe } from 'src/shared/pipes/objectIdValidation.pipe';
 
 @ApiTags('transfers')
 @Controller('transfers')
@@ -49,8 +50,14 @@ export class TransfersController {
   @Get(':transferId')
   @ApiOkResponse({ type: TransferDto })
   @ApiNotFoundResponse()
-  async showTransfer(@Param('transferId') transferId: string) {
-    const transfer = await this.transfersService.showTransfer(transferId);
+  async showTransfer(
+    @Param('transferId', ObjectIdValidationPipe) transferId: string,
+    @User('sub') userId: string,
+  ) {
+    const transfer = await this.transfersService.showTransfer(
+      transferId,
+      userId,
+    );
     if (!transfer) throw new NotFoundException('Transfer not found');
     return transfer;
   }
@@ -82,10 +89,11 @@ export class TransfersController {
   @ApiConflictResponse()
   async updateTransfer(
     @Body() data: UpdateTransferDto,
-    @Param('transferId') transferId: string,
+    @Param('transferId', ObjectIdValidationPipe) transferId: string,
+    @User('sub') userId: string,
   ) {
     try {
-      return this.transfersService.updateTransfer(data, transferId);
+      return this.transfersService.updateTransfer(data, transferId, userId);
     } catch (error) {
       if (
         error.message === 'Transfer not found' ||
@@ -108,9 +116,12 @@ export class TransfersController {
   @ApiOkResponse({ type: TransferIdDto })
   @ApiNotFoundResponse()
   @ApiConflictResponse()
-  async deleteTransfer(@Param('transferId') transferId: string) {
+  async deleteTransfer(
+    @Param('transferId', ObjectIdValidationPipe) transferId: string,
+    @User('sub') userId: string,
+  ) {
     try {
-      return this.transfersService.deleteTransfer(transferId);
+      return this.transfersService.deleteTransfer(transferId, userId);
     } catch (error) {
       throw new NotFoundException('Transfer not found');
     }

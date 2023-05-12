@@ -24,8 +24,8 @@ export class CategoriesService {
       .where({ type: query.type });
   }
 
-  async showCategory(categoryId: string) {
-    return await this.Category.findById(categoryId);
+  async showCategory(categoryId: string, userId: string) {
+    return await this.Category.findOne({ _id: categoryId, user: userId });
   }
 
   async createCategory(data: CreateCategoryDto, userId: string) {
@@ -37,12 +37,19 @@ export class CategoriesService {
     return { categoryId: newCategory._id };
   }
 
-  async updateCategory(data: UpdateCategoryDto, categoryId: string) {
-    await this.Category.findByIdAndUpdate(categoryId, data).orFail();
+  async updateCategory(
+    data: UpdateCategoryDto,
+    categoryId: string,
+    userId: string,
+  ) {
+    await this.Category.updateOne(
+      { _id: categoryId, user: userId },
+      data,
+    ).orFail();
     return { categoryId };
   }
 
-  async deleteCategory(categoryId: string) {
+  async deleteCategory(categoryId: string, userId: string) {
     const transactionsUsedCategory = await this.Transaction.find({
       category: categoryId,
     });
@@ -50,7 +57,7 @@ export class CategoriesService {
     if (transactionsUsedCategory.length > 0)
       throw new Error('There are transactions using this category');
 
-    await this.Category.findByIdAndDelete(categoryId).orFail();
+    await this.Category.deleteOne({ _id: categoryId, user: userId }).orFail();
     return { categoryId };
   }
 }

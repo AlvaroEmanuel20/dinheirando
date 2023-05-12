@@ -19,8 +19,8 @@ export class AccountsService {
     return await this.Account.find({ user: userId });
   }
 
-  async showAccount(accountId: string) {
-    return await this.Account.findById(accountId);
+  async showAccount(accountId: string, userId: string) {
+    return await this.Account.findOne({ _id: accountId, user: userId });
   }
 
   async createAccount(data: CreateAccountDto, userId: string) {
@@ -32,12 +32,19 @@ export class AccountsService {
     return { accountId: newAccount._id };
   }
 
-  async updateAccount(data: UpdateAccountDto, accountId: string) {
-    await this.Account.findByIdAndUpdate(accountId, data).orFail();
+  async updateAccount(
+    data: UpdateAccountDto,
+    accountId: string,
+    userId: string,
+  ) {
+    await this.Account.updateOne(
+      { _id: accountId, user: userId },
+      data,
+    ).orFail();
     return { accountId };
   }
 
-  async deleteAccount(accountId: string) {
+  async deleteAccount(accountId: string, userId: string) {
     const transactionsUsedAccount = await this.Transaction.find({
       account: accountId,
     });
@@ -52,7 +59,7 @@ export class AccountsService {
     if (transfersUsedAccount.length > 0)
       throw new Error('There are transfers using this account');
 
-    await this.Account.findByIdAndDelete(accountId).orFail();
+    await this.Account.deleteOne({ _id: accountId, user: userId }).orFail();
     return { accountId };
   }
 }

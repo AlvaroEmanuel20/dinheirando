@@ -24,12 +24,14 @@ import {
   CreateTransactionDto,
   TransactionDto,
   TransactionIdDto,
+  TransactionsTotalDto,
   UpdateTransactionDto,
 } from './dto/transactions.dto';
 import {
   createTransactionSchema,
   updateTransactionSchema,
 } from './validations/transactions.validations';
+import { ObjectIdValidationPipe } from 'src/shared/pipes/objectIdValidation.pipe';
 
 @ApiTags('transactions')
 @Controller('transactions')
@@ -45,12 +47,23 @@ export class TransactionsController {
     return await this.transactionsService.showTransactions(userId, query);
   }
 
+  @Get('total')
+  @ApiOkResponse({ type: TransactionsTotalDto })
+  async showTotal(@User('sub') userId: string) {
+    const result = await this.transactionsService.showTotal(userId);
+    return result;
+  }
+
   @Get(':transactionId')
   @ApiOkResponse({ type: TransactionDto })
   @ApiNotFoundResponse()
-  async showTransaction(@Param('transactionId') transactionId: string) {
+  async showTransaction(
+    @Param('transactionId', ObjectIdValidationPipe) transactionId: string,
+    @User('sub') userId: string,
+  ) {
     const transaction = await this.transactionsService.showTransaction(
       transactionId,
+      userId,
     );
 
     if (!transaction) throw new NotFoundException('Transaction not found');
@@ -84,10 +97,15 @@ export class TransactionsController {
   @ApiConflictResponse()
   async updateTransaction(
     @Body() data: UpdateTransactionDto,
-    @Param('transactionId') transactionId: string,
+    @Param('transactionId', ObjectIdValidationPipe) transactionId: string,
+    @User('sub') userId: string,
   ) {
     try {
-      return this.transactionsService.updateTransaction(data, transactionId);
+      return this.transactionsService.updateTransaction(
+        data,
+        transactionId,
+        userId,
+      );
     } catch (error) {
       if (
         error.message === 'Transaction not found' ||
@@ -103,9 +121,12 @@ export class TransactionsController {
   @ApiOkResponse({ type: TransactionIdDto })
   @ApiNotFoundResponse()
   @ApiConflictResponse()
-  async deleteTransaction(@Param('transactionId') transactionId: string) {
+  async deleteTransaction(
+    @Param('transactionId', ObjectIdValidationPipe) transactionId: string,
+    @User('sub') userId: string,
+  ) {
     try {
-      return this.transactionsService.deleteTransaction(transactionId);
+      return this.transactionsService.deleteTransaction(transactionId, userId);
     } catch (error) {
       throw new NotFoundException('Transaction not found');
     }
