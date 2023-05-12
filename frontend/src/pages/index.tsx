@@ -2,6 +2,7 @@ import {
   Anchor,
   Container,
   Group,
+  Skeleton,
   Stack,
   Text,
   useMantineColorScheme,
@@ -17,10 +18,31 @@ import TotalCard from '@/components/home/TotalCard';
 import GoalCard from '@/components/home/GoalCard';
 import TransactionCard from '@/components/shared/TransactionCard';
 import AppFooter from '@/components/shared/AppFooter';
+import useSWR from 'swr';
+import { fetcher } from '@/lib/apiInstance';
+import { Transaction, TransactionsTotals } from '@/lib/apiTypes/transactions';
+import { formatMoney } from '@/lib/formatMoney';
+import useTransactions from '@/hooks/useTransactions';
+import useUser from '@/hooks/useUser';
+import NoData from '@/components/shared/NoData';
 
 export default function Home() {
   const { colorScheme } = useMantineColorScheme();
   const { data: session } = useSession();
+
+  const {
+    data: totals,
+    error: errorTotals,
+    isLoading: isLoadingTotals,
+  } = useSWR<TransactionsTotals>('/transactions/total', fetcher);
+
+  const {
+    data: latestTransactions,
+    isLoading: isLoadingLatestTransaction,
+    error: errorLatestTransactions,
+  } = useTransactions<Transaction[]>({ limit: 5 });
+
+  const { userData, isLoadingUser, errorUser } = useUser();
 
   useEffect(() => {
     if (session?.error === 'RefreshAccessTokenError') signIn();
@@ -30,17 +52,33 @@ export default function Home() {
     <>
       <AppHeader>
         <Stack spacing={1} mt="xl">
-          <Text size="sm" color="white">
-            Saldo total:
-          </Text>
-          <Text size="xl" weight="bold" color="white">
-            R$150.000,00
-          </Text>
+          <Skeleton visible={isLoadingTotals} width="40%">
+            <Text size="sm" color="white">
+              Saldo total:
+            </Text>
+
+            <Text size="xl" weight="bold" color="white">
+              R${formatMoney.format(totals ? totals.total : 0)}
+            </Text>
+          </Skeleton>
         </Stack>
 
         <Group grow spacing={20} mt="xl" pb="sm">
-          <TotalCard value={200000} label="Ganhos totais:" bg="green.9" />
-          <TotalCard value={50000} label="Gastos totais:" bg="red.9" />
+          <Skeleton visible={isLoadingTotals}>
+            <TotalCard
+              value={totals ? totals.totalIncome : 0}
+              label="Ganhos totais:"
+              bg="green.9"
+            />
+          </Skeleton>
+
+          <Skeleton visible={isLoadingTotals}>
+            <TotalCard
+              value={totals ? totals.totalExpense : 0}
+              label="Gastos totais:"
+              bg="red.9"
+            />
+          </Skeleton>
         </Group>
       </AppHeader>
 
@@ -61,19 +99,35 @@ export default function Home() {
         </Group>
 
         <Group grow spacing={20} mt="xl" pb="sm">
-          <GoalCard
-            bg={colorScheme === 'dark' ? 'gray.7' : 'gray.2'}
-            label="Meta de ganhos:"
-            value={200000}
-            progress={{ color: 'green.7', value: 54.31 }}
-          />
+          <Skeleton visible={isLoadingUser}>
+            <GoalCard
+              bg={colorScheme === 'dark' ? 'gray.7' : 'gray.2'}
+              label="Meta de ganhos:"
+              value={userData ? userData.incomeGoal : 0}
+              progress={{
+                color: 'green.7',
+                value:
+                  totals && userData
+                    ? (totals.totalIncome / userData.incomeGoal) * 100
+                    : 0,
+              }}
+            />
+          </Skeleton>
 
-          <GoalCard
-            bg={colorScheme === 'dark' ? 'gray.7' : 'gray.2'}
-            label="Meta de gastos:"
-            value={50000}
-            progress={{ color: 'red.7', value: 54.31 }}
-          />
+          <Skeleton visible={isLoadingUser}>
+            <GoalCard
+              bg={colorScheme === 'dark' ? 'gray.7' : 'gray.2'}
+              label="Meta de gastos:"
+              value={userData ? userData.expenseGoal : 0}
+              progress={{
+                color: 'red.7',
+                value:
+                  totals && userData
+                    ? (totals.totalExpense / userData.expenseGoal) * 100
+                    : 0,
+              }}
+            />
+          </Skeleton>
         </Group>
       </Container>
 
@@ -93,21 +147,31 @@ export default function Home() {
         </Group>
 
         <Stack spacing={10}>
-          <TransactionCard
-            name="Compras online"
-            date={new Date(2023, 4, 7)}
-            value={1500}
-            category="Compras"
-            type="expense"
-          />
+          {isLoadingLatestTransaction && (
+            <div>
+              <Skeleton mb={10} height={60} />
+              <Skeleton height={60} />
+            </div>
+          )}
 
-          <TransactionCard
-            name="Meus investimentos"
-            date={new Date(2023, 4, 7)}
-            value={1000}
-            category="Investimentos"
-            type="income"
-          />
+          {latestTransactions &&
+            latestTransactions.map((transaction) => (
+              <TransactionCard
+                key={transaction._id}
+                name={transaction.name}
+                date={new Date(transaction.createdAt)}
+                value={transaction.value}
+                category={transaction.category.name}
+                type={transaction.type}
+              />
+            ))}
+
+          {(!latestTransactions || latestTransactions.length === 0) && (
+            <NoData
+              link="/adicionar/transacao"
+              text="Nenhuma transação encontrada"
+            />
+          )}
         </Stack>
       </Container>
 

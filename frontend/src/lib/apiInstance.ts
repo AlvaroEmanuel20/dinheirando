@@ -18,3 +18,6 @@ apiInstance.interceptors.request.use(
     return Promise.reject(error);
   }
 );
+
+export const fetcher = (url: string) =>
+  apiInstance.get(url).then((res) => res.data);

@@ -8,6 +8,7 @@ import {
   Divider,
   Group,
   Select,
+  Skeleton,
   Stack,
   Text,
 } from '@mantine/core';
@@ -23,10 +24,19 @@ import { signIn, useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { authOptions } from './api/auth/[...nextauth]';
+import useAccounts from '@/hooks/useAccounts';
+import { Account } from '@/lib/apiTypes/accounts';
+import NoData from '@/components/shared/NoData';
 
 export default function Wallet() {
   const router = useRouter();
   const { data: session } = useSession();
+
+  const {
+    data: accounts,
+    isLoading: isLoadingAccounts,
+    error: errorAccounts,
+  } = useAccounts<Account[]>();
 
   const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([
     null,
@@ -62,9 +72,29 @@ export default function Wallet() {
         </Text>
 
         <Stack spacing={10}>
-          <AccountCard name="Banco do Brasil" amount={1500} />
-          <AccountCard name="Inter" amount={250} />
-          <AccountCard name="Neon" amount={50.9} />
+          {isLoadingAccounts && (
+            <div>
+              <Skeleton mb={10} height={60} />
+              <Skeleton height={60} />
+            </div>
+          )}
+
+          {accounts &&
+            accounts.map((account) => (
+              <AccountCard
+                key={account._id}
+                name={account.name}
+                amount={account.amount}
+              />
+            ))}
+
+          {(!accounts || accounts.length === 0) && (
+            <NoData
+              color="yellow.6"
+              link="/adicionar/conta"
+              text="Nenhuma conta encontrada"
+            />
+          )}
         </Stack>
       </Container>
 
