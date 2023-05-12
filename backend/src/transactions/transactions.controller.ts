@@ -17,6 +17,7 @@ import {
   ApiCreatedResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
+  ApiTags,
 } from '@nestjs/swagger';
 import { TransactionsQuery, TransactionsService } from './transactions.service';
 import {
@@ -30,6 +31,7 @@ import {
   updateTransactionSchema,
 } from './validations/transactions.validations';
 
+@ApiTags('transactions')
 @Controller('transactions')
 export class TransactionsController {
   constructor(private readonly transactionsService: TransactionsService) {}

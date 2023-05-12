@@ -7,7 +7,6 @@ import { AuthModule } from './auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/guards/jwtAuth.guard';
 import { TransactionalTokensModule } from './transactionalTokens/transactionalTokens.module';
-import { CategoriesController } from './categories/categories.controller';
 import { CategoriesModule } from './categories/categories.module';
 import { AccountsModule } from './accounts/accounts.module';
 import { TransactionsModule } from './transactions/transactions.module';
@@ -38,6 +37,5 @@ import { TransfersModule } from './transfers/transfers.module';
       useClass: JwtAuthGuard,
     },
   ],
-  controllers: [CategoriesController],
 })
 export class AppModule {}

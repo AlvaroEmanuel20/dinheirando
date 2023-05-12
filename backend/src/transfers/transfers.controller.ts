@@ -18,6 +18,7 @@ import {
   ApiCreatedResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
+  ApiTags,
 } from '@nestjs/swagger';
 import { TransfersQuery, TransfersService } from './transfers.service';
 import {
@@ -31,6 +32,7 @@ import {
   updateTransferSchema,
 } from './validations/transfers.validations';
 
+@ApiTags('transfers')
 @Controller('transfers')
 export class TransfersController {
   constructor(private readonly transfersService: TransfersService) {}
