@@ -10,6 +10,7 @@ import {
   Group,
   PasswordInput,
   Select,
+  Skeleton,
   Stack,
   Text,
 } from '@mantine/core';
@@ -27,10 +28,13 @@ import { signIn, useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { authOptions } from './api/auth/[...nextauth]';
+import useUser from '@/hooks/useUser';
 
 export default function Preferences() {
   const router = useRouter();
   const { data: session } = useSession();
+
+  const { userData, isLoadingUser, errorUser } = useUser();
 
   useEffect(() => {
     if (session?.error === 'RefreshAccessTokenError') signIn();
@@ -55,17 +59,25 @@ export default function Preferences() {
       </AppHeader>
 
       <Container mt={20}>
-        <Group>
-          <Avatar src="/profile.jpg" color="yellow.6" size="lg" radius="xl" />
-          <Stack spacing={0}>
-            <Text size="sm" weight="bold">
-              Álvaro Emanuel
-            </Text>
-            <Text size="sm" color="dimmed">
-              alvarodiasribeiro16@gmail.com
-            </Text>
-          </Stack>
-        </Group>
+        <Skeleton visible={isLoadingUser}>
+          <Group>
+            <Avatar
+              src={userData?.avatar ? userData.avatar : null}
+              color="yellow.6"
+              size="lg"
+              radius="xl"
+            />
+
+            <Stack spacing={0}>
+              <Text size="sm" weight="bold">
+                {userData?.name}
+              </Text>
+              <Text size="sm" color="dimmed">
+                {userData?.email}
+              </Text>
+            </Stack>
+          </Group>
+        </Skeleton>
       </Container>
 
       <Container mt={20}>
@@ -87,13 +99,13 @@ export default function Preferences() {
           <TextCustomInput
             icon={<IconUser size="0.8rem" />}
             placeholder="Seu nome"
-            defaultValue="Álvaro Emanuel"
+            defaultValue={userData?.name}
           />
 
           <TextCustomInput
             icon={<IconMail size="0.8rem" />}
             placeholder="Seu email"
-            defaultValue="alvarodiasribeiro16@gmail.com"
+            defaultValue={userData?.email}
           />
 
           <Button color="yellow.6">Salvar</Button>

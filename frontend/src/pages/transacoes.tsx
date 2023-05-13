@@ -10,6 +10,7 @@ import {
   Divider,
   Group,
   Select,
+  Skeleton,
   Stack,
   Text,
   useMantineColorScheme,
@@ -27,6 +28,9 @@ import { signIn, useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { authOptions } from './api/auth/[...nextauth]';
+import useTransactions from '@/hooks/useTransactions';
+import NoData from '@/components/shared/NoData';
+import { Transaction } from '@/lib/apiTypes/transactions';
 
 export default function Transactions() {
   const { colorScheme } = useMantineColorScheme();
@@ -39,7 +43,14 @@ export default function Transactions() {
   ]);
 
   const [typeSelect, setTypeSelect] = useState<string | null>(null);
-  const [sortBy, setSortBy] = useState<string | null>('latest');
+  const [sortBy, setSortBy] = useState<string | null>('desc');
+  const [limit, setLimit] = useState(10);
+
+  const {
+    data: transactions,
+    isLoading: isLoadingTransactions,
+    error: errorTransactions,
+  } = useTransactions<Transaction[]>({ limit, sort: sortBy, type: typeSelect });
 
   useEffect(() => {
     if (session?.error === 'RefreshAccessTokenError') signIn();
@@ -80,6 +91,7 @@ export default function Transactions() {
 
         <Stack spacing={10}>
           <DatePickerInput
+            disabled
             clearable
             icon={<IconCalendar size="1rem" />}
             valueFormat="DD/MM/YYYY"
@@ -142,8 +154,8 @@ export default function Transactions() {
             value={sortBy}
             onChange={setSortBy}
             data={[
-              { value: 'latest', label: 'Mais recentes' },
-              { value: 'oldest', label: 'Mais antigas' },
+              { value: 'desc', label: 'Mais recentes' },
+              { value: 'asc', label: 'Mais antigas' },
             ]}
             icon={<IconArrowsSort size="1rem" />}
             styles={(theme) => ({
@@ -173,44 +185,44 @@ export default function Transactions() {
         <Divider my={15} />
 
         <Stack spacing={10}>
-          <TransactionCard
-            name="Compras online"
-            date={new Date(2023, 4, 7)}
-            value={1500}
-            category="Compras"
-            type="expense"
-          />
+          {isLoadingTransactions && (
+            <div>
+              <Skeleton mb={10} height={60} />
+              <Skeleton height={60} />
+            </div>
+          )}
 
-          <TransactionCard
-            name="Meus investimentos"
-            date={new Date(2023, 4, 7)}
-            value={1000}
-            category="Investimentos"
-            type="income"
-          />
+          {transactions &&
+            transactions.map((transaction) => (
+              <TransactionCard
+                key={transaction._id}
+                name={transaction.name}
+                date={new Date(transaction.createdAt)}
+                value={transaction.value}
+                category={transaction.category.name}
+                type={transaction.type}
+              />
+            ))}
 
-          <TransactionCard
-            name="Compras online"
-            date={new Date(2023, 4, 7)}
-            value={1500}
-            category="Compras"
-            type="expense"
-          />
-
-          <TransactionCard
-            name="Meus investimentos"
-            date={new Date(2023, 4, 7)}
-            value={1000}
-            category="Investimentos"
-            type="income"
-          />
+          {!isLoadingTransactions && transactions?.length === 0 && (
+            <NoData
+              link="/adicionar/transacao"
+              text="Nenhuma transação encontrada"
+            />
+          )}
         </Stack>
 
-        <Center mt={20}>
-          <Button variant="subtle" color="gray">
-            Carregar mais
-          </Button>
-        </Center>
+        {transactions && transactions.length > 8 && (
+          <Center mt={20}>
+            <Button
+              onClick={() => setLimit(limit + 10)}
+              variant="subtle"
+              color="gray"
+            >
+              Carregar mais
+            </Button>
+          </Center>
+        )}
       </Container>
 
       <AppFooter />

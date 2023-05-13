@@ -81,7 +81,7 @@ export default function Categories() {
               />
             ))}
 
-          {(!incomeCategories || incomeCategories.length === 0) && (
+          {!isLoadingIncomeCategories && incomeCategories?.length === 0 && (
             <NoData
               color="green.8"
               link="/adicionar/categoria"
@@ -114,7 +114,7 @@ export default function Categories() {
               />
             ))}
 
-          {(!expenseCategories || expenseCategories.length === 0) && (
+          {!isLoadingExpenseCategories && expenseCategories?.length === 0 && (
             <NoData
               color="red.8"
               link="/adicionar/categoria"

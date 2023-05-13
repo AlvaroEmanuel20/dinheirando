@@ -4,6 +4,8 @@ import AccountCard from '@/components/wallet/AccountCard';
 import TransferCard from '@/components/wallet/TransferCard';
 import {
   ActionIcon,
+  Button,
+  Center,
   Container,
   Divider,
   Group,
@@ -27,6 +29,8 @@ import { authOptions } from './api/auth/[...nextauth]';
 import useAccounts from '@/hooks/useAccounts';
 import { Account } from '@/lib/apiTypes/accounts';
 import NoData from '@/components/shared/NoData';
+import useTransfers from '@/hooks/useTransfers';
+import { Transfer } from '@/lib/apiTypes/transfers';
 
 export default function Wallet() {
   const router = useRouter();
@@ -42,7 +46,15 @@ export default function Wallet() {
     null,
     null,
   ]);
-  const [sortBy, setSortBy] = useState<string | null>('latest');
+
+  const [sortBy, setSortBy] = useState<string | null>('desc');
+  const [limit, setLimit] = useState(10);
+
+  const {
+    data: transfers,
+    isLoading: isLoadingTransfers,
+    error: errorTransfers,
+  } = useTransfers<Transfer[]>({ sort: sortBy, limit });
 
   useEffect(() => {
     if (session?.error === 'RefreshAccessTokenError') signIn();
@@ -88,7 +100,7 @@ export default function Wallet() {
               />
             ))}
 
-          {(!accounts || accounts.length === 0) && (
+          {!isLoadingAccounts && accounts?.length === 0 && (
             <NoData
               color="yellow.6"
               link="/adicionar/conta"
@@ -105,6 +117,7 @@ export default function Wallet() {
 
         <Stack spacing={10}>
           <DatePickerInput
+            disabled
             clearable
             icon={<IconCalendar size="1rem" />}
             valueFormat="DD/MM/YYYY"
@@ -134,8 +147,8 @@ export default function Wallet() {
             value={sortBy}
             onChange={setSortBy}
             data={[
-              { value: 'latest', label: 'Mais recentes' },
-              { value: 'oldest', label: 'Mais antigas' },
+              { value: 'desc', label: 'Mais recentes' },
+              { value: 'asc', label: 'Mais antigas' },
             ]}
             icon={<IconArrowsSort size="1rem" />}
             styles={(theme) => ({
@@ -165,27 +178,43 @@ export default function Wallet() {
         <Divider my={15} />
 
         <Stack spacing={10}>
-          <TransferCard
-            fromAccount="Banco do Brasil"
-            toAccount="Neon"
-            value={25.9}
-            date={new Date(2023, 4, 9)}
-          />
+          {isLoadingTransfers && (
+            <div>
+              <Skeleton mb={10} height={60} />
+              <Skeleton height={60} />
+            </div>
+          )}
 
-          <TransferCard
-            fromAccount="Inter"
-            toAccount="Neon"
-            value={89}
-            date={new Date(2023, 4, 9)}
-          />
+          {transfers &&
+            transfers.map((transfer) => (
+              <TransferCard
+                key={transfer._id}
+                fromAccount={transfer.fromAccount.name}
+                toAccount={transfer.toAccount.name}
+                date={new Date(transfer.createdAt)}
+                value={transfer.value}
+              />
+            ))}
 
-          <TransferCard
-            fromAccount="Neon"
-            toAccount="Banco do Brasil"
-            value={389.9}
-            date={new Date(2023, 4, 9)}
-          />
+          {(!isLoadingTransfers && transfers?.length === 0) && (
+            <NoData
+              link="/adicionar/transferencia"
+              text="Nenhuma transferência encontrada"
+            />
+          )}
         </Stack>
+
+        {transfers && transfers.length > 8 && (
+          <Center mt={20}>
+            <Button
+              onClick={() => setLimit(limit + 10)}
+              variant="subtle"
+              color="gray"
+            >
+              Carregar mais
+            </Button>
+          </Center>
+        )}
       </Container>
 
       <AppFooter />

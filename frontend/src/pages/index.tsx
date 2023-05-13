@@ -166,7 +166,7 @@ export default function Home() {
               />
             ))}
 
-          {(!latestTransactions || latestTransactions.length === 0) && (
+          {!isLoadingLatestTransaction && latestTransactions?.length === 0 && (
             <NoData
               link="/adicionar/transacao"
               text="Nenhuma transação encontrada"

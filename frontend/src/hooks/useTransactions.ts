@@ -4,8 +4,8 @@ import useSWR from 'swr';
 interface UseTransactions {
   id?: string;
   limit?: number;
-  sort?: 'asc' | 'desc';
-  type?: 'income' | 'expense';
+  sort?: string | null;
+  type?: string | null;
 }
 
 export default function useTransactions<T>({
