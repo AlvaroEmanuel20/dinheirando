@@ -4,3 +4,7 @@ export interface Category {
   type: string;
   totalOfTransactions: number;
 }
+
+export interface CategoryId {
+  categoryId: string;
+}
