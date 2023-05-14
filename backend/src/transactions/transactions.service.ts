@@ -27,10 +27,18 @@ export class TransactionsService {
   ) {}
 
   async showTransactions(userId: string, query: TransactionsQuery) {
+    if (query.type === 'expense' || query.type === 'income') {
+      return await this.Transaction.find({ user: userId })
+        .sort(query.sort)
+        .limit(query.limit)
+        .where({ type: query.type })
+        .populate('category', 'name')
+        .populate('account', 'name');
+    }
+
     return await this.Transaction.find({ user: userId })
       .sort(query.sort)
       .limit(query.limit)
-      .where({ type: query.type })
       .populate('category', 'name')
       .populate('account', 'name');
   }
@@ -59,14 +67,14 @@ export class TransactionsService {
 
   async createTransaction(data: CreateTransactionDto, userId: string) {
     const categoryExists = await this.Category.findOne({
-      userId,
+      user: userId,
       _id: data.category,
     });
 
     if (!categoryExists) throw new Error('Category not found');
 
     const accountExists = await this.Account.findOne({
-      userId,
+      user: userId,
       _id: data.account,
     });
 

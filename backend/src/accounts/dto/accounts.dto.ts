@@ -31,3 +31,8 @@ export class UpdateAccountDto {
   @ApiPropertyOptional()
   amount?: number;
 }
+
+export class AccountsTotalDto {
+  @ApiProperty()
+  total: number;
+}

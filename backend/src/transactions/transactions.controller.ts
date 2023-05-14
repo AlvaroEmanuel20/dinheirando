@@ -13,7 +13,6 @@ import {
 import { User } from 'src/users/decorators/user.decorator';
 import { JoiValidationPipe } from 'src/shared/pipes/joiValidation.pipe';
 import {
-  ApiConflictResponse,
   ApiCreatedResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
@@ -73,7 +72,7 @@ export class TransactionsController {
   @Post()
   @UsePipes(new JoiValidationPipe(createTransactionSchema))
   @ApiCreatedResponse({ type: TransactionIdDto })
-  @ApiConflictResponse()
+  @ApiNotFoundResponse({ description: 'Category or account not found' })
   async createTransaction(
     @Body() data: CreateTransactionDto,
     @User('sub') userId: string,
@@ -93,8 +92,8 @@ export class TransactionsController {
   @Patch(':transactionId')
   @UsePipes(new JoiValidationPipe(updateTransactionSchema))
   @ApiOkResponse({ type: TransactionIdDto })
-  @ApiNotFoundResponse()
-  @ApiConflictResponse()
+  @ApiNotFoundResponse({ description: 'Transaction not found' })
+  @ApiNotFoundResponse({ description: 'New category or account not found' })
   async updateTransaction(
     @Body() data: UpdateTransactionDto,
     @Param('transactionId', ObjectIdValidationPipe) transactionId: string,
@@ -120,7 +119,6 @@ export class TransactionsController {
   @Delete(':transactionId')
   @ApiOkResponse({ type: TransactionIdDto })
   @ApiNotFoundResponse()
-  @ApiConflictResponse()
   async deleteTransaction(
     @Param('transactionId', ObjectIdValidationPipe) transactionId: string,
     @User('sub') userId: string,

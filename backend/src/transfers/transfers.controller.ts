@@ -65,7 +65,7 @@ export class TransfersController {
   @Post()
   @UsePipes(new JoiValidationPipe(createTransferSchema))
   @ApiCreatedResponse({ type: TransferIdDto })
-  @ApiConflictResponse()
+  @ApiNotFoundResponse({ description: 'From or to account not found' })
   async createTransfer(
     @Body() data: CreateTransferDto,
     @User('sub') userId: string,
@@ -85,7 +85,8 @@ export class TransfersController {
   @Patch(':transferId')
   @UsePipes(new JoiValidationPipe(updateTransferSchema))
   @ApiOkResponse({ type: TransferIdDto })
-  @ApiNotFoundResponse()
+  @ApiNotFoundResponse({ description: 'Transfer not found' })
+  @ApiNotFoundResponse({ description: 'New from or to account not found' })
   @ApiConflictResponse()
   async updateTransfer(
     @Body() data: UpdateTransferDto,
@@ -115,7 +116,6 @@ export class TransfersController {
   @Delete(':transferId')
   @ApiOkResponse({ type: TransferIdDto })
   @ApiNotFoundResponse()
-  @ApiConflictResponse()
   async deleteTransfer(
     @Param('transferId', ObjectIdValidationPipe) transferId: string,
     @User('sub') userId: string,

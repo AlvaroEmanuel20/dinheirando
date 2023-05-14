@@ -24,6 +24,7 @@ import { AccountsService } from './accounts.service';
 import {
   AccountDto,
   AccountIdDto,
+  AccountsTotalDto,
   CreateAccountDto,
   UpdateAccountDto,
 } from './dto/accounts.dto';
@@ -42,6 +43,13 @@ export class AccountsController {
   @ApiOkResponse({ type: [AccountDto] })
   async showAccounts(@User('sub') userId: string) {
     return await this.accountsService.showAccounts(userId);
+  }
+
+  @Get('total')
+  @ApiOkResponse({ type: AccountsTotalDto })
+  async showTotal(@User('sub') userId: string) {
+    const result = await this.accountsService.showTotal(userId);
+    return result;
   }
 
   @Get(':accountId')

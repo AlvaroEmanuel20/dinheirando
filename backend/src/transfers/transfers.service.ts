@@ -35,14 +35,14 @@ export class TransfersService {
 
   async createTransfer(data: CreateTransferDto, userId: string) {
     const fromAccountExists = await this.Account.findOne({
-      userId,
+      user: userId,
       _id: data.fromAccount,
     });
 
     if (!fromAccountExists) throw new Error('From account not found');
 
     const toAccountExists = await this.Account.findOne({
-      userId,
+      user: userId,
       _id: data.toAccount,
     });
 

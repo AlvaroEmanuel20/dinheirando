@@ -23,6 +23,12 @@ export class AccountsService {
     return await this.Account.findOne({ _id: accountId, user: userId });
   }
 
+  async showTotal(userId: string) {
+    const accounts = await this.Account.find({ user: userId });
+    const total = accounts.reduce((acc, value) => (acc += value.amount), 0);
+    return { total };
+  }
+
   async createAccount(data: CreateAccountDto, userId: string) {
     const newAccount = await this.Account.create({
       user: userId,
