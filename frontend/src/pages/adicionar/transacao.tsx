@@ -7,6 +7,7 @@ import {
   Chip,
   Container,
   Group,
+  Loader,
   NumberInput,
   Select,
   Stack,
@@ -34,10 +35,38 @@ import useAccounts from '@/hooks/useAccounts';
 import { Account } from '@/lib/apiTypes/accounts';
 import useCategories from '@/hooks/useCategories';
 import { Category } from '@/lib/apiTypes/categories';
+import useSWRMutation from 'swr/mutation';
+import { apiInstance } from '@/lib/apiInstance';
+import { TransactionId } from '@/lib/apiTypes/transactions';
+
+interface Arg {
+  arg: {
+    name: string;
+    category: string;
+    account: string;
+    createdAt: Date;
+    value: number;
+    type: string;
+  };
+}
+
+async function createTransaction(url: string, { arg }: Arg) {
+  return apiInstance.post<TransactionId>(url, arg).then((res) => res.data);
+}
 
 export default function AddTransaction() {
   const router = useRouter();
   const { data: session } = useSession();
+
+  const {
+    trigger,
+    isMutating,
+    error: errorMutate,
+  } = useSWRMutation('/transactions', createTransaction, {
+    onSuccess(data, key, config) {
+      router.push('/transacoes');
+    },
+  });
 
   const form = useForm({
     validate: zodResolver(createTransactionSchema),
@@ -110,7 +139,13 @@ export default function AddTransaction() {
       </AppHeader>
 
       <Container mt={20} mb={50}>
-        <form onSubmit={form.onSubmit((values) => console.log(values))}>
+        <form
+          onSubmit={form.onSubmit(async (values) => {
+            try {
+              await trigger(values);
+            } catch (error) {}
+          })}
+        >
           <Stack spacing={10}>
             {!isLoadingAccounts && accounts && accounts.length < 1 && (
               <Alert
@@ -132,7 +167,8 @@ export default function AddTransaction() {
                   color="yellow"
                   variant="outline"
                 >
-                  Para adicionar uma transação de ganho é preciso cadastrar categorias de ganho
+                  Para adicionar uma transação de ganho é preciso cadastrar
+                  categorias de ganho
                 </Alert>
               )}
 
@@ -145,7 +181,8 @@ export default function AddTransaction() {
                   color="yellow"
                   variant="outline"
                 >
-                  Para adicionar uma transação de gasto é preciso cadastrar categorias de gasto
+                  Para adicionar uma transação de gasto é preciso cadastrar
+                  categorias de gasto
                 </Alert>
               )}
 
@@ -293,8 +330,20 @@ export default function AddTransaction() {
               type="submit"
               color="yellow.6"
             >
-              Adicionar
+              {isMutating ? (
+                <Loader size="xs" variant="dots" color="white" />
+              ) : (
+                'Adicionar'
+              )}
             </Button>
+
+            {errorMutate && (
+              <Text size="sm" color="red">
+                {errorMutate.response.status === 404
+                  ? 'Categoria ou conta não encontrada'
+                  : 'Error interno no servidor'}
+              </Text>
+            )}
           </Stack>
         </form>
       </Container>

@@ -3,3 +3,11 @@ export interface Account {
   name: string;
   amount: number;
 }
+
+export interface AccountId {
+  accountId: string;
+}
+
+export interface AccountsTotal {
+  total: number;
+}

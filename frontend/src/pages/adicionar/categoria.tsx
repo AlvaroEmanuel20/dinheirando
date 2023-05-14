@@ -56,12 +56,6 @@ export default function AddCategory() {
     },
   });
 
-  const submit = async (values: { name: string; type: string }) => {
-    try {
-      await trigger(values);
-    } catch (error) {}
-  };
-
   useEffect(() => {
     if (session?.error === 'RefreshAccessTokenError') signIn();
   }, [session]);
@@ -85,7 +79,13 @@ export default function AddCategory() {
       </AppHeader>
 
       <Container mt={20} mb={50}>
-        <form onSubmit={form.onSubmit((values) => submit(values))}>
+        <form
+          onSubmit={form.onSubmit(async (values) => {
+            try {
+              await trigger(values);
+            } catch (error) {}
+          })}
+        >
           <Stack spacing={10}>
             <TextCustomInput
               placeholder="Investimentos"

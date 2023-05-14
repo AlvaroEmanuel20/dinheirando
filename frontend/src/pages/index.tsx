@@ -25,6 +25,8 @@ import { formatMoney } from '@/lib/formatMoney';
 import useTransactions from '@/hooks/useTransactions';
 import useUser from '@/hooks/useUser';
 import NoData from '@/components/shared/NoData';
+import useAccounts from '@/hooks/useAccounts';
+import { AccountsTotal } from '@/lib/apiTypes/accounts';
 
 export default function Home() {
   const { colorScheme } = useMantineColorScheme();
@@ -35,6 +37,12 @@ export default function Home() {
     error: errorTotals,
     isLoading: isLoadingTotals,
   } = useSWR<TransactionsTotals>('/transactions/total', fetcher);
+
+  const {
+    data: accountsTotal,
+    error: errorAccountTotal,
+    isLoading: isLoadingAccountTotal,
+  } = useSWR<AccountsTotal>('/accounts/total', fetcher);
 
   const {
     data: latestTransactions,
@@ -52,13 +60,13 @@ export default function Home() {
     <>
       <AppHeader>
         <Stack spacing={1} mt="xl">
-          <Skeleton visible={isLoadingTotals} width="40%">
+          <Skeleton visible={isLoadingAccountTotal} width="40%">
             <Text size="sm" color="white">
               Saldo total:
             </Text>
 
             <Text size="xl" weight="bold" color="white">
-              R${formatMoney.format(totals ? totals.total : 0)}
+              R${formatMoney.format(accountsTotal ? accountsTotal.total : 0)}
             </Text>
           </Skeleton>
         </Stack>

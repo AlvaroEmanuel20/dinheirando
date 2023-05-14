@@ -18,7 +18,9 @@ export default function useTransactions<T>({
   if (id) url = `${url}/${id}`;
 
   const result = useSWR<T>(
-    `${url}?limit=${limit ? limit : 10}&sort=${sort}&type=${type}`,
+    `${url}?limit=${limit ? limit : 10}&sort=${
+      sort ? sort : 'desc'
+    }&type=${type}`,
     fetcher
   );
 

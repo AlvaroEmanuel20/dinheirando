@@ -19,3 +19,7 @@ export interface Transaction {
     name: string;
   };
 }
+
+export interface TransactionId {
+  transactionId: string;
+}

@@ -5,6 +5,7 @@ import {
   Button,
   Container,
   Group,
+  Loader,
   NumberInput,
   Select,
   Stack,
@@ -28,10 +29,36 @@ import { useForm, zodResolver } from '@mantine/form';
 import { createTransferSchema } from '@/lib/schemas/transfers';
 import useAccounts from '@/hooks/useAccounts';
 import { Account } from '@/lib/apiTypes/accounts';
+import useSWRMutation from 'swr/mutation';
+import { apiInstance } from '@/lib/apiInstance';
+import { TransferId } from '@/lib/apiTypes/transfers';
+
+interface Arg {
+  arg: {
+    fromAccount: string;
+    toAccount: string;
+    createdAt: Date;
+    value: number;
+  };
+}
+
+async function createTransfer(url: string, { arg }: Arg) {
+  return apiInstance.post<TransferId>(url, arg).then((res) => res.data);
+}
 
 export default function AddTransfer() {
   const router = useRouter();
   const { data: session } = useSession();
+
+  const {
+    trigger,
+    isMutating,
+    error: errorMutate,
+  } = useSWRMutation('/transfers', createTransfer, {
+    onSuccess(data, key, config) {
+      router.push('/carteira');
+    },
+  });
 
   const {
     data: accounts,
@@ -78,7 +105,13 @@ export default function AddTransfer() {
       </AppHeader>
 
       <Container mt={20} mb={50}>
-        <form onSubmit={form.onSubmit((values) => console.log(values))}>
+        <form
+          onSubmit={form.onSubmit(async (values) => {
+            try {
+              await trigger(values);
+            } catch (error) {}
+          })}
+        >
           <Stack spacing={10}>
             {!isLoadingAccounts && accounts && accounts.length < 1 && (
               <Alert
@@ -210,8 +243,20 @@ export default function AddTransfer() {
               type="submit"
               color="yellow.6"
             >
-              Adicionar
+              {isMutating ? (
+                <Loader size="xs" variant="dots" color="white" />
+              ) : (
+                'Adicionar'
+              )}
             </Button>
+
+            {errorMutate && (
+              <Text size="sm" color="red">
+                {errorMutate.response.status === 404
+                  ? 'Conta de origem ou de destino não encontrada'
+                  : 'Error interno no servidor'}
+              </Text>
+            )}
           </Stack>
         </form>
       </Container>

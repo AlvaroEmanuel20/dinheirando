@@ -11,3 +11,7 @@ export interface Transfer {
   value: number;
   createdAt: Date;
 }
+
+export interface TransferId {
+  transferId: string;
+}

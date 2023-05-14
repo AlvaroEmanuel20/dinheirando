@@ -5,6 +5,7 @@ import {
   Button,
   Container,
   Group,
+  Loader,
   NumberInput,
   Stack,
   Text,
@@ -18,10 +19,34 @@ import { useEffect } from 'react';
 import { authOptions } from '../api/auth/[...nextauth]';
 import { useForm, zodResolver } from '@mantine/form';
 import { createAccountSchema } from '@/lib/schemas/accounts';
+import { AccountId } from '@/lib/apiTypes/accounts';
+import { apiInstance } from '@/lib/apiInstance';
+import useSWRMutation from 'swr/mutation';
+
+interface Arg {
+  arg: {
+    name: string;
+    amount: number;
+  };
+}
+
+async function createAccount(url: string, { arg }: Arg) {
+  return apiInstance.post<AccountId>(url, arg).then((res) => res.data);
+}
 
 export default function AddAccount() {
   const router = useRouter();
   const { data: session } = useSession();
+
+  const {
+    trigger,
+    isMutating,
+    error: errorMutate,
+  } = useSWRMutation('/accounts', createAccount, {
+    onSuccess(data, key, config) {
+      router.push('/carteira');
+    },
+  });
 
   const form = useForm({
     validate: zodResolver(createAccountSchema),
@@ -54,7 +79,13 @@ export default function AddAccount() {
       </AppHeader>
 
       <Container mt={20} mb={50}>
-        <form onSubmit={form.onSubmit((values) => console.log(values))}>
+        <form
+          onSubmit={form.onSubmit(async (values) => {
+            try {
+              await trigger(values);
+            } catch (error) {}
+          })}
+        >
           <Stack spacing={10}>
             <TextCustomInput
               placeholder="Banco do Brasil"
@@ -84,8 +115,20 @@ export default function AddAccount() {
             />
 
             <Button type="submit" color="yellow.6">
-              Adicionar
+              {isMutating ? (
+                <Loader size="xs" variant="dots" color="white" />
+              ) : (
+                'Adicionar'
+              )}
             </Button>
+
+            {errorMutate && (
+              <Text size="sm" color="red">
+                {errorMutate.response.status === 409
+                  ? 'Já existe uma conta com esse nome'
+                  : 'Error interno no servidor'}
+              </Text>
+            )}
           </Stack>
         </form>
       </Container>
