@@ -3,11 +3,13 @@ import TextCustomInput from '@/components/shared/TextCustomInput';
 import ThemeToggle from '@/components/shared/ThemeToggle';
 import {
   ActionIcon,
+  Alert,
   Avatar,
   Button,
   Container,
   FileInput,
   Group,
+  Loader,
   PasswordInput,
   Select,
   Skeleton,
@@ -15,6 +17,7 @@ import {
   Text,
 } from '@mantine/core';
 import {
+  IconAlertCircle,
   IconArrowLeft,
   IconLanguage,
   IconLock,
@@ -26,15 +29,71 @@ import { GetServerSideProps } from 'next';
 import { getServerSession } from 'next-auth';
 import { signIn, useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { authOptions } from './api/auth/[...nextauth]';
 import useUser from '@/hooks/useUser';
+import { useForm, zodResolver } from '@mantine/form';
+import { updatePasswordSchema, updateUserSchema } from '@/lib/schemas/users';
+import { apiInstance } from '@/lib/apiInstance';
+import { UserId } from '@/lib/apiTypes/users';
+import useSWRMutation from 'swr/mutation';
+
+interface Arg {
+  arg: {
+    name: string;
+    email: string;
+  };
+}
+
+async function updateUser(url: string, { arg }: Arg) {
+  return apiInstance.patch<UserId>(url, arg).then((res) => res.data);
+}
+
+interface ArgPassword {
+  arg: {
+    password: string;
+    confirmPassword: string;
+  };
+}
+
+async function updatePassword(url: string, { arg }: ArgPassword) {
+  return apiInstance.patch<UserId>(url, arg).then((res) => res.data);
+}
 
 export default function Preferences() {
   const router = useRouter();
   const { data: session } = useSession();
+  const [emailWasUpdated, setEmailWasUpdated] = useState(false);
+
+  const {
+    trigger: triggerUpdateUser,
+    isMutating: isMutatingUser,
+    error: errorMutateUser,
+  } = useSWRMutation('/users', updateUser);
+
+  const {
+    trigger: triggerUpdatePassword,
+    isMutating: isMutatingPassword,
+    error: errorMutatePassword,
+  } = useSWRMutation('/users', updatePassword);
 
   const { userData, isLoadingUser, errorUser } = useUser();
+
+  const form = useForm({
+    validate: zodResolver(updateUserSchema),
+    initialValues: {
+      name: '',
+      email: '',
+    },
+  });
+
+  const formPassword = useForm({
+    validate: zodResolver(updatePasswordSchema),
+    initialValues: {
+      password: '',
+      confirmPassword: '',
+    },
+  });
 
   useEffect(() => {
     if (session?.error === 'RefreshAccessTokenError') signIn();
@@ -80,62 +139,137 @@ export default function Preferences() {
         </Skeleton>
       </Container>
 
+      {userData && !userData.isVerified && (
+        <Container mt={15}>
+          <Alert
+            icon={<IconAlertCircle size="1rem" />}
+            title="Aviso"
+            color="yellow"
+            variant="outline"
+          >
+            Seu email ainda não foi verificado. Verifique o email enviado por
+            nós com as instruções para verificar seu email.
+            <Button compact mt={8} color="yellow.6">
+              Reenviar email
+            </Button>
+          </Alert>
+        </Container>
+      )}
+
       <Container mt={20}>
         <Text weight="bold">Alterar perfil</Text>
 
-        <Stack spacing="sm" mt={10}>
-          <FileInput
-            placeholder="Foto de perfil"
-            icon={<IconUpload size="0.8rem" />}
-            styles={(theme) => ({
-              input: {
-                '&:focus-within': {
-                  borderColor: theme.colors.yellow[5],
+        <form
+          onSubmit={form.onSubmit(async (values) => {
+            try {
+              await triggerUpdateUser(values);
+              if (values.email.length > 0) setEmailWasUpdated(true);
+            } catch (error) {}
+          })}
+        >
+          <Stack spacing="sm" mt={10}>
+            <FileInput
+              placeholder="Foto de perfil"
+              icon={<IconUpload size="0.8rem" />}
+              accept="image/png,image/jpeg,image/jpg"
+              styles={(theme) => ({
+                input: {
+                  '&:focus-within': {
+                    borderColor: theme.colors.yellow[5],
+                  },
                 },
-              },
-            })}
-          />
+              })}
+            />
 
-          <TextCustomInput
-            icon={<IconUser size="0.8rem" />}
-            placeholder="Seu nome"
-            defaultValue={userData?.name}
-          />
+            <TextCustomInput
+              icon={<IconUser size="0.8rem" />}
+              placeholder="Seu nome"
+              {...form.getInputProps('name')}
+            />
 
-          <TextCustomInput
-            icon={<IconMail size="0.8rem" />}
-            placeholder="Seu email"
-            defaultValue={userData?.email}
-          />
+            <TextCustomInput
+              icon={<IconMail size="0.8rem" />}
+              placeholder="Seu email"
+              {...form.getInputProps('email')}
+            />
 
-          <Button color="yellow.6">Salvar</Button>
-        </Stack>
+            <Button type="submit" color="yellow.6">
+              {isMutatingUser ? (
+                <Loader size="xs" variant="dots" color="white" />
+              ) : (
+                'Alterar'
+              )}
+            </Button>
+
+            {errorMutateUser && (
+              <Text size="sm" color="red">
+                {errorMutateUser.response.status === 409
+                  ? 'Já existe uma conta com esse email'
+                  : 'Error interno no servidor'}
+              </Text>
+            )}
+
+            {!errorMutateUser && emailWasUpdated && (
+              <Text size="sm" color="green">
+                Enviamos um email de confirmação para você
+              </Text>
+            )}
+          </Stack>
+        </form>
       </Container>
 
       <Container mt={20}>
         <Text weight="bold">Alterar senha</Text>
 
-        <Stack spacing="sm" mt={10}>
-          <PasswordInput
-            icon={<IconLock size="1rem" />}
-            placeholder="Nova senha"
-            styles={(theme) => ({
-              input: {
-                '&:focus-within': {
-                  borderColor: theme.colors.yellow[5],
+        <form
+          onSubmit={formPassword.onSubmit(async (values) => {
+            try {
+              await triggerUpdatePassword(values);
+            } catch (error) {}
+          })}
+        >
+          <Stack spacing="sm" mt={10}>
+            <PasswordInput
+              icon={<IconLock size="1rem" />}
+              placeholder="Nova senha"
+              styles={(theme) => ({
+                input: {
+                  '&:focus-within': {
+                    borderColor: theme.colors.yellow[5],
+                  },
                 },
-              },
-            })}
-          />
+              })}
+              {...formPassword.getInputProps('password')}
+            />
 
-          <TextCustomInput
-            type="password"
-            icon={<IconLock size="1rem" />}
-            placeholder="Confirme a nova senha"
-          />
+            <PasswordInput
+              icon={<IconLock size="1rem" />}
+              placeholder="Confirme a nova senha"
+              styles={(theme) => ({
+                input: {
+                  '&:focus-within': {
+                    borderColor: theme.colors.yellow[5],
+                  },
+                },
+              })}
+              {...formPassword.getInputProps('confirmPassword')}
+            />
 
-          <Button color="yellow.6">Salvar</Button>
-        </Stack>
+            <Button type="submit" color="yellow.6">
+              {isMutatingPassword ? (
+                <Loader size="xs" variant="dots" color="white" />
+              ) : (
+                'Alterar'
+              )}
+            </Button>
+
+            {errorMutatePassword && (
+              <Text size="sm" color="red">
+                Error interno no servidor
+              </Text>
+            )}
+          </Stack>
+        </form>
       </Container>
 
       <Container mt={20} mb={50}>
@@ -182,7 +316,9 @@ export default function Preferences() {
           </Group>
 
           <Group grow spacing={10} mt={10}>
-            <Button color="yellow.6">Salvar</Button>
+            <Button disabled color="yellow.6">
+              Salvar
+            </Button>
             <Button variant="subtle" color="red">
               Excluir conta
             </Button>

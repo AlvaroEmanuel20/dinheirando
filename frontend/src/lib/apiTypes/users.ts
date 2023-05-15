@@ -8,3 +8,7 @@ export interface User {
   incomeGoal: number;
   expenseGoal: number;
 }
+
+export interface UserId {
+  userId: string;
+}
