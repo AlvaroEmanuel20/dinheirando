@@ -68,9 +68,9 @@ export class UsersService {
 
   async updateUser(data: UpdateUserDto, userId: string) {
     if (data.password) data.password = await hash(data.password, 10);
-    await this.User.findByIdAndUpdate(userId, data).orFail();
+    const user = await this.User.findByIdAndUpdate(userId, data).orFail();
 
-    if (data.email) {
+    if (data.email && user.email !== data.email) {
       await this.User.findByIdAndUpdate(userId, {
         isVerified: false,
       });
