@@ -1,5 +1,14 @@
 import { formatMoney } from '@/lib/formatMoney';
-import { Card, Group, Text, useMantineColorScheme } from '@mantine/core';
+import {
+  ActionIcon,
+  Card,
+  Group,
+  Text,
+  useMantineColorScheme,
+} from '@mantine/core';
+import { IconDotsVertical } from '@tabler/icons-react';
+import { useState } from 'react';
+import CardOptions from '../shared/CardOptions';
 
 interface CategoryCard {
   name: string;
@@ -13,6 +22,15 @@ export default function CategoryCard({
   type,
 }: CategoryCard) {
   const { colorScheme } = useMantineColorScheme();
+  const [showOptions, setShowOptions] = useState(false);
+  const handleShowOptions = () => setShowOptions(!showOptions);
+  const ShowOptions = () => (
+    <ActionIcon onClick={handleShowOptions}>
+      <IconDotsVertical />
+    </ActionIcon>
+  );
+
+  const onDelete = () => console.log('excluei');
 
   return (
     <Card withBorder p={10} bg={colorScheme === 'dark' ? 'gray.7' : 'white'}>
@@ -21,9 +39,23 @@ export default function CategoryCard({
           {name}
         </Text>
 
-        <Text color={type === 'income' ? 'green' : 'red'} size="sm">
-          R${formatMoney.format(totalOfTransactions)}
-        </Text>
+        {!showOptions && (
+          <Group spacing={8}>
+            <Text color={type === 'income' ? 'green' : 'red'} size="sm">
+              R${formatMoney.format(totalOfTransactions)}
+            </Text>
+            <ShowOptions />
+          </Group>
+        )}
+
+        {showOptions && (
+          <CardOptions
+            editLink="/editar/categoria"
+            toggleOptions={<ShowOptions />}
+            handleShowOptions={handleShowOptions}
+            onDelete={onDelete}
+          />
+        )}
       </Group>
     </Card>
   );
