@@ -63,6 +63,18 @@ export default function Login() {
                 {...form.getInputProps('password')}
               />
 
+              <Text size="sm" color="dimmed">
+                Esqueceu a senha?{' '}
+                <Anchor
+                  component={Link}
+                  weight="bold"
+                  color="dimmed"
+                  href="senha/recuperar"
+                >
+                  Recuperar
+                </Anchor>
+              </Text>
+
               <Button type="submit" color="yellow.6">
                 {isLoadingSignIn ? (
                   <Loader size="xs" variant="dots" color="white" />

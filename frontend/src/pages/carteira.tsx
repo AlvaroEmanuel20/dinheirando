@@ -196,7 +196,7 @@ export default function Wallet() {
               />
             ))}
 
-          {(!isLoadingTransfers && transfers?.length === 0) && (
+          {!isLoadingTransfers && transfers?.length === 0 && (
             <NoData
               link="/adicionar/transferencia"
               text="Nenhuma transferência encontrada"

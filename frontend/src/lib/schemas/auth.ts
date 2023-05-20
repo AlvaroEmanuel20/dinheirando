@@ -10,3 +10,17 @@ export const loginSchema = z.object({
   email: z.string().email({ message: 'Email inválido' }),
   password: z.string().min(8, 'No mínimo 8 caracteres'),
 });
+
+export const recoverPasswordSchema = z.object({
+  email: z.string().email({ message: 'Email inválido' }),
+});
+
+export const newPasswordSchema = z
+  .object({
+    password: z.string().min(8, 'No mínimo 8 caracteres'),
+    confirmPassword: z.string().min(8, 'As senhas devem ser iguais'),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'As senhas devem ser iguais',
+    path: ['confirmPassword'],
+  });
