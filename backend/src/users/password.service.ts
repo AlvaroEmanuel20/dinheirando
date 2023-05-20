@@ -65,9 +65,12 @@ export class PasswordService {
 
     const payload = await this.transactionalTokenService.verify(data.token);
     if (payload) {
-      await this.User.findByIdAndUpdate(payload.userId, {
+      const user = await this.User.findByIdAndUpdate(payload.userId, {
         password: await hash(data.password, 10),
       }).orFail();
+
+      await this.TransactionalToken.deleteOne({ token: data.token });
+      return { userId: user._id };
     }
 
     await this.TransactionalToken.deleteOne({ token: data.token });

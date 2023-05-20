@@ -17,13 +17,18 @@ import {
   putResetPasswordSchema,
   resetPasswordSchema,
 } from './validations/users.validation';
-import { PutResetPasswordDto, ResetPasswordDto } from './dto/users.dto';
+import {
+  PutResetPasswordDto,
+  ResetPasswordDto,
+  UserIdDto,
+} from './dto/users.dto';
 import { PasswordService } from './password.service';
 import mongoose from 'mongoose';
 import {
   ApiCreatedResponse,
   ApiFoundResponse,
   ApiNotFoundResponse,
+  ApiOkResponse,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
@@ -79,14 +84,13 @@ export class PasswordController {
   @Public()
   @Put()
   @UsePipes(new JoiValidationPipe(putResetPasswordSchema))
-  @Redirect()
-  @ApiFoundResponse({ description: 'Redirect to frontend app' })
+  @ApiOkResponse({ type: UserIdDto })
   @ApiNotFoundResponse()
   @ApiUnauthorizedResponse()
   async putResetPassword(@Body() data: PutResetPasswordDto) {
     try {
-      await this.passwordService.putResetPassword(data);
-      return { url: this.configService.get<string>('CLIENT_URL') };
+      const response = await this.passwordService.putResetPassword(data);
+      return response;
     } catch (error) {
       if (error.message === 'Blocked password token')
         throw new UnauthorizedException(error.message);
