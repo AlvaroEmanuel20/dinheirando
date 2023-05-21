@@ -1,7 +1,6 @@
 import AppHeader from '@/components/shared/AppHeader';
 import {
   ActionIcon,
-  Alert,
   Button,
   Container,
   Group,
@@ -13,7 +12,6 @@ import {
 } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import {
-  IconAlertCircle,
   IconArrowLeft,
   IconCalendar,
   IconCurrencyReal,
@@ -22,7 +20,7 @@ import {
 import { GetServerSideProps } from 'next';
 import { getServerSession } from 'next-auth';
 import { useRouter } from 'next/router';
-import { authOptions } from '../api/auth/[...nextauth]';
+import { authOptions } from '../../api/auth/[...nextauth]';
 import { signIn, useSession } from 'next-auth/react';
 import { useEffect } from 'react';
 import { useForm, zodResolver } from '@mantine/form';
@@ -30,8 +28,8 @@ import { createTransferSchema } from '@/lib/schemas/transfers';
 import useAccounts from '@/hooks/useAccounts';
 import { Account } from '@/lib/apiTypes/accounts';
 import useSWRMutation from 'swr/mutation';
-import { TransferId } from '@/lib/apiTypes/transfers';
-import { createService } from '@/lib/mutateServices';
+import { Transfer, TransferId } from '@/lib/apiTypes/transfers';
+import { updateService } from '@/lib/mutateServices';
 
 interface Arg {
   arg: {
@@ -42,7 +40,7 @@ interface Arg {
   };
 }
 
-export default function AddTransfer() {
+export default function AddTransfer({ transfer }: { transfer: Transfer }) {
   const router = useRouter();
   const { data: session } = useSession();
 
@@ -50,11 +48,15 @@ export default function AddTransfer() {
     trigger,
     isMutating,
     error: errorMutate,
-  } = useSWRMutation('/transfers', createService<TransferId, Arg>, {
-    onSuccess(data, key, config) {
-      router.push('/carteira');
-    },
-  });
+  } = useSWRMutation(
+    `/transfers/${transfer._id}`,
+    updateService<TransferId, Arg>,
+    {
+      onSuccess(data, key, config) {
+        router.push('/carteira');
+      },
+    }
+  );
 
   const {
     data: accounts,
@@ -65,10 +67,10 @@ export default function AddTransfer() {
   const form = useForm({
     validate: zodResolver(createTransferSchema),
     initialValues: {
-      fromAccount: '',
-      toAccount: '',
-      createdAt: new Date(),
-      value: 0,
+      fromAccount: transfer.fromAccount._id,
+      toAccount: transfer.toAccount._id,
+      createdAt: new Date(transfer.createdAt),
+      value: transfer.value,
     },
   });
 
@@ -95,7 +97,7 @@ export default function AddTransfer() {
           </ActionIcon>
 
           <Text size="lg" weight="bold" color="white">
-            Adicionar transferência
+            Atualizar transferência
           </Text>
         </Group>
       </AppHeader>
@@ -109,17 +111,6 @@ export default function AddTransfer() {
           })}
         >
           <Stack spacing={10}>
-            {!isLoadingAccounts && accounts && accounts.length < 1 && (
-              <Alert
-                icon={<IconAlertCircle size="1rem" />}
-                title="Aviso"
-                color="yellow"
-                variant="outline"
-              >
-                Para adicionar uma transferência é preciso cadastrar contas
-              </Alert>
-            )}
-
             <Select
               disabled={isLoadingAccounts}
               clearable
@@ -242,15 +233,18 @@ export default function AddTransfer() {
               {isMutating ? (
                 <Loader size="xs" variant="dots" color="white" />
               ) : (
-                'Adicionar'
+                'Atualizar'
               )}
             </Button>
 
             {errorMutate && (
               <Text size="sm" color="red">
-                {errorMutate.response.status === 404
-                  ? 'Conta de origem ou de destino não encontrada'
-                  : 'Error interno no servidor'}
+                {errorMutate.response.status === 409 &&
+                  'Contas não podem ser iguais'}
+                {errorMutate.response.status === 404 &&
+                  'Transferência não encontrada'}
+                {errorMutate.response.status === 500 &&
+                  'Erro interno no servidor'}
               </Text>
             )}
           </Stack>
@@ -281,7 +275,27 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     };
   }
 
+  if (!ctx.query.id) {
+    return {
+      redirect: {
+        destination: '/carteira',
+        permanent: false,
+      },
+    };
+  }
+
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/transfers/${ctx.query.id}`,
+    {
+      headers: {
+        Authorization: `Bearer ${session.user.accessToken}`,
+      },
+    }
+  );
+
   return {
-    props: {},
+    props: {
+      transfer: await res.json(),
+    },
   };
 };

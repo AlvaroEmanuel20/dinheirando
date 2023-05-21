@@ -11,20 +11,28 @@ import { IconDotsVertical } from '@tabler/icons-react';
 import { format } from 'our-dates';
 import { useState } from 'react';
 import CardOptions from './CardOptions';
+import useSWRMutation from 'swr/mutation';
+import { useSWRConfig } from 'swr';
+import { deleteService } from '@/lib/mutateServices';
+import { TransactionId } from '@/lib/apiTypes/transactions';
 
 interface TransactionCard {
+  id: string;
   name: string;
   date: Date;
   value: number;
   category: string;
+  account: string;
   type: 'income' | 'expense';
 }
 
 export default function TransactionCard({
+  id,
   name,
   date,
   value,
   category,
+  account,
   type,
 }: TransactionCard) {
   const { colorScheme } = useMantineColorScheme();
@@ -36,7 +44,26 @@ export default function TransactionCard({
     </ActionIcon>
   );
 
-  const onDelete = () => console.log('excluei');
+  const { mutate } = useSWRConfig();
+
+  const {
+    trigger,
+    isMutating,
+    error: errorMutate,
+  } = useSWRMutation(`/transactions/${id}`, deleteService<TransactionId>);
+
+  const onDelete = async () => {
+    try {
+      await trigger();
+      await mutate(
+        (key) => typeof key === 'string' && key.startsWith('/transactions')
+      );
+
+      await mutate(
+        (key) => typeof key === 'string' && key.startsWith('/accounts')
+      );
+    } catch (error) {}
+  };
 
   return (
     <Card
@@ -51,7 +78,7 @@ export default function TransactionCard({
             {name}
           </Text>
           <Text color="dimmed" size="xs">
-            {category}
+            {category} | {account}
           </Text>
         </Stack>
 
@@ -75,10 +102,10 @@ export default function TransactionCard({
 
         {showOptions && (
           <CardOptions
-            editLink="/editar/transacao"
+            editLink={`/editar/transacao/${id}`}
             toggleOptions={<ShowOptions />}
-            handleShowOptions={handleShowOptions}
             onDelete={onDelete}
+            isDeleting={isMutating}
           />
         )}
       </Group>

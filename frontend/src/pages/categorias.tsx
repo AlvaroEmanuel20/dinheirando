@@ -75,6 +75,7 @@ export default function Categories() {
             incomeCategories.map((category) => (
               <CategoryCard
                 key={category._id}
+                id={category._id}
                 name={category.name}
                 type="income"
                 totalOfTransactions={category.totalOfTransactions}
@@ -108,6 +109,7 @@ export default function Categories() {
             expenseCategories.map((category) => (
               <CategoryCard
                 key={category._id}
+                id={category._id}
                 name={category.name}
                 type="expense"
                 totalOfTransactions={category.totalOfTransactions}

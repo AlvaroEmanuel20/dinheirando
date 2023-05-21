@@ -9,14 +9,20 @@ import {
 import { IconDotsVertical } from '@tabler/icons-react';
 import { useState } from 'react';
 import CardOptions from '../shared/CardOptions';
+import useSWRMutation from 'swr/mutation';
+import { CategoryId } from '@/lib/apiTypes/categories';
+import { deleteService } from '@/lib/mutateServices';
+import { useSWRConfig } from 'swr';
 
 interface CategoryCard {
+  id: string;
   name: string;
   totalOfTransactions: number;
   type: 'income' | 'expense';
 }
 
 export default function CategoryCard({
+  id,
   name,
   totalOfTransactions,
   type,
@@ -30,7 +36,22 @@ export default function CategoryCard({
     </ActionIcon>
   );
 
-  const onDelete = () => console.log('excluei');
+  const { mutate } = useSWRConfig();
+
+  const {
+    trigger,
+    isMutating,
+    error: errorMutate,
+  } = useSWRMutation(`/categories/${id}`, deleteService<CategoryId>);
+
+  const onDelete = async () => {
+    try {
+      await trigger();
+      await mutate(
+        (key) => typeof key === 'string' && key.startsWith('/categories')
+      );
+    } catch (error) {}
+  };
 
   return (
     <Card withBorder p={10} bg={colorScheme === 'dark' ? 'gray.7' : 'white'}>
@@ -50,10 +71,10 @@ export default function CategoryCard({
 
         {showOptions && (
           <CardOptions
-            editLink="/editar/categoria"
+            editLink={`/editar/categoria/${id}`}
             toggleOptions={<ShowOptions />}
-            handleShowOptions={handleShowOptions}
             onDelete={onDelete}
+            isDeleting={isMutating}
           />
         )}
       </Group>

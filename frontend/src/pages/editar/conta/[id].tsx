@@ -3,34 +3,34 @@ import TextCustomInput from '@/components/shared/TextCustomInput';
 import {
   ActionIcon,
   Button,
-  Chip,
   Container,
   Group,
   Loader,
+  NumberInput,
   Stack,
   Text,
 } from '@mantine/core';
-import { IconArrowLeft, IconEdit } from '@tabler/icons-react';
+import { IconArrowLeft, IconCurrencyReal, IconEdit } from '@tabler/icons-react';
 import { GetServerSideProps } from 'next';
 import { getServerSession } from 'next-auth';
 import { signIn, useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
-import { authOptions } from '../api/auth/[...nextauth]';
+import { authOptions } from '../../api/auth/[...nextauth]';
 import { useForm, zodResolver } from '@mantine/form';
-import { createCategorySchema } from '@/lib/schemas/categories';
-import { CategoryId } from '@/lib/apiTypes/categories';
+import { createAccountSchema } from '@/lib/schemas/accounts';
+import { Account, AccountId } from '@/lib/apiTypes/accounts';
 import useSWRMutation from 'swr/mutation';
-import { createService } from '@/lib/mutateServices';
+import { createService, updateService } from '@/lib/mutateServices';
 
 interface Arg {
   arg: {
     name: string;
-    type: string;
+    amount: number;
   };
 }
 
-export default function AddCategory() {
+export default function AddAccount({ account }: { account: Account }) {
   const router = useRouter();
   const { data: session } = useSession();
 
@@ -38,17 +38,21 @@ export default function AddCategory() {
     trigger,
     isMutating,
     error: errorMutate,
-  } = useSWRMutation('/categories', createService<CategoryId, Arg>, {
-    onSuccess(data, key, config) {
-      router.push('/categorias');
-    },
-  });
+  } = useSWRMutation(
+    `/accounts/${account._id}`,
+    updateService<AccountId, Arg>,
+    {
+      onSuccess(data, key, config) {
+        router.push('/carteira');
+      },
+    }
+  );
 
   const form = useForm({
-    validate: zodResolver(createCategorySchema),
+    validate: zodResolver(createAccountSchema),
     initialValues: {
-      name: '',
-      type: 'income',
+      name: account.name,
+      amount: account.amount,
     },
   });
 
@@ -69,7 +73,7 @@ export default function AddCategory() {
           </ActionIcon>
 
           <Text size="lg" weight="bold" color="white">
-            Adicionar categoria
+            Atualizar conta
           </Text>
         </Group>
       </AppHeader>
@@ -84,43 +88,47 @@ export default function AddCategory() {
         >
           <Stack spacing={10}>
             <TextCustomInput
-              placeholder="Investimentos"
+              placeholder="Banco do Brasil"
               label="Nome"
               withAsterisk
               icon={<IconEdit size="1rem" />}
               {...form.getInputProps('name')}
             />
 
-            <Group spacing={15} my={10}>
-              <Text size="sm" weight={500}>
-                Tipo:{' '}
-              </Text>
-
-              <Chip.Group multiple={false} {...form.getInputProps('type')}>
-                <Group spacing={10}>
-                  <Chip color="green" value="income">
-                    Ganho
-                  </Chip>
-                  <Chip color="red" value="expense">
-                    Gasto
-                  </Chip>
-                </Group>
-              </Chip.Group>
-            </Group>
+            <NumberInput
+              withAsterisk
+              decimalSeparator=","
+              thousandsSeparator="."
+              label="Saldo"
+              placeholder="1500,00"
+              precision={2}
+              step={0.5}
+              icon={<IconCurrencyReal size="1rem" />}
+              styles={(theme) => ({
+                input: {
+                  '&:focus-within': {
+                    borderColor: theme.colors.yellow[5],
+                  },
+                },
+              })}
+              {...form.getInputProps('amount')}
+            />
 
             <Button type="submit" color="yellow.6">
               {isMutating ? (
                 <Loader size="xs" variant="dots" color="white" />
               ) : (
-                'Adicionar'
+                'Atualizar'
               )}
             </Button>
 
             {errorMutate && (
               <Text size="sm" color="red">
-                {errorMutate.response.status === 409
-                  ? 'Já existe uma categoria com esse nome'
-                  : 'Error interno no servidor'}
+                {errorMutate.response.status === 409 &&
+                  'Já existe uma conta com esse nome'}
+                {errorMutate.response.status === 404 && 'Conta não encontrada'}
+                {errorMutate.response.status === 500 &&
+                  'Erro interno no servidor'}
               </Text>
             )}
           </Stack>
@@ -151,7 +159,27 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     };
   }
 
+  if (!ctx.query.id) {
+    return {
+      redirect: {
+        destination: '/carteira',
+        permanent: false,
+      },
+    };
+  }
+
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/accounts/${ctx.query.id}`,
+    {
+      headers: {
+        Authorization: `Bearer ${session.user.accessToken}`,
+      },
+    }
+  );
+
   return {
-    props: {},
+    props: {
+      account: await res.json(),
+    },
   };
 };

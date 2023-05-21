@@ -16,12 +16,12 @@ import { getServerSession } from 'next-auth';
 import { signIn, useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
-import { authOptions } from '../api/auth/[...nextauth]';
+import { authOptions } from '../../api/auth/[...nextauth]';
 import { useForm, zodResolver } from '@mantine/form';
 import { createCategorySchema } from '@/lib/schemas/categories';
-import { CategoryId } from '@/lib/apiTypes/categories';
+import { Category, CategoryId } from '@/lib/apiTypes/categories';
 import useSWRMutation from 'swr/mutation';
-import { createService } from '@/lib/mutateServices';
+import { updateService } from '@/lib/mutateServices';
 
 interface Arg {
   arg: {
@@ -30,7 +30,7 @@ interface Arg {
   };
 }
 
-export default function AddCategory() {
+export default function AddCategory({ category }: { category: Category }) {
   const router = useRouter();
   const { data: session } = useSession();
 
@@ -38,17 +38,21 @@ export default function AddCategory() {
     trigger,
     isMutating,
     error: errorMutate,
-  } = useSWRMutation('/categories', createService<CategoryId, Arg>, {
-    onSuccess(data, key, config) {
-      router.push('/categorias');
-    },
-  });
+  } = useSWRMutation(
+    `/categories/${category._id}`,
+    updateService<CategoryId, Arg>,
+    {
+      onSuccess(data, key, config) {
+        router.push('/categorias');
+      },
+    }
+  );
 
   const form = useForm({
     validate: zodResolver(createCategorySchema),
     initialValues: {
-      name: '',
-      type: 'income',
+      name: category.name,
+      type: category.type,
     },
   });
 
@@ -69,7 +73,7 @@ export default function AddCategory() {
           </ActionIcon>
 
           <Text size="lg" weight="bold" color="white">
-            Adicionar categoria
+            Atualizar categoria
           </Text>
         </Group>
       </AppHeader>
@@ -112,15 +116,18 @@ export default function AddCategory() {
               {isMutating ? (
                 <Loader size="xs" variant="dots" color="white" />
               ) : (
-                'Adicionar'
+                'Atualizar'
               )}
             </Button>
 
             {errorMutate && (
               <Text size="sm" color="red">
-                {errorMutate.response.status === 409
-                  ? 'Já existe uma categoria com esse nome'
-                  : 'Error interno no servidor'}
+                {errorMutate.response.status === 409 &&
+                  'Já existe uma categoria com esse nome'}
+                {errorMutate.response.status === 404 &&
+                  'Categoria não encontrada'}
+                {errorMutate.response.status === 500 &&
+                  'Erro interno no servidor'}
               </Text>
             )}
           </Stack>
@@ -151,7 +158,27 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     };
   }
 
+  if (!ctx.query.id) {
+    return {
+      redirect: {
+        destination: '/categorias',
+        permanent: false,
+      },
+    };
+  }
+
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/categories/${ctx.query.id}`,
+    {
+      headers: {
+        Authorization: `Bearer ${session.user.accessToken}`,
+      },
+    }
+  );
+
   return {
-    props: {},
+    props: {
+      category: await res.json(),
+    },
   };
 };

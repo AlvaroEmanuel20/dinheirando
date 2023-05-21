@@ -2,7 +2,6 @@ import AppHeader from '@/components/shared/AppHeader';
 import TextCustomInput from '@/components/shared/TextCustomInput';
 import {
   ActionIcon,
-  Alert,
   Button,
   Chip,
   Container,
@@ -15,7 +14,6 @@ import {
 } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import {
-  IconAlertCircle,
   IconArrowLeft,
   IconCalendar,
   IconCurrencyReal,
@@ -26,7 +24,7 @@ import {
 import { GetServerSideProps } from 'next';
 import { getServerSession } from 'next-auth';
 import { useRouter } from 'next/router';
-import { authOptions } from '../api/auth/[...nextauth]';
+import { authOptions } from '../../api/auth/[...nextauth]';
 import { useEffect } from 'react';
 import { signIn, useSession } from 'next-auth/react';
 import { useForm, zodResolver } from '@mantine/form';
@@ -36,8 +34,8 @@ import { Account } from '@/lib/apiTypes/accounts';
 import useCategories from '@/hooks/useCategories';
 import { Category } from '@/lib/apiTypes/categories';
 import useSWRMutation from 'swr/mutation';
-import { TransactionId } from '@/lib/apiTypes/transactions';
-import { createService } from '@/lib/mutateServices';
+import { Transaction, TransactionId } from '@/lib/apiTypes/transactions';
+import { updateService } from '@/lib/mutateServices';
 
 interface Arg {
   arg: {
@@ -50,7 +48,11 @@ interface Arg {
   };
 }
 
-export default function AddTransaction() {
+export default function AddTransaction({
+  transaction,
+}: {
+  transaction: Transaction;
+}) {
   const router = useRouter();
   const { data: session } = useSession();
 
@@ -58,21 +60,25 @@ export default function AddTransaction() {
     trigger,
     isMutating,
     error: errorMutate,
-  } = useSWRMutation('/transactions', createService<TransactionId, Arg>, {
-    onSuccess(data, key, config) {
-      router.push('/transacoes');
-    },
-  });
+  } = useSWRMutation(
+    `/transactions/${transaction._id}`,
+    updateService<TransactionId, Arg>,
+    {
+      onSuccess(data, key, config) {
+        router.push('/transacoes');
+      },
+    }
+  );
 
   const form = useForm({
     validate: zodResolver(createTransactionSchema),
     initialValues: {
-      name: '',
-      category: '',
-      account: '',
-      createdAt: new Date(),
-      value: 0,
-      type: 'income',
+      name: transaction.name,
+      category: transaction.category._id,
+      account: transaction.account._id,
+      createdAt: new Date(transaction.createdAt),
+      value: transaction.value,
+      type: transaction.type,
     },
   });
 
@@ -129,7 +135,7 @@ export default function AddTransaction() {
           </ActionIcon>
 
           <Text size="lg" weight="bold" color="white">
-            Adicionar transação
+            Atualizar transação
           </Text>
         </Group>
       </AppHeader>
@@ -143,45 +149,6 @@ export default function AddTransaction() {
           })}
         >
           <Stack spacing={10}>
-            {!isLoadingAccounts && accounts && accounts.length < 1 && (
-              <Alert
-                icon={<IconAlertCircle size="1rem" />}
-                title="Aviso"
-                color="yellow"
-                variant="outline"
-              >
-                Para adicionar uma transação é preciso cadastrar contas
-              </Alert>
-            )}
-
-            {!isLoadingIncomeCategories &&
-              incomeCategories &&
-              incomeCategories.length < 1 && (
-                <Alert
-                  icon={<IconAlertCircle size="1rem" />}
-                  title="Aviso"
-                  color="yellow"
-                  variant="outline"
-                >
-                  Para adicionar uma transação de ganho é preciso cadastrar
-                  categorias de ganho
-                </Alert>
-              )}
-
-            {!isLoadingExpenseCategories &&
-              expenseCategories &&
-              expenseCategories.length < 1 && (
-                <Alert
-                  icon={<IconAlertCircle size="1rem" />}
-                  title="Aviso"
-                  color="yellow"
-                  variant="outline"
-                >
-                  Para adicionar uma transação de gasto é preciso cadastrar
-                  categorias de gasto
-                </Alert>
-              )}
-
             <TextCustomInput
               placeholder="Meus investimentos"
               label="Nome"
@@ -329,14 +296,14 @@ export default function AddTransaction() {
               {isMutating ? (
                 <Loader size="xs" variant="dots" color="white" />
               ) : (
-                'Adicionar'
+                'Atualizar'
               )}
             </Button>
 
             {errorMutate && (
               <Text size="sm" color="red">
                 {errorMutate.response.status === 404
-                  ? 'Categoria ou conta não encontrada'
+                  ? 'Transação não encontrada'
                   : 'Error interno no servidor'}
               </Text>
             )}
@@ -368,7 +335,27 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     };
   }
 
+  if (!ctx.query.id) {
+    return {
+      redirect: {
+        destination: '/transacoes',
+        permanent: false,
+      },
+    };
+  }
+
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/transactions/${ctx.query.id}`,
+    {
+      headers: {
+        Authorization: `Bearer ${session.user.accessToken}`,
+      },
+    }
+  );
+
   return {
-    props: {},
+    props: {
+      transaction: await res.json(),
+    },
   };
 };

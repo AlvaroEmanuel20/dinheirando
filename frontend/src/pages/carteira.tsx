@@ -95,6 +95,7 @@ export default function Wallet() {
             accounts.map((account) => (
               <AccountCard
                 key={account._id}
+                id={account._id}
                 name={account.name}
                 amount={account.amount}
               />
@@ -189,6 +190,7 @@ export default function Wallet() {
             transfers.map((transfer) => (
               <TransferCard
                 key={transfer._id}
+                id={transfer._id}
                 fromAccount={transfer.fromAccount.name}
                 toAccount={transfer.toAccount.name}
                 date={new Date(transfer.createdAt)}

@@ -25,7 +25,6 @@ import { formatMoney } from '@/lib/formatMoney';
 import useTransactions from '@/hooks/useTransactions';
 import useUser from '@/hooks/useUser';
 import NoData from '@/components/shared/NoData';
-import useAccounts from '@/hooks/useAccounts';
 import { AccountsTotal } from '@/lib/apiTypes/accounts';
 
 export default function Home() {
@@ -166,10 +165,12 @@ export default function Home() {
             latestTransactions.map((transaction) => (
               <TransactionCard
                 key={transaction._id}
+                id={transaction._id}
                 name={transaction.name}
                 date={new Date(transaction.createdAt)}
                 value={transaction.value}
                 category={transaction.category.name}
+                account={transaction.account.name}
                 type={transaction.type}
               />
             ))}

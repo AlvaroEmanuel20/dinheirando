@@ -1,15 +1,26 @@
 import { formatMoney } from '@/lib/formatMoney';
-import { ActionIcon, Card, Group, Text, useMantineColorScheme } from '@mantine/core';
+import {
+  ActionIcon,
+  Card,
+  Group,
+  Text,
+  useMantineColorScheme,
+} from '@mantine/core';
 import { IconDotsVertical } from '@tabler/icons-react';
 import { useState } from 'react';
 import CardOptions from '../shared/CardOptions';
+import { AccountId } from '@/lib/apiTypes/accounts';
+import useSWRMutation from 'swr/mutation';
+import { deleteService } from '@/lib/mutateServices';
+import { useSWRConfig } from 'swr';
 
 interface AccountCard {
+  id: string;
   name: string;
   amount: number;
 }
 
-export default function AccountCard({ name, amount }: AccountCard) {
+export default function AccountCard({ id, name, amount }: AccountCard) {
   const { colorScheme } = useMantineColorScheme();
   const [showOptions, setShowOptions] = useState(false);
   const handleShowOptions = () => setShowOptions(!showOptions);
@@ -19,7 +30,22 @@ export default function AccountCard({ name, amount }: AccountCard) {
     </ActionIcon>
   );
 
-  const onDelete = () => console.log('excluei');
+  const { mutate } = useSWRConfig();
+
+  const {
+    trigger,
+    isMutating,
+    error: errorMutate,
+  } = useSWRMutation(`/accounts/${id}`, deleteService<AccountId>);
+
+  const onDelete = async () => {
+    try {
+      await trigger();
+      await mutate(
+        (key) => typeof key === 'string' && key.startsWith('/accounts')
+      );
+    } catch (error) {}
+  };
 
   return (
     <Card withBorder p={10} bg={colorScheme === 'dark' ? 'gray.7' : 'white'}>
@@ -39,9 +65,9 @@ export default function AccountCard({ name, amount }: AccountCard) {
 
         {showOptions && (
           <CardOptions
-            editLink="/editar/conta"
+            editLink={`/editar/conta/${id}`}
             toggleOptions={<ShowOptions />}
-            handleShowOptions={handleShowOptions}
+            isDeleting={isMutating}
             onDelete={onDelete}
           />
         )}

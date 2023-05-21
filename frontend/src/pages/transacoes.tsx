@@ -196,10 +196,12 @@ export default function Transactions() {
             transactions.map((transaction) => (
               <TransactionCard
                 key={transaction._id}
+                id={transaction._id}
                 name={transaction.name}
                 date={new Date(transaction.createdAt)}
                 value={transaction.value}
                 category={transaction.category.name}
+                account={transaction.account.name}
                 type={transaction.type}
               />
             ))}

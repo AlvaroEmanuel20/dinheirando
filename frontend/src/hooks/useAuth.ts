@@ -3,6 +3,7 @@ import { AxiosError } from 'axios';
 import { signIn, signOut } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
+import { useSWRConfig } from 'swr';
 
 interface AuthError {
   message: string;
@@ -20,6 +21,7 @@ interface SignUpValues extends SignInValues {
 
 export default function useAuth() {
   const router = useRouter();
+  const { mutate } = useSWRConfig();
 
   const [errorSignOut, setErrorSignOut] = useState<AuthError | null>(null);
   const [isLoadingSignOut, setIsLoadingSignOut] = useState(false);
@@ -91,6 +93,7 @@ export default function useAuth() {
       setErrorSignOut({ message: 'Erro interno no servidor', statusCode: 500 });
     } else {
       setIsLoadingSignOut(false);
+      await mutate(() => true, undefined, { revalidate: false });
       router.push(result.url);
     }
   };

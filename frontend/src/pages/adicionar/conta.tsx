@@ -20,18 +20,14 @@ import { authOptions } from '../api/auth/[...nextauth]';
 import { useForm, zodResolver } from '@mantine/form';
 import { createAccountSchema } from '@/lib/schemas/accounts';
 import { AccountId } from '@/lib/apiTypes/accounts';
-import { apiInstance } from '@/lib/apiInstance';
 import useSWRMutation from 'swr/mutation';
+import { createService } from '@/lib/mutateServices';
 
 interface Arg {
   arg: {
     name: string;
     amount: number;
   };
-}
-
-async function createAccount(url: string, { arg }: Arg) {
-  return apiInstance.post<AccountId>(url, arg).then((res) => res.data);
 }
 
 export default function AddAccount() {
@@ -42,7 +38,7 @@ export default function AddAccount() {
     trigger,
     isMutating,
     error: errorMutate,
-  } = useSWRMutation('/accounts', createAccount, {
+  } = useSWRMutation('/accounts', createService<AccountId, Arg>, {
     onSuccess(data, key, config) {
       router.push('/carteira');
     },
