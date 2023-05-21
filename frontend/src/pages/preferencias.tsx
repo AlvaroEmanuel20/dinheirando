@@ -34,19 +34,16 @@ import { authOptions } from './api/auth/[...nextauth]';
 import useUser from '@/hooks/useUser';
 import { useForm, zodResolver } from '@mantine/form';
 import { updatePasswordSchema, updateUserSchema } from '@/lib/schemas/users';
-import { apiInstance } from '@/lib/apiInstance';
 import { UserId } from '@/lib/apiTypes/users';
 import useSWRMutation from 'swr/mutation';
+import { updateService } from '@/lib/mutateServices';
+import { useSWRConfig } from 'swr';
 
 interface Arg {
   arg: {
     name: string;
     email: string;
   };
-}
-
-async function updateUser(url: string, { arg }: Arg) {
-  return apiInstance.patch<UserId>(url, arg).then((res) => res.data);
 }
 
 interface ArgPassword {
@@ -56,34 +53,39 @@ interface ArgPassword {
   };
 }
 
-async function updatePassword(url: string, { arg }: ArgPassword) {
-  return apiInstance.patch<UserId>(url, arg).then((res) => res.data);
+interface PreferencesProps {
+  userForm: {
+    name: string;
+    email: string;
+  };
 }
 
-export default function Preferences() {
+export default function Preferences({ userForm }: PreferencesProps) {
   const router = useRouter();
   const { data: session } = useSession();
   const [emailWasUpdated, setEmailWasUpdated] = useState(false);
+
+  const { mutate } = useSWRConfig();
 
   const {
     trigger: triggerUpdateUser,
     isMutating: isMutatingUser,
     error: errorMutateUser,
-  } = useSWRMutation('/users', updateUser);
+  } = useSWRMutation('/users', updateService<UserId, Arg>);
 
   const {
     trigger: triggerUpdatePassword,
     isMutating: isMutatingPassword,
     error: errorMutatePassword,
-  } = useSWRMutation('/users', updatePassword);
+  } = useSWRMutation('/users', updateService<UserId, ArgPassword>);
 
   const { userData, isLoadingUser, errorUser } = useUser();
 
   const form = useForm({
     validate: zodResolver(updateUserSchema),
     initialValues: {
-      name: '',
-      email: '',
+      name: userForm.name,
+      email: userForm.email,
     },
   });
 
@@ -163,6 +165,11 @@ export default function Preferences() {
           onSubmit={form.onSubmit(async (values) => {
             try {
               await triggerUpdateUser(values);
+
+              await mutate(
+                (key) => typeof key === 'string' && key.startsWith('/users')
+              );
+
               if (values.email.length > 0) setEmailWasUpdated(true);
             } catch (error) {}
           })}
@@ -351,6 +358,11 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   }
 
   return {
-    props: {},
+    props: {
+      userForm: {
+        name: session.user.name,
+        email: session.user.email,
+      },
+    },
   };
 };

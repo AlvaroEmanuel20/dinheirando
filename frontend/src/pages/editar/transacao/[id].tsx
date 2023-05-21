@@ -48,7 +48,7 @@ interface Arg {
   };
 }
 
-export default function AddTransaction({
+export default function EditTransaction({
   transaction,
 }: {
   transaction: Transaction;

@@ -3,6 +3,7 @@ import TextCustomInput from '@/components/shared/TextCustomInput';
 import {
   ActionIcon,
   Button,
+  Chip,
   Container,
   Group,
   Loader,
@@ -16,21 +17,29 @@ import { getServerSession } from 'next-auth';
 import { signIn, useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
-import { authOptions } from '../../api/auth/[...nextauth]';
 import { useForm, zodResolver } from '@mantine/form';
-import { createAccountSchema } from '@/lib/schemas/accounts';
-import { Account, AccountId } from '@/lib/apiTypes/accounts';
+import { createCategorySchema } from '@/lib/schemas/categories';
 import useSWRMutation from 'swr/mutation';
-import { createService, updateService } from '@/lib/mutateServices';
+import { updateService } from '@/lib/mutateServices';
+import { authOptions } from './api/auth/[...nextauth]';
+import { User, UserId } from '@/lib/apiTypes/users';
+import { updateGoalsSchema } from '@/lib/schemas/users';
 
 interface Arg {
   arg: {
-    name: string;
-    amount: number;
+    incomeGoal: number;
+    expenseGoal: number;
   };
 }
 
-export default function EditAccount({ account }: { account: Account }) {
+interface Goals {
+  goals: {
+    incomeGoal: number;
+    expenseGoal: number;
+  };
+}
+
+export default function EditGoals({ goals }: Goals) {
   const router = useRouter();
   const { data: session } = useSession();
 
@@ -38,21 +47,17 @@ export default function EditAccount({ account }: { account: Account }) {
     trigger,
     isMutating,
     error: errorMutate,
-  } = useSWRMutation(
-    `/accounts/${account._id}`,
-    updateService<AccountId, Arg>,
-    {
-      onSuccess(data, key, config) {
-        router.push('/carteira');
-      },
-    }
-  );
+  } = useSWRMutation('/users', updateService<UserId, Arg>, {
+    onSuccess(data, key, config) {
+      router.push('/');
+    },
+  });
 
   const form = useForm({
-    validate: zodResolver(createAccountSchema),
+    validate: zodResolver(updateGoalsSchema),
     initialValues: {
-      name: account.name,
-      amount: account.amount,
+      incomeGoal: goals.incomeGoal,
+      expenseGoal: goals.expenseGoal,
     },
   });
 
@@ -73,7 +78,7 @@ export default function EditAccount({ account }: { account: Account }) {
           </ActionIcon>
 
           <Text size="lg" weight="bold" color="white">
-            Atualizar conta
+            Atualizar metas
           </Text>
         </Group>
       </AppHeader>
@@ -87,19 +92,11 @@ export default function EditAccount({ account }: { account: Account }) {
           })}
         >
           <Stack spacing={10}>
-            <TextCustomInput
-              placeholder="Banco do Brasil"
-              label="Nome"
-              withAsterisk
-              icon={<IconEdit size="1rem" />}
-              {...form.getInputProps('name')}
-            />
-
             <NumberInput
               withAsterisk
               decimalSeparator=","
               thousandsSeparator="."
-              label="Saldo"
+              label="Meta de ganhos"
               placeholder="1500,00"
               precision={2}
               step={0.5}
@@ -111,7 +108,26 @@ export default function EditAccount({ account }: { account: Account }) {
                   },
                 },
               })}
-              {...form.getInputProps('amount')}
+              {...form.getInputProps('incomeGoal')}
+            />
+
+            <NumberInput
+              withAsterisk
+              decimalSeparator=","
+              thousandsSeparator="."
+              label="Meta de gastos"
+              placeholder="1500,00"
+              precision={2}
+              step={0.5}
+              icon={<IconCurrencyReal size="1rem" />}
+              styles={(theme) => ({
+                input: {
+                  '&:focus-within': {
+                    borderColor: theme.colors.yellow[5],
+                  },
+                },
+              })}
+              {...form.getInputProps('expenseGoal')}
             />
 
             <Button type="submit" color="yellow.6">
@@ -124,9 +140,8 @@ export default function EditAccount({ account }: { account: Account }) {
 
             {errorMutate && (
               <Text size="sm" color="red">
-                {errorMutate.response.status === 409 &&
-                  'Já existe uma conta com esse nome'}
-                {errorMutate.response.status === 404 && 'Conta não encontrada'}
+                {errorMutate.response.status === 404 &&
+                  'Usuário não encontrada'}
                 {errorMutate.response.status === 500 &&
                   'Erro interno no servidor'}
               </Text>
@@ -159,27 +174,20 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     };
   }
 
-  if (!ctx.query.id) {
-    return {
-      redirect: {
-        destination: '/carteira',
-        permanent: false,
-      },
-    };
-  }
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users`, {
+    headers: {
+      Authorization: `Bearer ${session.user.accessToken}`,
+    },
+  });
 
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/accounts/${ctx.query.id}`,
-    {
-      headers: {
-        Authorization: `Bearer ${session.user.accessToken}`,
-      },
-    }
-  );
+  const user: User = await res.json();
 
   return {
     props: {
-      account: await res.json(),
+      goals: {
+        incomeGoal: user.incomeGoal,
+        expenseGoal: user.expenseGoal,
+      },
     },
   };
 };

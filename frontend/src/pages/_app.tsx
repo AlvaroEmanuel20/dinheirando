@@ -10,6 +10,7 @@ import { RouterTransition } from '@/components/shared/RouterTransition';
 import { SessionProvider } from 'next-auth/react';
 import { DatesProvider } from '@mantine/dates';
 import 'dayjs/locale/pt-br';
+import { Notifications } from '@mantine/notifications';
 
 export default function App({ Component, pageProps }: AppProps) {
   const [colorScheme, setColorScheme] = useLocalStorage<ColorScheme>({
@@ -52,6 +53,7 @@ export default function App({ Component, pageProps }: AppProps) {
             }),
           }}
         >
+          <Notifications limit={5} />
           <RouterTransition />
           <SessionProvider session={pageProps.session}>
             <DatesProvider settings={{ locale: 'pt-br' }}>

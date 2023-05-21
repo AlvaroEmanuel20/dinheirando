@@ -26,6 +26,7 @@ import useTransactions from '@/hooks/useTransactions';
 import useUser from '@/hooks/useUser';
 import NoData from '@/components/shared/NoData';
 import { AccountsTotal } from '@/lib/apiTypes/accounts';
+import { notifications } from '@mantine/notifications';
 
 export default function Home() {
   const { colorScheme } = useMantineColorScheme();
@@ -35,13 +36,29 @@ export default function Home() {
     data: totals,
     error: errorTotals,
     isLoading: isLoadingTotals,
-  } = useSWR<TransactionsTotals>('/transactions/total', fetcher);
+  } = useSWR<TransactionsTotals>('/transactions/total', fetcher, {
+    onError(err, key, config) {
+      notifications.show({
+        color: 'red',
+        title: 'Erro inesperado',
+        message: 'Houve um erro ao carregar os totais de transações',
+      });
+    },
+  });
 
   const {
     data: accountsTotal,
     error: errorAccountTotal,
     isLoading: isLoadingAccountTotal,
-  } = useSWR<AccountsTotal>('/accounts/total', fetcher);
+  } = useSWR<AccountsTotal>('/accounts/total', fetcher, {
+    onError(err, key, config) {
+      notifications.show({
+        color: 'red',
+        title: 'Erro inesperado',
+        message: 'Houve um erro ao carregar o saldo total',
+      });
+    },
+  });
 
   const {
     data: latestTransactions,
@@ -97,7 +114,7 @@ export default function Home() {
 
           <Anchor
             component={Link}
-            href="/preferencias"
+            href="/metas"
             color={colorScheme === 'dark' ? 'white' : 'dark'}
             size="sm"
           >

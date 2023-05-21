@@ -1,4 +1,5 @@
 import { fetcher } from '@/lib/apiInstance';
+import { notifications } from '@mantine/notifications';
 import useSWR from 'swr';
 
 interface UseTransfers {
@@ -13,7 +14,16 @@ export default function useTransfers<T>({ id, limit, sort }: UseTransfers) {
 
   const result = useSWR<T>(
     `${url}?limit=${limit ? limit : 10}&sort=${sort}`,
-    fetcher
+    fetcher,
+    {
+      onError(err, key, config) {
+        notifications.show({
+          color: 'red',
+          title: 'Erro inesperado',
+          message: 'Houve um erro ao carregar as transferências',
+        });
+      },
+    }
   );
 
   return result;

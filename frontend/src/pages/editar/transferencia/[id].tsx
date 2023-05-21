@@ -40,7 +40,7 @@ interface Arg {
   };
 }
 
-export default function AddTransfer({ transfer }: { transfer: Transfer }) {
+export default function EditTransfer({ transfer }: { transfer: Transfer }) {
   const router = useRouter();
   const { data: session } = useSession();
 

@@ -1,11 +1,9 @@
 import { z } from 'zod';
 
-export const updateUserSchema = z
-  .object({
-    name: z.string().min(2, 'No mínimo 2 caracteres'),
-    email: z.string().email({ message: 'Email inválido' }),
-  })
-  .partial();
+export const updateUserSchema = z.object({
+  name: z.string().min(2, 'No mínimo 2 caracteres'),
+  email: z.string().email({ message: 'Email inválido' }),
+});
 
 export const updatePasswordSchema = z
   .object({
@@ -16,3 +14,8 @@ export const updatePasswordSchema = z
     message: 'As senhas devem ser iguais',
     path: ['confirmPassword'],
   });
+
+export const updateGoalsSchema = z.object({
+  incomeGoal: z.number().min(0.1, 'Insira um valor maior que 0'),
+  expenseGoal: z.number().min(0.1, 'Insira um valor maior que 0'),
+});

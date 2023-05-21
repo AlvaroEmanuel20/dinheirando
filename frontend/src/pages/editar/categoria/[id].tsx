@@ -30,7 +30,7 @@ interface Arg {
   };
 }
 
-export default function AddCategory({ category }: { category: Category }) {
+export default function EditCategory({ category }: { category: Category }) {
   const router = useRouter();
   const { data: session } = useSession();
 
