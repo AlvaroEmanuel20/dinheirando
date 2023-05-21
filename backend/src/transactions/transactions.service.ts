@@ -109,12 +109,18 @@ export class TransactionsService {
     const transaction = await this.Transaction.findById(transactionId);
     if (!transaction) throw new Error('Transaction not found');
 
-    if (category && category !== transaction.category) {
+    if (category && category != transaction.category) {
       const newCategory = await this.Category.findById(category);
+      const oldCategory = await this.Category.findById(transaction.category);
       if (!newCategory) throw new Error('New category not found');
+
+      newCategory.totalOfTransactions += transaction.value;
+      oldCategory.totalOfTransactions -= transaction.value;
+      await newCategory.save();
+      await oldCategory.save();
     }
 
-    if (account && account !== transaction.account) {
+    if (account && account != transaction.account) {
       const newAccount = await this.Account.findById(account);
       const oldAccount = await this.Account.findById(transaction.account);
 
@@ -156,6 +162,10 @@ export class TransactionsService {
 
     if (value && value !== transaction.value) {
       const account = await this.Account.findById(transaction.account);
+      const category = await this.Category.findById(transaction.category);
+
+      category.totalOfTransactions += value - category.totalOfTransactions;
+      await category.save();
 
       if (account) {
         const difference = value - transaction.value;
@@ -185,7 +195,9 @@ export class TransactionsService {
     const transaction = await this.Transaction.findById(transactionId);
     if (!transaction) throw new Error('Transaction not found');
 
+    const category = await this.Category.findById(transaction.category);
     const account = await this.Account.findById(transaction.account);
+
     if (account) {
       if (transaction.type === 'expense') {
         account.amount += transaction.value;
@@ -200,6 +212,10 @@ export class TransactionsService {
       _id: transactionId,
       user: userId,
     }).orFail();
+
+    category.totalOfTransactions -= transaction.value;
+    await category.save();
+
     return { transactionId };
   }
 }

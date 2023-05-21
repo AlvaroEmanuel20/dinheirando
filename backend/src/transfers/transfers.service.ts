@@ -74,25 +74,33 @@ export class TransfersService {
     const newFromAccount = await this.Account.findById(fromAccount);
     const newToAccount = await this.Account.findById(toAccount);
 
-    if (fromAccount && fromAccount !== transfer.fromAccount) {
+    if (fromAccount && fromAccount != transfer.fromAccount) {
       if (fromAccount === transfer.toAccount)
         throw new Error('From account is equals to account');
       if (!newFromAccount) throw new Error('New from account not found');
 
+      const oldFromAccount = await this.Account.findById(transfer.fromAccount);
+
+      oldFromAccount.amount += transfer.value;
       newFromAccount.amount -= transfer.value;
       transfer.fromAccount = newFromAccount.id;
       await newFromAccount.save();
+      await oldFromAccount.save();
       await transfer.save();
     }
 
-    if (toAccount && toAccount !== transfer.toAccount) {
+    if (toAccount && toAccount != transfer.toAccount) {
       if (toAccount === transfer.fromAccount)
         throw new Error('To account is equals from account');
       if (!newToAccount) throw new Error('New to account not found');
 
+      const oldToAccount = await this.Account.findById(transfer.toAccount);
+
+      oldToAccount.amount -= transfer.value;
       newToAccount.amount += transfer.value;
       transfer.toAccount = newToAccount.id;
       await newToAccount.save();
+      await oldToAccount.save();
       await transfer.save();
     }
 
