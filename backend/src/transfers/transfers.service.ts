@@ -4,10 +4,13 @@ import { Transfer } from './schemas/transfer.schema';
 import { Model } from 'mongoose';
 import { CreateTransferDto, UpdateTransferDto } from './dto/transfers.dto';
 import { Account } from 'src/accounts/schemas/account.schema';
+import defineDateFilter from 'src/shared/utils/defineDateFilter';
 
 export interface TransfersQuery {
   sort?: 'asc' | 'desc';
   limit?: number;
+  fromDate?: string; //ISO 8601
+  toDate?: string; //ISO 8601
 }
 
 @Injectable()
@@ -20,11 +23,14 @@ export class TransfersService {
   ) {}
 
   async showTransfers(userId: string, query: TransfersQuery) {
+    const dateRange = defineDateFilter(query.fromDate, query.toDate);
     return await this.Transfer.find({ user: userId })
-      .sort(query.sort)
+      .sort({ createdAt: query.sort })
       .limit(query.limit)
       .populate('fromAccount', 'name')
-      .populate('toAccount', 'name');
+      .populate('toAccount', 'name')
+      .gte('createdAt', dateRange[0])
+      .lte('createdAt', dateRange[1]);
   }
 
   async showTransfer(transferId: string, userId: string) {

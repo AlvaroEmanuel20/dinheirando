@@ -8,11 +8,14 @@ import {
 } from './dto/transactions.dto';
 import { Account } from 'src/accounts/schemas/account.schema';
 import { Category } from 'src/categories/schemas/category.schema';
+import defineDateFilter from 'src/shared/utils/defineDateFilter';
 
 export interface TransactionsQuery {
   sort?: 'asc' | 'desc';
   limit?: number;
   type?: 'income' | 'expense';
+  fromDate?: string; //ISO 8601 Date
+  toDate?: string; //ISO 8601 Date
 }
 
 @Injectable()
@@ -27,20 +30,26 @@ export class TransactionsService {
   ) {}
 
   async showTransactions(userId: string, query: TransactionsQuery) {
+    const dateRange = defineDateFilter(query.fromDate, query.toDate);
+
     if (query.type === 'expense' || query.type === 'income') {
       return await this.Transaction.find({ user: userId })
-        .sort(query.sort)
+        .sort({ createdAt: query.sort })
         .limit(query.limit)
         .where({ type: query.type })
         .populate('category', 'name')
-        .populate('account', 'name');
+        .populate('account', 'name')
+        .gte('createdAt', dateRange[0])
+        .lte('createdAt', dateRange[1]);
     }
 
     return await this.Transaction.find({ user: userId })
-      .sort(query.sort)
+      .sort({ createdAt: query.sort })
       .limit(query.limit)
       .populate('category', 'name')
-      .populate('account', 'name');
+      .populate('account', 'name')
+      .gte('createdAt', dateRange[0])
+      .lte('createdAt', dateRange[1]);
   }
 
   async showTransaction(transactionId: string, userId: string) {
@@ -50,9 +59,12 @@ export class TransactionsService {
   }
 
   async showTotal(userId: string) {
+    const dateRange = defineDateFilter();
     const transactions = await this.Transaction.find({
       user: userId,
-    });
+    })
+      .gte('createdAt', dateRange[0])
+      .lte('createdAt', dateRange[1]);
 
     const total = transactions.reduce((acc, value) => (acc += value.value), 0);
     const totalIncome = transactions

@@ -4302,6 +4302,11 @@ os-tmpdir@~1.0.2:
   resolved "https://registry.yarnpkg.com/os-tmpdir/-/os-tmpdir-1.0.2.tgz#bbe67406c79aa85c5cfec766fe5734555dfa1274"
   integrity sha512-D2FR03Vir7FIu45XBY20mTb+/ZSWB00sjU9jdQXt83gDrI4Ztz5Fs7/yy74g2N5SVQY4xY1qDr4rNddwYRVX0g==
 
+our-dates@^1.0.6:
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/our-dates/-/our-dates-1.0.6.tgz#af812eb2681c01a3daaffbd28b91f55ffd11adb0"
+  integrity sha512-VgO4q8yMu9hpMmipsuFK/rvSoIXQHceyIsBC6S9htcY7aluZdi3zgy4arW1BNBR+34ws10jLamXxyCbb4QAsKw==
+
 p-limit@^2.2.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/p-limit/-/p-limit-2.3.0.tgz#3dd33c647a214fdfffd835933eb086da0dc21db1"
