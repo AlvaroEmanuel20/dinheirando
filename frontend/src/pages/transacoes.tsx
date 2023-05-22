@@ -50,7 +50,13 @@ export default function Transactions() {
     data: transactions,
     isLoading: isLoadingTransactions,
     error: errorTransactions,
-  } = useTransactions<Transaction[]>({ limit, sort: sortBy, type: typeSelect });
+  } = useTransactions<Transaction[]>({
+    limit,
+    sort: sortBy,
+    type: typeSelect,
+    fromDate: dateRange[0],
+    toDate: dateRange[1],
+  });
 
   useEffect(() => {
     if (session?.error === 'RefreshAccessTokenError') signIn();
@@ -91,7 +97,6 @@ export default function Transactions() {
 
         <Stack spacing={10}>
           <DatePickerInput
-            disabled
             clearable
             icon={<IconCalendar size="1rem" />}
             valueFormat="DD/MM/YYYY"

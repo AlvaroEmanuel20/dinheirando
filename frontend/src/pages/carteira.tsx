@@ -54,7 +54,12 @@ export default function Wallet() {
     data: transfers,
     isLoading: isLoadingTransfers,
     error: errorTransfers,
-  } = useTransfers<Transfer[]>({ sort: sortBy, limit });
+  } = useTransfers<Transfer[]>({
+    sort: sortBy,
+    limit,
+    fromDate: dateRange[0],
+    toDate: dateRange[1],
+  });
 
   useEffect(() => {
     if (session?.error === 'RefreshAccessTokenError') signIn();
@@ -118,7 +123,6 @@ export default function Wallet() {
 
         <Stack spacing={10}>
           <DatePickerInput
-            disabled
             clearable
             icon={<IconCalendar size="1rem" />}
             valueFormat="DD/MM/YYYY"

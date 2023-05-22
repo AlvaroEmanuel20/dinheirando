@@ -2369,10 +2369,10 @@ optionator@^0.9.1:
     type-check "^0.4.0"
     word-wrap "^1.2.3"
 
-our-dates@^1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/our-dates/-/our-dates-1.0.3.tgz#2543f36076978ecfa9fa8b230f5a1d793a0425c1"
-  integrity sha512-Mlsb593g0Jdejxh5yQxgbxQYp/pvyRAu7wSOeIqyhs7uVhsLRiSNlgUesckNiQBeuKMOt2JRs0EzSQMlJdWVaQ==
+our-dates@^1.0.6:
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/our-dates/-/our-dates-1.0.6.tgz#af812eb2681c01a3daaffbd28b91f55ffd11adb0"
+  integrity sha512-VgO4q8yMu9hpMmipsuFK/rvSoIXQHceyIsBC6S9htcY7aluZdi3zgy4arW1BNBR+34ws10jLamXxyCbb4QAsKw==
 
 p-limit@^3.0.2:
   version "3.1.0"
