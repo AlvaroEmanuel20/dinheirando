@@ -1,5 +1,6 @@
 import {
   ActionIcon,
+  Anchor,
   Avatar,
   Burger,
   Container,
@@ -14,6 +15,7 @@ import { IconBell } from '@tabler/icons-react';
 import { ReactNode } from 'react';
 import Link from 'next/link';
 import useUser from '@/hooks/useUser';
+import getFirstLettersName from '@/lib/getFirstLettersName';
 
 export default function AppHeader({ children }: { children: ReactNode }) {
   const [opened, { toggle, open, close }] = useDisclosure(false);
@@ -40,15 +42,29 @@ export default function AppHeader({ children }: { children: ReactNode }) {
 
             <ThemeToggle />
 
-            <Link href="/preferencias">
+            <Anchor
+              component={Link}
+              sx={{
+                '&:hover': {
+                  textDecoration: 'none',
+                },
+                '&:active': {
+                  textDecoration: 'none',
+                },
+              }}
+              href="/preferencias"
+            >
               <Skeleton visible={isLoadingUser} radius="50%">
                 <Avatar
-                  src={userData?.avatar ? userData.avatar : null}
+                  src={userData ? userData.avatar : null}
+                  alt={userData?.name}
                   color="yellow.6"
                   radius="xl"
-                />
+                >
+                  {userData && getFirstLettersName(userData.name).join('')}
+                </Avatar>
               </Skeleton>
-            </Link>
+            </Anchor>
           </Group>
         </Group>
 

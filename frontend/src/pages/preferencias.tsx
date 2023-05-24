@@ -38,6 +38,8 @@ import { UserId } from '@/lib/apiTypes/users';
 import useSWRMutation from 'swr/mutation';
 import { updateService } from '@/lib/mutateServices';
 import { useSWRConfig } from 'swr';
+import { apiInstance } from '@/lib/apiInstance';
+import getFirstLettersName from '@/lib/getFirstLettersName';
 
 interface Arg {
   arg: {
@@ -65,6 +67,7 @@ export default function Preferences({ userForm }: PreferencesProps) {
   const { data: session } = useSession();
   const [emailWasUpdated, setEmailWasUpdated] = useState(false);
 
+  const { userData, isLoadingUser } = useUser();
   const { mutate } = useSWRConfig();
 
   const {
@@ -78,8 +81,6 @@ export default function Preferences({ userForm }: PreferencesProps) {
     isMutating: isMutatingPassword,
     error: errorMutatePassword,
   } = useSWRMutation('/users', updateService<UserId, ArgPassword>);
-
-  const { userData, isLoadingUser, errorUser } = useUser();
 
   const form = useForm({
     validate: zodResolver(updateUserSchema),
@@ -96,6 +97,35 @@ export default function Preferences({ userForm }: PreferencesProps) {
       confirmPassword: '',
     },
   });
+
+  const [isUploading, setIsUploading] = useState(false);
+  const [errorUpload, setErrorUpload] = useState('');
+  const formAvatar = useForm({
+    initialValues: {
+      avatar: null,
+    },
+    validate: {
+      avatar: (value) => (value === null ? 'Campo obrigatório' : null),
+    },
+  });
+
+  const uploadAvatar = async (avatar: File | null) => {
+    setIsUploading(true);
+    if (!avatar) return;
+
+    try {
+      const formData = new FormData();
+      formData.append('file', avatar);
+      const res = await apiInstance.post('/users/avatar', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      console.log(res);
+      setIsUploading(false);
+    } catch (error) {
+      console.log(error);
+      setIsUploading(false);
+    }
+  };
 
   useEffect(() => {
     if (session?.error === 'RefreshAccessTokenError') signIn();
@@ -123,11 +153,14 @@ export default function Preferences({ userForm }: PreferencesProps) {
         <Skeleton visible={isLoadingUser}>
           <Group>
             <Avatar
-              src={userData?.avatar ? userData.avatar : null}
+              src={userData ? userData.avatar : null}
+              alt={userData?.name}
               color="yellow.6"
               size="lg"
               radius="xl"
-            />
+            >
+              {userData && getFirstLettersName(userData.name).join('')}
+            </Avatar>
 
             <Stack spacing={0}>
               <Text size="sm" weight="bold">
@@ -159,6 +192,47 @@ export default function Preferences({ userForm }: PreferencesProps) {
       )}
 
       <Container mt={20}>
+        <Text weight="bold">Alterar avatar</Text>
+
+        <form
+          encType="multipart/form-data"
+          onSubmit={formAvatar.onSubmit(async (values) =>
+            uploadAvatar(values.avatar)
+          )}
+        >
+          <Stack spacing="sm" mt={10}>
+            <FileInput
+              clearable
+              multiple={false}
+              placeholder="Selecione a imagem"
+              icon={<IconUpload size="0.8rem" />}
+              accept="image/png,image/jpeg,image/jpg"
+              styles={(theme) => ({
+                input: {
+                  '&:focus-within': {
+                    borderColor: theme.colors.yellow[5],
+                  },
+                },
+              })}
+              {...formAvatar.getInputProps('avatar')}
+            />
+
+            <Button
+              color="yellow.6"
+              type="submit"
+              leftIcon={<IconUpload size="1rem" />}
+            >
+              {isUploading ? (
+                <Loader size="xs" variant="dots" color="white" />
+              ) : (
+                'Enviar'
+              )}
+            </Button>
+          </Stack>
+        </form>
+      </Container>
+
+      <Container mt={20}>
         <Text weight="bold">Alterar perfil</Text>
 
         <form
@@ -175,19 +249,6 @@ export default function Preferences({ userForm }: PreferencesProps) {
           })}
         >
           <Stack spacing="sm" mt={10}>
-            <FileInput
-              placeholder="Foto de perfil"
-              icon={<IconUpload size="0.8rem" />}
-              accept="image/png,image/jpeg,image/jpg"
-              styles={(theme) => ({
-                input: {
-                  '&:focus-within': {
-                    borderColor: theme.colors.yellow[5],
-                  },
-                },
-              })}
-            />
-
             <TextCustomInput
               icon={<IconUser size="0.8rem" />}
               placeholder="Seu nome"
