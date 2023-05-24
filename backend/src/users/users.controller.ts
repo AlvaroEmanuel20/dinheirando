@@ -12,6 +12,8 @@ import {
   Redirect,
   UnauthorizedException,
   HttpCode,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import {
@@ -38,6 +40,7 @@ import {
   ApiUnauthorizedResponse,
   ApiFoundResponse,
 } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('users')
 @Controller('users')
@@ -67,6 +70,12 @@ export class UsersController {
     } catch (error) {
       throw new ConflictException('There is an user with this email');
     }
+  }
+
+  @Post('avatar')
+  @UseInterceptors(FileInterceptor('file'))
+  uploadAvatar(@UploadedFile() file: Express.Multer.File) {
+    console.log(file);
   }
 
   //ROTA DE VALIDAÇÃO DE EMAIL
