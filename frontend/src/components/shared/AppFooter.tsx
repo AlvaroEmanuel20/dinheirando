@@ -1,19 +1,19 @@
-import {
-  ActionIcon,
-  Anchor,
-  Center,
-  Container,
-  Menu,
-  useMantineColorScheme,
-} from '@mantine/core';
+import { useStyles } from '@/hooks/useStyles';
+import { ActionIcon, Anchor, Center, Container, Menu } from '@mantine/core';
 import { IconPlus } from '@tabler/icons-react';
 import Link from 'next/link';
 
 export default function AppFooter() {
-  const { colorScheme } = useMantineColorScheme();
+  const { classes } = useStyles();
 
   return (
-    <Container w="100%" py={10} bg="gray.8" pos="fixed" bottom={0}>
+    <Container
+      className={classes.appFooter}
+      py={10}
+      bg="gray.8"
+      pos="fixed"
+      bottom={0}
+    >
       <Center pb={5}>
         <Menu shadow="md">
           <Menu.Target>
@@ -23,6 +23,7 @@ export default function AppFooter() {
               variant="filled"
               radius="xl"
               size="xl"
+              className={classes.appFooterBtn}
             >
               <IconPlus size="1.1rem" />
             </ActionIcon>
@@ -43,11 +44,7 @@ export default function AppFooter() {
             >
               <Menu.Item icon={<IconPlus size={14} />}>Categoria</Menu.Item>
             </Anchor>
-            <Anchor
-              underline={false}
-              component={Link}
-              href="/adicionar/conta"
-            >
+            <Anchor underline={false} component={Link} href="/adicionar/conta">
               <Menu.Item icon={<IconPlus size={14} />}>Conta</Menu.Item>
             </Anchor>
             <Anchor

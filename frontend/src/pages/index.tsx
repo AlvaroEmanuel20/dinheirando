@@ -1,5 +1,6 @@
 import {
   Anchor,
+  Box,
   Container,
   Group,
   Skeleton,
@@ -27,10 +28,12 @@ import useUser from '@/hooks/useUser';
 import NoData from '@/components/shared/NoData';
 import { AccountsTotal } from '@/lib/apiTypes/accounts';
 import { notifications } from '@mantine/notifications';
+import { useStyles } from '@/hooks/useStyles';
 
 export default function Home() {
   const { colorScheme } = useMantineColorScheme();
   const { data: session } = useSession();
+  const { classes } = useStyles();
 
   const {
     data: totals,
@@ -106,53 +109,62 @@ export default function Home() {
         </Group>
       </AppHeader>
 
-      <Container py={20} bg={colorScheme === 'dark' ? 'gray.8' : 'gray.4'}>
-        <Group position="apart" mb={15}>
-          <Text color={colorScheme === 'dark' ? 'white' : 'dark'} weight="bold">
-            Suas metas
-          </Text>
+      <Container
+        className={classes.container}
+        py={20}
+        bg={colorScheme === 'dark' ? 'gray.8' : 'gray.4'}
+      >
+        <Box className={classes.innerContainer}>
+          <Group position="apart" mb={15}>
+            <Text
+              color={colorScheme === 'dark' ? 'white' : 'dark'}
+              weight="bold"
+            >
+              Suas metas
+            </Text>
 
-          <Anchor
-            component={Link}
-            href="/metas"
-            color={colorScheme === 'dark' ? 'white' : 'dark'}
-            size="sm"
-          >
-            Alterar
-          </Anchor>
-        </Group>
+            <Anchor
+              component={Link}
+              href="/metas"
+              color={colorScheme === 'dark' ? 'white' : 'dark'}
+              size="sm"
+            >
+              Alterar
+            </Anchor>
+          </Group>
 
-        <Group grow spacing={20} mt="xl" pb="sm">
-          <Skeleton visible={isLoadingUser}>
-            <GoalCard
-              bg={colorScheme === 'dark' ? 'gray.7' : 'gray.2'}
-              label="Meta de ganhos:"
-              value={userData ? userData.incomeGoal : 0}
-              progress={{
-                color: 'green.7',
-                value:
-                  totals && userData
-                    ? (totals.totalIncome / userData.incomeGoal) * 100
-                    : 0,
-              }}
-            />
-          </Skeleton>
+          <Group grow spacing={20} mt="xl" pb="sm">
+            <Skeleton visible={isLoadingUser}>
+              <GoalCard
+                bg={colorScheme === 'dark' ? 'gray.7' : 'gray.2'}
+                label="Meta de ganhos:"
+                value={userData ? userData.incomeGoal : 0}
+                progress={{
+                  color: 'green.7',
+                  value:
+                    totals && userData
+                      ? (totals.totalIncome / userData.incomeGoal) * 100
+                      : 0,
+                }}
+              />
+            </Skeleton>
 
-          <Skeleton visible={isLoadingUser}>
-            <GoalCard
-              bg={colorScheme === 'dark' ? 'gray.7' : 'gray.2'}
-              label="Meta de gastos:"
-              value={userData ? userData.expenseGoal : 0}
-              progress={{
-                color: 'red.7',
-                value:
-                  totals && userData
-                    ? (totals.totalExpense / userData.expenseGoal) * 100
-                    : 0,
-              }}
-            />
-          </Skeleton>
-        </Group>
+            <Skeleton visible={isLoadingUser}>
+              <GoalCard
+                bg={colorScheme === 'dark' ? 'gray.7' : 'gray.2'}
+                label="Meta de gastos:"
+                value={userData ? userData.expenseGoal : 0}
+                progress={{
+                  color: 'red.7',
+                  value:
+                    totals && userData
+                      ? (totals.totalExpense / userData.expenseGoal) * 100
+                      : 0,
+                }}
+              />
+            </Skeleton>
+          </Group>
+        </Box>
       </Container>
 
       <Container mt={20} mb={90}>

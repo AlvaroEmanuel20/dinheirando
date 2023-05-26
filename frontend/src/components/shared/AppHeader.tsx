@@ -2,6 +2,7 @@ import {
   ActionIcon,
   Anchor,
   Avatar,
+  Box,
   Burger,
   Container,
   Group,
@@ -16,17 +17,23 @@ import { ReactNode } from 'react';
 import Link from 'next/link';
 import useUser from '@/hooks/useUser';
 import getFirstLettersName from '@/lib/getFirstLettersName';
+import { useStyles } from '@/hooks/useStyles';
 
 export default function AppHeader({ children }: { children: ReactNode }) {
   const [opened, { toggle, open, close }] = useDisclosure(false);
   const label = opened ? 'Close navigation' : 'Open navigation';
   const { colorScheme } = useMantineColorScheme();
+  const { classes } = useStyles();
 
   const { userData, isLoadingUser, errorUser } = useUser();
 
   return (
     <>
-      <Container py={30} bg={colorScheme === 'dark' ? 'gray.9' : 'gray.8'}>
+      <Container
+        className={classes.container}
+        py={30}
+        bg={colorScheme === 'dark' ? 'gray.9' : 'gray.8'}
+      >
         <Group position="apart">
           <Burger
             color="white"
@@ -70,7 +77,7 @@ export default function AppHeader({ children }: { children: ReactNode }) {
 
         <AppDrawer opened={opened} close={close} />
 
-        {children}
+        <Box className={classes.innerAppHeader}>{children}</Box>
       </Container>
     </>
   );
