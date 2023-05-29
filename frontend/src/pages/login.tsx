@@ -5,10 +5,8 @@ import { loginSchema } from '@/lib/schemas/auth';
 import {
   Container,
   Stack,
-  Title,
   PasswordInput,
   Button,
-  Center,
   Text,
   Anchor,
   Loader,
@@ -32,14 +30,17 @@ export default function Login() {
 
   return (
     <>
-      <AuthLayout>
-        <Container mt={30}>
-          <Title order={1} size="1.5rem" mb={15}>
-            Login
-          </Title>
-
+      <AuthLayout
+        title="Login"
+        auxLink={{
+          text: 'Não tem uma conta?',
+          textLink: 'Cadastre-se',
+          link: '/cadastro',
+        }}
+      >
+        <Container size="xs" mt={20}>
           <form onSubmit={form.onSubmit((values) => signInAndRedirect(values))}>
-            <Stack spacing="sm">
+            <Stack spacing={20}>
               <TextCustomInput
                 icon={<IconMail size="0.8rem" />}
                 placeholder="exemplo@gmail.com"
@@ -56,66 +57,50 @@ export default function Login() {
                 styles={(theme) => ({
                   input: {
                     '&:focus-within': {
-                      borderColor: theme.colors.yellow[5],
+                      borderColor: theme.colors.violet[6],
                     },
                   },
                 })}
                 {...form.getInputProps('password')}
               />
 
-              <Text size="sm" color="dimmed">
-                Esqueceu a senha?{' '}
-                <Anchor
-                  component={Link}
-                  weight="bold"
-                  color="dimmed"
-                  href="senha/recuperar"
-                >
-                  Recuperar
-                </Anchor>
-              </Text>
+              <Stack spacing={10}>
+                <Button type="submit" color="violet.6">
+                  {isLoadingSignIn ? (
+                    <Loader size="xs" variant="dots" color="white" />
+                  ) : (
+                    'Entrar'
+                  )}
+                </Button>
 
-              <Button type="submit" color="yellow.6">
-                {isLoadingSignIn ? (
-                  <Loader size="xs" variant="dots" color="white" />
-                ) : (
-                  'Entrar'
+                {errorSignIn && (
+                  <Text size="sm" color="red">
+                    {errorSignIn.message}
+                  </Text>
                 )}
-              </Button>
 
-              {errorSignIn && (
-                <Text size="sm" color="red">
-                  {errorSignIn.message}
-                </Text>
-              )}
+                <Button
+                  fullWidth
+                  leftIcon={<GoogleIcon />}
+                  variant="default"
+                  color="gray"
+                  onClick={() => signIn('google', { callbackUrl: '/' })}
+                >
+                  Entrar com Google
+                </Button>
+              </Stack>
             </Stack>
           </form>
 
-          <Center my={15}>
-            <Text size="sm" color="dimmed">
-              Ou entre com
-            </Text>
-          </Center>
-
-          <Button
-            fullWidth
-            leftIcon={<GoogleIcon />}
-            variant="default"
-            color="gray"
-            onClick={() => signIn('google', { callbackUrl: '/' })}
-          >
-            Google
-          </Button>
-
-          <Text mt={15} size="sm" color="dimmed">
-            Não tem uma conta?{' '}
+          <Text mt={20} size="sm" color="dimmed">
+            Esqueceu a senha?{' '}
             <Anchor
               component={Link}
               weight="bold"
               color="dimmed"
-              href="cadastro"
+              href="senha/recuperar"
             >
-              Cadastre-se
+              Recuperar
             </Anchor>
           </Text>
         </Container>

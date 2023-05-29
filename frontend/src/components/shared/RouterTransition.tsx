@@ -23,7 +23,7 @@ export function RouterTransition() {
 
   return (
     <NavigationProgress
-      color="yellow.5"
+      color="violet.6"
       progressLabel="Carregando página"
       autoReset={true}
     />

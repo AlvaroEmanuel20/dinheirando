@@ -3,7 +3,6 @@ import { newPasswordSchema } from '@/lib/schemas/auth';
 import {
   Container,
   Stack,
-  Title,
   PasswordInput,
   Button,
   Text,
@@ -52,12 +51,8 @@ export default function NewPassword({ token }: { token: string }) {
 
   return (
     <>
-      <AuthLayout>
-        <Container mt={30}>
-          <Title order={1} size="1.5rem" mb={15}>
-            Login
-          </Title>
-
+      <AuthLayout title="Redefinir senha">
+        <Container size="xs" mt={20}>
           <form
             onSubmit={form.onSubmit(async (values) => {
               try {
@@ -72,7 +67,7 @@ export default function NewPassword({ token }: { token: string }) {
                 styles={(theme) => ({
                   input: {
                     '&:focus-within': {
-                      borderColor: theme.colors.yellow[5],
+                      borderColor: theme.colors.violet[6],
                     },
                   },
                 })}
@@ -85,14 +80,14 @@ export default function NewPassword({ token }: { token: string }) {
                 styles={(theme) => ({
                   input: {
                     '&:focus-within': {
-                      borderColor: theme.colors.yellow[5],
+                      borderColor: theme.colors.violet[6],
                     },
                   },
                 })}
                 {...form.getInputProps('confirmPassword')}
               />
 
-              <Button type="submit" color="yellow.6">
+              <Button type="submit" color="violet.6">
                 {isMutating ? (
                   <Loader size="xs" variant="dots" color="white" />
                 ) : (

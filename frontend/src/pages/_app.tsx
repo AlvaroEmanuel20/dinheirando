@@ -47,7 +47,7 @@ export default function App({ Component, pageProps }: AppProps) {
               body: {
                 backgroundColor:
                   theme.colorScheme === 'dark'
-                    ? theme.colors.gray[9]
+                    ? theme.colors.dark[6]
                     : theme.white,
               },
             }),

@@ -7,12 +7,12 @@ export default function ThemeToggle() {
 
   return (
     <ActionIcon
-      variant="filled"
-      color="yellow.6"
+      variant="transparent"
+      color={dark ? 'gray' : 'dark'}
       onClick={() => toggleColorScheme()}
-      title="Toggle color scheme"
+      title="Alterar tema entre escuro e claro"
     >
-      {dark ? <IconSun size="1.1rem" /> : <IconMoonStars size="1.1rem" />}
+      {dark ? <IconSun size="1.5rem" /> : <IconMoonStars size="1.5rem" />}
     </ActionIcon>
   );
 }
