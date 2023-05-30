@@ -7,6 +7,7 @@ import {
   Center,
   Container,
   Group,
+  Menu,
   SimpleGrid,
   Skeleton,
   Stack,
@@ -23,7 +24,7 @@ import { useEffect, useState } from 'react';
 import AppHeader from '@/components/home/AppHeader';
 import Link from 'next/link';
 import TotalCard from '@/components/home/TotalCard';
-import TransactionCard from '@/components/shared/TransactionCard';
+import TransactionCard from '@/components/home/TransactionCard';
 import AppFooter from '@/components/shared/AppFooter';
 import useSWR from 'swr';
 import { fetcher } from '@/lib/apiInstance';
@@ -39,16 +40,26 @@ import Image from 'next/image';
 import ThemeToggle from '@/components/shared/ThemeToggle';
 import {
   IconAppsFilled,
+  IconCalendar,
+  IconCalendarSearch,
+  IconCash,
+  IconChevronDown,
+  IconCirclePlus,
+  IconDotsVertical,
   IconEye,
   IconLogout,
   IconMinus,
   IconPlus,
+  IconSortDescending,
+  IconSortDescending2,
   IconWallet,
 } from '@tabler/icons-react';
 import useAuth from '@/hooks/useAuth';
 import WalletCard from '@/components/home/WalletCard';
 import CategoryCard from '@/components/home/CategoryCard';
 import NewItemCard from '@/components/home/NewItemCard';
+import ListTransactionsTransfersMenu from '@/components/home/ListTransactionsTransfersMenu';
+import TransferCard from '@/components/home/TransferCard';
 
 export default function Home() {
   const { colorScheme } = useMantineColorScheme();
@@ -57,6 +68,9 @@ export default function Home() {
 
   const { classes } = useStyles();
   const [categoriesChecked, setCategoriesChecked] = useState(true);
+  const [menuSelected, setMenuSelected] = useState<
+    'transactions' | 'transfers'
+  >('transactions');
 
   const {
     data: totals,
@@ -99,7 +113,7 @@ export default function Home() {
   }, [session]);
 
   return (
-    <Box mih="100vh" bg="violet.6">
+    <Box mih="100vh" bg={colorScheme === 'dark' ? 'dark.7' : 'violet.6'}>
       <Group position="apart" grow align="stretch" spacing={50}>
         <Container my={50} p={0} pl={50}>
           <AppHeader />
@@ -159,11 +173,76 @@ export default function Home() {
         <Container
           miw={730}
           my={30}
-          bg="gray.1"
+          bg={colorScheme === 'dark' ? 'dark.6' : 'gray.1'}
           p={30}
-          sx={{ borderRadius: '10px 0px 0px 10px' }}
+          sx={{
+            borderRadius: '10px 0px 0px 10px',
+            minHeight: 'calc(100vh - 60px)',
+          }}
         >
-          right side
+          <Stack spacing={20}>
+            <Group position="apart">
+              <ListTransactionsTransfersMenu
+                menuSelected={menuSelected}
+                setMenuSelected={setMenuSelected}
+              />
+
+              <Group spacing={25}>
+                <Group spacing={10}>
+                  {menuSelected === 'transactions' && <Switch color="teal.9" />}
+
+                  <ActionIcon
+                    variant="transparent"
+                    color={colorScheme === 'dark' ? 'gray.0' : 'gray.6'}
+                  >
+                    <IconCalendarSearch size="1.56rem" />
+                  </ActionIcon>
+
+                  <ActionIcon
+                    variant="transparent"
+                    color={colorScheme === 'dark' ? 'gray.0' : 'gray.6'}
+                  >
+                    <IconSortDescending2 size="1.56rem" />
+                  </ActionIcon>
+                </Group>
+
+                <ActionIcon
+                  variant="transparent"
+                  color={colorScheme === 'dark' ? 'gray.0' : 'violet.6'}
+                >
+                  <IconCirclePlus size="1.56rem" />
+                </ActionIcon>
+              </Group>
+            </Group>
+
+            <Stack spacing={10}>
+              {menuSelected === 'transactions' &&
+                [1, 2, 3].map((item) => (
+                  <TransactionCard
+                    key={item}
+                    name="Investimentos"
+                    categoryName="Investimentos"
+                    accountName="Banco do Brasil"
+                    value={1250}
+                    type="income"
+                    createdAt={new Date()}
+                  />
+                ))}
+
+              {menuSelected === 'transfers' &&
+                [1, 2, 3].map((item) => (
+                  <TransferCard
+                    key={item}
+                    fromAccountName="Banco do Brasil"
+                    toAccountName="Itaú"
+                    value={500}
+                    createdAt={new Date()}
+                  />
+                ))}
+
+              {/*<NewItemCard link="/" />*/}
+            </Stack>
+          </Stack>
         </Container>
       </Group>
     </Box>

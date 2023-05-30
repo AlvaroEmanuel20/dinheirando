@@ -1,4 +1,11 @@
-import { ActionIcon, Card, Group, Stack, Text } from '@mantine/core';
+import {
+  ActionIcon,
+  Card,
+  Group,
+  Stack,
+  Text,
+  useMantineColorScheme,
+} from '@mantine/core';
 import { IconEdit, IconTags, IconTrash } from '@tabler/icons-react';
 import { useState } from 'react';
 
@@ -9,6 +16,7 @@ interface CategoryCard {
 
 export default function CategoryCard({ name, type }: CategoryCard) {
   const [options, setOptions] = useState(false);
+  const { colorScheme } = useMantineColorScheme();
 
   return (
     <Card
@@ -33,18 +41,30 @@ export default function CategoryCard({ name, type }: CategoryCard) {
 
           {options && (
             <Group spacing={8}>
-              <ActionIcon size="xs" variant="transparent" color="gray.6">
+              <ActionIcon
+                size="xs"
+                variant="transparent"
+                color={colorScheme === 'dark' ? 'gray.0' : 'gray.6'}
+              >
                 <IconEdit size="1rem" />
               </ActionIcon>
 
-              <ActionIcon size="xs" variant="transparent" color="red">
+              <ActionIcon
+                size="xs"
+                variant="transparent"
+                color={colorScheme === 'dark' ? 'red.6' : 'red'}
+              >
                 <IconTrash size="1rem" />
               </ActionIcon>
             </Group>
           )}
         </Group>
 
-        <Text size="sm" fw="bold" color="gray.7">
+        <Text
+          size="sm"
+          fw="bold"
+          color={colorScheme === 'dark' ? 'gray.0' : 'gray.7'}
+        >
           {name}
         </Text>
       </Stack>

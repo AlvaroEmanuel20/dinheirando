@@ -1,5 +1,13 @@
 import { formatMoney } from '@/lib/formatMoney';
-import { ActionIcon, Card, Group, Skeleton, Stack, Text } from '@mantine/core';
+import {
+  ActionIcon,
+  Card,
+  Group,
+  Skeleton,
+  Stack,
+  Text,
+  useMantineColorScheme,
+} from '@mantine/core';
 import { IconEye, IconEyeOff } from '@tabler/icons-react';
 import { useState } from 'react';
 
@@ -10,10 +18,12 @@ interface TotalCard {
 
 export default function TotalCard({ label, value }: TotalCard) {
   const [show, setShow] = useState(true);
+  const { colorScheme } = useMantineColorScheme();
 
   return (
     <Card
       p={12}
+      bg={colorScheme === 'dark' ? 'violet.6' : ''}
       sx={{
         background: 'rgba(255, 255, 255, 0.24)',
         backdropFilter: 'blur(0.2px)',
