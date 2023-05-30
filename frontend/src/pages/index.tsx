@@ -1,22 +1,28 @@
 import {
+  ActionIcon,
   Anchor,
+  Avatar,
   Box,
+  Card,
+  Center,
   Container,
   Group,
+  SimpleGrid,
   Skeleton,
   Stack,
+  Switch,
   Text,
+  Title,
   useMantineColorScheme,
 } from '@mantine/core';
 import { GetServerSideProps } from 'next';
 import { getServerSession } from 'next-auth';
 import { authOptions } from './api/auth/[...nextauth]';
 import { signIn, useSession } from 'next-auth/react';
-import { useEffect } from 'react';
-import AppHeader from '@/components/shared/AppHeader';
+import { useEffect, useState } from 'react';
+import AppHeader from '@/components/home/AppHeader';
 import Link from 'next/link';
 import TotalCard from '@/components/home/TotalCard';
-import GoalCard from '@/components/home/GoalCard';
 import TransactionCard from '@/components/shared/TransactionCard';
 import AppFooter from '@/components/shared/AppFooter';
 import useSWR from 'swr';
@@ -29,11 +35,28 @@ import NoData from '@/components/shared/NoData';
 import { AccountsTotal } from '@/lib/apiTypes/accounts';
 import { notifications } from '@mantine/notifications';
 import { useStyles } from '@/hooks/useStyles';
+import Image from 'next/image';
+import ThemeToggle from '@/components/shared/ThemeToggle';
+import {
+  IconAppsFilled,
+  IconEye,
+  IconLogout,
+  IconMinus,
+  IconPlus,
+  IconWallet,
+} from '@tabler/icons-react';
+import useAuth from '@/hooks/useAuth';
+import WalletCard from '@/components/home/WalletCard';
+import CategoryCard from '@/components/home/CategoryCard';
+import NewItemCard from '@/components/home/NewItemCard';
 
 export default function Home() {
   const { colorScheme } = useMantineColorScheme();
   const { data: session } = useSession();
+  const { signOutAndRedirect } = useAuth();
+
   const { classes } = useStyles();
+  const [categoriesChecked, setCategoriesChecked] = useState(true);
 
   const {
     data: totals,
@@ -76,6 +99,77 @@ export default function Home() {
   }, [session]);
 
   return (
+    <Box mih="100vh" bg="violet.6">
+      <Group position="apart" grow align="stretch" spacing={50}>
+        <Container my={50} p={0} pl={50}>
+          <AppHeader />
+
+          <Group mt={40} spacing={20} grow>
+            <TotalCard label="Saldo total" value={75000} />
+            <TotalCard label="Ganhos totais" value={20000} />
+            <TotalCard label="Gastos totais" value={5000} />
+          </Group>
+
+          <Stack spacing={15} mt={40}>
+            <Text size="lg" fw="bold" color="white">
+              Minha Carteira
+            </Text>
+
+            <SimpleGrid spacing={20} cols={3}>
+              <WalletCard name="Banco do Brasil" amount={5000} />
+              <WalletCard name="Neon" amount={2000} />
+              <WalletCard name="Bradesco" amount={895.9} />
+              <WalletCard name="Itaú" amount={50000} />
+              <NewItemCard link="/" />
+            </SimpleGrid>
+          </Stack>
+
+          <Stack spacing={15} mt={40}>
+            <Group position="apart">
+              <Text size="lg" fw="bold" color="white">
+                Minhas Categorias
+              </Text>
+
+              <Switch
+                checked={categoriesChecked}
+                onChange={(event) =>
+                  setCategoriesChecked(event.currentTarget.checked)
+                }
+                color="teal.9"
+                thumbIcon={
+                  !categoriesChecked ? (
+                    <IconMinus color="red" size="0.7rem" />
+                  ) : (
+                    <IconPlus color="teal" size="0.7rem" />
+                  )
+                }
+              />
+            </Group>
+
+            <SimpleGrid spacing={20} cols={3}>
+              <CategoryCard type="income" name="Investimentos" />
+              <CategoryCard type="income" name="Salário" />
+              <CategoryCard type="income" name="Cashback" />
+              <CategoryCard type="income" name="Vendas" />
+              <NewItemCard link="/" />
+            </SimpleGrid>
+          </Stack>
+        </Container>
+
+        <Container
+          miw={730}
+          my={30}
+          bg="gray.1"
+          p={30}
+          sx={{ borderRadius: '10px 0px 0px 10px' }}
+        >
+          right side
+        </Container>
+      </Group>
+    </Box>
+  );
+
+  /*return (
     <>
       <AppHeader>
         <Stack spacing={1} mt="xl">
@@ -215,7 +309,7 @@ export default function Home() {
 
       <AppFooter />
     </>
-  );
+  );*/
 }
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {

@@ -40,7 +40,10 @@ export default function AuthLayout({ children, title, auxLink }: AuthLayout) {
             height={31}
           />
 
-          <ThemeToggle />
+          <ThemeToggle
+            color={colorScheme === 'dark' ? 'gray.0' : 'dark'}
+            size="1.5rem"
+          />
         </Group>
       </Container>
 
