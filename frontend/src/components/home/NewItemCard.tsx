@@ -2,12 +2,19 @@ import { ActionIcon, Card } from '@mantine/core';
 import { IconAppsFilled } from '@tabler/icons-react';
 import Link from 'next/link';
 
-export default function NewItemCard({ link }: { link: string }) {
+export default function NewItemCard({
+  link,
+  height,
+}: {
+  link: string;
+  height?: number;
+}) {
   return (
     <Card
       component={Link}
       href={link}
       radius="6px"
+      h={height}
       bg="none"
       display="flex"
       sx={{

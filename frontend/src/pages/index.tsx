@@ -1,19 +1,13 @@
 import {
   ActionIcon,
-  Anchor,
-  Avatar,
   Box,
-  Card,
-  Center,
   Container,
   Group,
-  Menu,
+  MediaQuery,
   SimpleGrid,
-  Skeleton,
   Stack,
   Switch,
   Text,
-  Title,
   useMantineColorScheme,
 } from '@mantine/core';
 import { GetServerSideProps } from 'next';
@@ -22,37 +16,21 @@ import { authOptions } from './api/auth/[...nextauth]';
 import { signIn, useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 import AppHeader from '@/components/home/AppHeader';
-import Link from 'next/link';
 import TotalCard from '@/components/home/TotalCard';
 import TransactionCard from '@/components/home/TransactionCard';
-import AppFooter from '@/components/shared/AppFooter';
 import useSWR from 'swr';
 import { fetcher } from '@/lib/apiInstance';
 import { Transaction, TransactionsTotals } from '@/lib/apiTypes/transactions';
-import { formatMoney } from '@/lib/formatMoney';
 import useTransactions from '@/hooks/useTransactions';
 import useUser from '@/hooks/useUser';
-import NoData from '@/components/shared/NoData';
 import { AccountsTotal } from '@/lib/apiTypes/accounts';
 import { notifications } from '@mantine/notifications';
-import { useStyles } from '@/hooks/useStyles';
-import Image from 'next/image';
-import ThemeToggle from '@/components/shared/ThemeToggle';
 import {
-  IconAppsFilled,
-  IconCalendar,
   IconCalendarSearch,
-  IconCash,
-  IconChevronDown,
   IconCirclePlus,
-  IconDotsVertical,
-  IconEye,
-  IconLogout,
   IconMinus,
   IconPlus,
-  IconSortDescending,
   IconSortDescending2,
-  IconWallet,
 } from '@tabler/icons-react';
 import useAuth from '@/hooks/useAuth';
 import WalletCard from '@/components/home/WalletCard';
@@ -60,13 +38,15 @@ import CategoryCard from '@/components/home/CategoryCard';
 import NewItemCard from '@/components/home/NewItemCard';
 import ListTransactionsTransfersMenu from '@/components/home/ListTransactionsTransfersMenu';
 import TransferCard from '@/components/home/TransferCard';
+import { useStylesHome } from '@/hooks/styles/useStylesHome';
+import { Carousel } from '@mantine/carousel';
 
 export default function Home() {
   const { colorScheme } = useMantineColorScheme();
   const { data: session } = useSession();
   const { signOutAndRedirect } = useAuth();
 
-  const { classes } = useStyles();
+  const { classes } = useStylesHome();
   const [categoriesChecked, setCategoriesChecked] = useState(true);
   const [menuSelected, setMenuSelected] = useState<
     'transactions' | 'transfers'
@@ -114,27 +94,53 @@ export default function Home() {
 
   return (
     <Box mih="100vh" bg={colorScheme === 'dark' ? 'dark.7' : 'violet.6'}>
-      <Group position="apart" grow align="stretch" spacing={50}>
-        <Container my={50} p={0} pl={50}>
+      <Group
+        className={classes.mainGroup}
+        noWrap
+        position="apart"
+        grow
+        align="strecth"
+        spacing={50}
+      >
+        <Container className={classes.leftContainer} my={50} p={0} pl={50}>
           <AppHeader />
 
-          <Group mt={40} spacing={20} grow>
+          <SimpleGrid
+            className={classes.gridVerticalSpace}
+            mt={40}
+            spacing={20}
+            cols={3}
+            breakpoints={[
+              { maxWidth: 'lgg', cols: 2 },
+              { maxWidth: 'md', cols: 3, spacing: 10 },
+              { maxWidth: 'lxs', cols: 2, spacing: 10 },
+            ]}
+          >
             <TotalCard label="Saldo total" value={75000} />
             <TotalCard label="Ganhos totais" value={20000} />
             <TotalCard label="Gastos totais" value={5000} />
-          </Group>
+          </SimpleGrid>
 
           <Stack spacing={15} mt={40}>
             <Text size="lg" fw="bold" color="white">
               Minha Carteira
             </Text>
 
-            <SimpleGrid spacing={20} cols={3}>
+            <SimpleGrid
+              className={classes.gridVerticalSpace}
+              spacing={20}
+              cols={3}
+              breakpoints={[
+                { maxWidth: 'lgg', cols: 2 },
+                { maxWidth: 'md', cols: 3, spacing: 10 },
+                { maxWidth: 'lxs', cols: 2, spacing: 10 },
+              ]}
+            >
               <WalletCard name="Banco do Brasil" amount={5000} />
               <WalletCard name="Neon" amount={2000} />
               <WalletCard name="Bradesco" amount={895.9} />
               <WalletCard name="Itaú" amount={50000} />
-              <NewItemCard link="/" />
+              <NewItemCard height={130} link="/" />
             </SimpleGrid>
           </Stack>
 
@@ -160,18 +166,28 @@ export default function Home() {
               />
             </Group>
 
-            <SimpleGrid spacing={20} cols={3}>
+            <SimpleGrid
+              className={classes.gridVerticalSpace}
+              spacing={20}
+              cols={3}
+              breakpoints={[
+                { maxWidth: 'lgg', cols: 2 },
+                { maxWidth: 'md', cols: 3, spacing: 10 },
+                { maxWidth: 'lxs', cols: 2, spacing: 10 },
+              ]}
+            >
               <CategoryCard type="income" name="Investimentos" />
               <CategoryCard type="income" name="Salário" />
               <CategoryCard type="income" name="Cashback" />
               <CategoryCard type="income" name="Vendas" />
-              <NewItemCard link="/" />
+              <NewItemCard height={95} link="/" />
             </SimpleGrid>
           </Stack>
         </Container>
 
         <Container
-          miw={730}
+          className={classes.rightContainer}
+          fluid
           my={30}
           bg={colorScheme === 'dark' ? 'dark.6' : 'gray.1'}
           p={30}

@@ -17,7 +17,7 @@ import { ReactNode } from 'react';
 import Link from 'next/link';
 import useUser from '@/hooks/useUser';
 import getFirstLettersName from '@/lib/getFirstLettersName';
-import { useStyles } from '@/hooks/useStyles';
+import { useStyles } from '@/hooks/styles/useStyles';
 
 export default function AppHeader({ children }: { children: ReactNode }) {
   const [opened, { toggle, open, close }] = useDisclosure(false);

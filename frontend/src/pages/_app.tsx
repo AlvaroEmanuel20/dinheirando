@@ -51,6 +51,16 @@ export default function App({ Component, pageProps }: AppProps) {
                     : theme.white,
               },
             }),
+            breakpoints: {
+              xs: '30em',
+              lxs: '44em',
+              sm: '48em',
+              md: '64em',
+              lmd: '65em',
+              lg: '74em',
+              lgg: '80em',
+              xl: '90em',
+            },
           }}
         >
           <Notifications limit={5} />

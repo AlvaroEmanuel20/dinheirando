@@ -11,7 +11,7 @@ import { ReactNode } from 'react';
 import ThemeToggle from '@/components/shared/ThemeToggle';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useStyles } from '@/hooks/useStyles';
+import { useStyles } from '@/hooks/styles/useStyles';
 
 interface AuthLayout {
   children: ReactNode;

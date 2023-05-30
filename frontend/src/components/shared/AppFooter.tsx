@@ -1,4 +1,4 @@
-import { useStyles } from '@/hooks/useStyles';
+import { useStyles } from '@/hooks/styles/useStyles';
 import { ActionIcon, Anchor, Center, Container, Menu } from '@mantine/core';
 import { IconPlus } from '@tabler/icons-react';
 import Link from 'next/link';
