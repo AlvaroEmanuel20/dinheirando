@@ -26,7 +26,7 @@
     "@types/react-dom": "^18.2.1",
     "axios": "^1.4.0",
     "dayjs": "^1.11.7",
-    "embla-carousel-react": "^8.0.0-rc05",
+    "embla-carousel-react": "7.1.0",
     "eslint": "^8.39.0",
     "eslint-config-next": "^13.3.1",
     "jsonwebtoken": "^9.0.0",

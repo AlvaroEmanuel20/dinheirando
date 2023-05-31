@@ -1,4 +1,10 @@
-import { Group, Menu, Text, useMantineColorScheme } from '@mantine/core';
+import {
+  Group,
+  MediaQuery,
+  Menu,
+  Text,
+  useMantineColorScheme,
+} from '@mantine/core';
 import {
   IconArrowsLeftRight,
   IconCash,
@@ -30,11 +36,13 @@ export default function ListTransactionsTransfersMenu({
     >
       <Menu.Target>
         <Group sx={{ cursor: 'pointer' }} spacing={10}>
-          {menuSelected === 'transactions' ? (
-            <IconCash size="1.56rem" color="#ADB5BD" />
-          ) : (
-            <IconArrowsLeftRight size="1.45rem" color="#ADB5BD" />
-          )}
+          <MediaQuery smallerThan="xss" styles={{ display: 'none' }}>
+            {menuSelected === 'transactions' ? (
+              <IconCash size="1.56rem" color="#ADB5BD" />
+            ) : (
+              <IconArrowsLeftRight size="1.45rem" color="#ADB5BD" />
+            )}
+          </MediaQuery>
 
           <Text fw="bold" color={colorScheme === 'dark' ? 'gray.0' : 'dimmed'}>
             {menuSelected === 'transactions' ? 'Transações' : 'Transferências'}

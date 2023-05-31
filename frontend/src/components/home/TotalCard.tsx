@@ -1,3 +1,4 @@
+import { useStylesHome } from '@/hooks/styles/useStylesHome';
 import { formatMoney } from '@/lib/formatMoney';
 import {
   ActionIcon,
@@ -19,9 +20,11 @@ interface TotalCard {
 export default function TotalCard({ label, value }: TotalCard) {
   const [show, setShow] = useState(true);
   const { colorScheme } = useMantineColorScheme();
+  const { classes } = useStylesHome();
 
   return (
     <Card
+      className={classes.totalCard}
       p={12}
       bg={colorScheme === 'dark' ? 'violet.6' : ''}
       sx={{
@@ -46,6 +49,7 @@ export default function TotalCard({ label, value }: TotalCard) {
         </Group>
 
         <Text
+          className={classes.totalCardValue}
           sx={{ filter: show ? 'none' : 'blur(0.4rem)' }}
           color="white"
           fw="bold"

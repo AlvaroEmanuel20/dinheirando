@@ -1,3 +1,4 @@
+import { useStylesHome } from '@/hooks/styles/useStylesHome';
 import { formatMoney } from '@/lib/formatMoney';
 import {
   ActionIcon,
@@ -30,6 +31,7 @@ export default function TransactionCard({
 }: TransactionCard) {
   const [options, setOptions] = useState(false);
   const { colorScheme } = useMantineColorScheme();
+  const { classes } = useStylesHome();
 
   return (
     <Card
@@ -37,8 +39,9 @@ export default function TransactionCard({
         borderLeft: `4px solid ${type === 'income' ? '#087F5B' : '#FA5252'}`,
       }}
       py={8}
-      pl={15}
-      pr={3}
+      pl={10}
+      pr={2}
+      className={classes.transactionCard}
       bg={colorScheme === 'dark' ? 'dark.5' : ''}
     >
       <Group position="apart">

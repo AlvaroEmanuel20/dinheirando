@@ -5,6 +5,7 @@ import {
   Group,
   MediaQuery,
   SimpleGrid,
+  Skeleton,
   Stack,
   Switch,
   Text,
@@ -23,7 +24,7 @@ import { fetcher } from '@/lib/apiInstance';
 import { Transaction, TransactionsTotals } from '@/lib/apiTypes/transactions';
 import useTransactions from '@/hooks/useTransactions';
 import useUser from '@/hooks/useUser';
-import { AccountsTotal } from '@/lib/apiTypes/accounts';
+import { Account, AccountsTotal } from '@/lib/apiTypes/accounts';
 import { notifications } from '@mantine/notifications';
 import {
   IconCalendarSearch,
@@ -32,7 +33,6 @@ import {
   IconPlus,
   IconSortDescending2,
 } from '@tabler/icons-react';
-import useAuth from '@/hooks/useAuth';
 import WalletCard from '@/components/home/WalletCard';
 import CategoryCard from '@/components/home/CategoryCard';
 import NewItemCard from '@/components/home/NewItemCard';
@@ -40,11 +40,12 @@ import ListTransactionsTransfersMenu from '@/components/home/ListTransactionsTra
 import TransferCard from '@/components/home/TransferCard';
 import { useStylesHome } from '@/hooks/styles/useStylesHome';
 import { Carousel } from '@mantine/carousel';
+import TotalCardTransparent from '@/components/home/TotalCardTransparent';
+import useAccounts from '@/hooks/useAccounts';
 
 export default function Home() {
   const { colorScheme } = useMantineColorScheme();
   const { data: session } = useSession();
-  const { signOutAndRedirect } = useAuth();
 
   const { classes } = useStylesHome();
   const [categoriesChecked, setCategoriesChecked] = useState(true);
@@ -81,6 +82,12 @@ export default function Home() {
   });
 
   const {
+    data: accounts,
+    isLoading: isLoadingAccounts,
+    error: errorAccounts,
+  } = useAccounts<Account[]>();
+
+  const {
     data: latestTransactions,
     isLoading: isLoadingLatestTransaction,
     error: errorLatestTransactions,
@@ -105,29 +112,10 @@ export default function Home() {
         <Container className={classes.leftContainer} my={50} p={0} pl={50}>
           <AppHeader />
 
-          <SimpleGrid
-            className={classes.gridVerticalSpace}
-            mt={40}
-            spacing={20}
-            cols={3}
-            breakpoints={[
-              { maxWidth: 'lgg', cols: 2 },
-              { maxWidth: 'md', cols: 3, spacing: 10 },
-              { maxWidth: 'lxs', cols: 2, spacing: 10 },
-            ]}
-          >
-            <TotalCard label="Saldo total" value={75000} />
-            <TotalCard label="Ganhos totais" value={20000} />
-            <TotalCard label="Gastos totais" value={5000} />
-          </SimpleGrid>
-
-          <Stack spacing={15} mt={40}>
-            <Text size="lg" fw="bold" color="white">
-              Minha Carteira
-            </Text>
-
+          <MediaQuery smallerThan="xs" styles={{ display: 'none' }}>
             <SimpleGrid
               className={classes.gridVerticalSpace}
+              mt={40}
               spacing={20}
               cols={3}
               breakpoints={[
@@ -136,53 +124,200 @@ export default function Home() {
                 { maxWidth: 'lxs', cols: 2, spacing: 10 },
               ]}
             >
-              <WalletCard name="Banco do Brasil" amount={5000} />
-              <WalletCard name="Neon" amount={2000} />
-              <WalletCard name="Bradesco" amount={895.9} />
-              <WalletCard name="Itaú" amount={50000} />
-              <NewItemCard height={130} link="/" />
+              <TotalCard label="Saldo total" value={75000} />
+              <TotalCard label="Ganhos totais" value={20000} />
+              <TotalCard label="Gastos totais" value={5000} />
             </SimpleGrid>
-          </Stack>
+          </MediaQuery>
 
-          <Stack spacing={15} mt={40}>
-            <Group position="apart">
+          <MediaQuery largerThan="xs" styles={{ display: 'none' }}>
+            <Stack mt={40} spacing={20} className={classes.paddingRightXs}>
+              <Skeleton
+                width="50%"
+                radius="6px"
+                visible={isLoadingAccountTotal}
+              >
+                <TotalCardTransparent
+                  label="Saldo total"
+                  value={accountsTotal ? accountsTotal.total : 0}
+                />
+              </Skeleton>
+
+              <Group spacing={10} grow position="apart">
+                <Skeleton radius="6px" visible={isLoadingTotals}>
+                  <TotalCard
+                    label="Ganhos totais"
+                    value={totals ? totals.totalIncome : 0}
+                  />
+                </Skeleton>
+                <Skeleton radius="6px" visible={isLoadingTotals}>
+                  <TotalCard
+                    label="Gastos totais"
+                    value={totals ? totals.totalExpense : 0}
+                  />
+                </Skeleton>
+              </Group>
+            </Stack>
+          </MediaQuery>
+
+          <MediaQuery smallerThan="xs" styles={{ display: 'none' }}>
+            <Stack spacing={15} mt={40}>
               <Text size="lg" fw="bold" color="white">
-                Minhas Categorias
+                Minha Carteira
               </Text>
 
-              <Switch
-                checked={categoriesChecked}
-                onChange={(event) =>
-                  setCategoriesChecked(event.currentTarget.checked)
-                }
-                color="teal.9"
-                thumbIcon={
-                  !categoriesChecked ? (
-                    <IconMinus color="red" size="0.7rem" />
-                  ) : (
-                    <IconPlus color="teal" size="0.7rem" />
-                  )
-                }
-              />
-            </Group>
+              <SimpleGrid
+                className={classes.gridVerticalSpace}
+                spacing={20}
+                cols={3}
+                breakpoints={[
+                  { maxWidth: 'lgg', cols: 2 },
+                  { maxWidth: 'md', cols: 3, spacing: 10 },
+                  { maxWidth: 'lxs', cols: 2, spacing: 10 },
+                ]}
+              >
+                <WalletCard name="Banco do Brasil" amount={5000} />
+                <WalletCard name="Neon" amount={2000} />
+                <WalletCard name="Bradesco" amount={895.9} />
+                <WalletCard name="Itaú" amount={50000} />
+                <NewItemCard height={130} link="/" />
+              </SimpleGrid>
+            </Stack>
+          </MediaQuery>
 
-            <SimpleGrid
-              className={classes.gridVerticalSpace}
-              spacing={20}
-              cols={3}
-              breakpoints={[
-                { maxWidth: 'lgg', cols: 2 },
-                { maxWidth: 'md', cols: 3, spacing: 10 },
-                { maxWidth: 'lxs', cols: 2, spacing: 10 },
-              ]}
-            >
-              <CategoryCard type="income" name="Investimentos" />
-              <CategoryCard type="income" name="Salário" />
-              <CategoryCard type="income" name="Cashback" />
-              <CategoryCard type="income" name="Vendas" />
-              <NewItemCard height={95} link="/" />
-            </SimpleGrid>
-          </Stack>
+          <MediaQuery largerThan="xs" styles={{ display: 'none' }}>
+            <Stack spacing={15} mt={40} pr={isLoadingAccounts ? 15 : 0}>
+              <Text
+                className={classes.paddingRightXs}
+                size="lg"
+                fw="bold"
+                color="white"
+              >
+                Minha Carteira
+              </Text>
+
+              <Skeleton visible={isLoadingAccounts} radius='6px'>
+                <Carousel
+                  withControls={false}
+                  slideGap={10}
+                  align="start"
+                  slideSize={202}
+                >
+                  <Carousel.Slide>
+                    <WalletCard name="Banco do Brasil" amount={5000} />
+                  </Carousel.Slide>
+                  <Carousel.Slide>
+                    <WalletCard name="Banco do Brasil" amount={5000} />
+                  </Carousel.Slide>
+                  <Carousel.Slide>
+                    <WalletCard name="Banco do Brasil" amount={5000} />
+                  </Carousel.Slide>
+                  <Carousel.Slide>
+                    <WalletCard name="Banco do Brasil" amount={5000} />
+                  </Carousel.Slide>
+                  <Carousel.Slide>
+                    <WalletCard name="Banco do Brasil" amount={5000} />
+                  </Carousel.Slide>
+                  <Carousel.Slide>
+                    <NewItemCard height={130} link="/" />
+                  </Carousel.Slide>
+                </Carousel>
+              </Skeleton>
+            </Stack>
+          </MediaQuery>
+
+          <MediaQuery smallerThan="xs" styles={{ display: 'none' }}>
+            <Stack spacing={15} mt={40}>
+              <Group position="apart">
+                <Text size="lg" fw="bold" color="white">
+                  Minhas Categorias
+                </Text>
+
+                <Switch
+                  checked={categoriesChecked}
+                  onChange={(event) =>
+                    setCategoriesChecked(event.currentTarget.checked)
+                  }
+                  color="teal.9"
+                  thumbIcon={
+                    !categoriesChecked ? (
+                      <IconMinus color="red" size="0.7rem" />
+                    ) : (
+                      <IconPlus color="teal" size="0.7rem" />
+                    )
+                  }
+                />
+              </Group>
+
+              <SimpleGrid
+                className={classes.gridVerticalSpace}
+                spacing={20}
+                cols={3}
+                breakpoints={[
+                  { maxWidth: 'lgg', cols: 2 },
+                  { maxWidth: 'md', cols: 3, spacing: 10 },
+                  { maxWidth: 'lxs', cols: 2, spacing: 10 },
+                ]}
+              >
+                <CategoryCard type="income" name="Investimentos" />
+                <CategoryCard type="income" name="Salário" />
+                <CategoryCard type="income" name="Cashback" />
+                <CategoryCard type="income" name="Vendas" />
+                <NewItemCard height={95} link="/" />
+              </SimpleGrid>
+            </Stack>
+          </MediaQuery>
+
+          <MediaQuery largerThan="xs" styles={{ display: 'none' }}>
+            <Stack spacing={15} mt={40}>
+              <Group position="apart" className={classes.paddingRightXs}>
+                <Text size="lg" fw="bold" color="white">
+                  Minhas Categorias
+                </Text>
+
+                <Switch
+                  checked={categoriesChecked}
+                  onChange={(event) =>
+                    setCategoriesChecked(event.currentTarget.checked)
+                  }
+                  color="teal.9"
+                  thumbIcon={
+                    !categoriesChecked ? (
+                      <IconMinus color="red" size="0.7rem" />
+                    ) : (
+                      <IconPlus color="teal" size="0.7rem" />
+                    )
+                  }
+                />
+              </Group>
+
+              <Carousel
+                withControls={false}
+                slideGap={10}
+                align="start"
+                slideSize={202}
+              >
+                <Carousel.Slide>
+                  <CategoryCard type="income" name="Vendas" />
+                </Carousel.Slide>
+                <Carousel.Slide>
+                  <CategoryCard type="income" name="Vendas" />
+                </Carousel.Slide>
+                <Carousel.Slide>
+                  <CategoryCard type="income" name="Vendas" />
+                </Carousel.Slide>
+                <Carousel.Slide>
+                  <CategoryCard type="income" name="Vendas" />
+                </Carousel.Slide>
+                <Carousel.Slide>
+                  <CategoryCard type="income" name="Vendas" />
+                </Carousel.Slide>
+                <Carousel.Slide>
+                  <NewItemCard height={95} link="/" />
+                </Carousel.Slide>
+              </Carousel>
+            </Stack>
+          </MediaQuery>
         </Container>
 
         <Container
@@ -203,7 +338,7 @@ export default function Home() {
                 setMenuSelected={setMenuSelected}
               />
 
-              <Group spacing={25}>
+              <Group spacing={25} className={classes.listOptions}>
                 <Group spacing={10}>
                   {menuSelected === 'transactions' && <Switch color="teal.9" />}
 

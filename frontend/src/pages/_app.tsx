@@ -52,6 +52,7 @@ export default function App({ Component, pageProps }: AppProps) {
               },
             }),
             breakpoints: {
+              xss: '25em',
               xs: '30em',
               lxs: '44em',
               sm: '48em',
