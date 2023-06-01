@@ -7,6 +7,7 @@ import {
   Group,
   MediaQuery,
   Skeleton,
+  Stack,
   useMantineColorScheme,
 } from '@mantine/core';
 import Image from 'next/image';
@@ -18,6 +19,7 @@ import useUser from '@/hooks/useUser';
 import Link from 'next/link';
 import getFirstLettersName from '@/lib/getFirstLettersName';
 import { useDisclosure } from '@mantine/hooks';
+import EditProfileForm from './EditProfileForm';
 
 export default function AppHeader() {
   const { signOutAndRedirect, isLoadingSignOut } = useAuth();
@@ -91,7 +93,7 @@ export default function AppHeader() {
         title="Editar Perfil"
         overlayProps={{ opacity: 0.5, blur: 4 }}
       >
-        Oi
+        <EditProfileForm />
       </Drawer>
     </>
   );

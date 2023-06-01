@@ -13,20 +13,28 @@ import { useDisclosure } from '@mantine/hooks';
 import { IconDotsVertical, IconEdit, IconTrash } from '@tabler/icons-react';
 import { format } from 'our-dates';
 import { useState } from 'react';
+import EditTransactionForm from './EditTransactionForm';
+import { useSWRConfig } from 'swr';
+import useSWRMutation from 'swr/mutation';
+import { deleteService } from '@/lib/mutateServices';
+import { TransactionId } from '@/lib/apiTypes/transactions';
+import { notifications } from '@mantine/notifications';
 
 interface TransactionCard {
+  id: string;
   name: string;
-  categoryName: string;
-  accountName: string;
+  category: { _id: string; name: string };
+  account: { _id: string; name: string };
   createdAt: Date;
   value: number;
   type: 'income' | 'expense';
 }
 
 export default function TransactionCard({
+  id,
   name,
-  categoryName,
-  accountName,
+  category,
+  account,
   createdAt,
   value,
   type,
@@ -35,6 +43,35 @@ export default function TransactionCard({
   const { colorScheme } = useMantineColorScheme();
   const { classes } = useStylesHome();
   const [opened, { open, close }] = useDisclosure(false);
+
+  const { mutate } = useSWRConfig();
+
+  const {
+    trigger,
+    isMutating,
+    error: errorMutate,
+  } = useSWRMutation(`/transactions/${id}`, deleteService<TransactionId>, {
+    onError(err, key, config) {
+      notifications.show({
+        color: 'red',
+        title: 'Erro ao excluir transação',
+        message: 'Houve um erro ao excluir transação',
+      });
+    },
+  });
+
+  const onDelete = async () => {
+    try {
+      await trigger();
+      await mutate(
+        (key) => typeof key === 'string' && key.startsWith('/transactions')
+      );
+
+      await mutate(
+        (key) => typeof key === 'string' && key.startsWith('/accounts')
+      );
+    } catch (error) {}
+  };
 
   return (
     <>
@@ -61,7 +98,7 @@ export default function TransactionCard({
               size="xs"
               color={colorScheme === 'dark' ? 'gray.5' : 'dimmed'}
             >
-              {categoryName} | {format(createdAt, 'dd/MM/yyyy')}
+              {category.name} | {format(createdAt, 'dd/MM/yyyy')}
             </Text>
           </Stack>
 
@@ -72,7 +109,7 @@ export default function TransactionCard({
                   size="xs"
                   color={colorScheme === 'dark' ? 'gray.5' : 'dimmed'}
                 >
-                  {accountName}
+                  {account.name}
                 </Text>
                 <Text
                   size="sm"
@@ -96,9 +133,11 @@ export default function TransactionCard({
                 </ActionIcon>
 
                 <ActionIcon
+                  onClick={onDelete}
                   size="xs"
                   variant="transparent"
                   color={colorScheme === 'dark' ? 'red.6' : 'red'}
+                  loading={isMutating}
                 >
                   <IconTrash size="1rem" />
                 </ActionIcon>
@@ -117,7 +156,18 @@ export default function TransactionCard({
       </Card>
 
       <Modal centered opened={opened} onClose={close} title="Editar Transação">
-        Oi
+        <EditTransactionForm
+          close={close}
+          transaction={{
+            _id: id,
+            name,
+            account,
+            category,
+            createdAt,
+            type,
+            value,
+          }}
+        />
       </Modal>
     </>
   );

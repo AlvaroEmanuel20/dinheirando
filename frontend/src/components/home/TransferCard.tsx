@@ -12,23 +12,60 @@ import { useDisclosure } from '@mantine/hooks';
 import { IconDotsVertical, IconEdit, IconTrash } from '@tabler/icons-react';
 import { format } from 'our-dates';
 import { useState } from 'react';
+import EditTransferForm from './EditTransferForm';
+import { useSWRConfig } from 'swr';
+import useSWRMutation from 'swr/mutation';
+import { deleteService } from '@/lib/mutateServices';
+import { TransferId } from '@/lib/apiTypes/transfers';
+import { notifications } from '@mantine/notifications';
 
 interface TransferCard {
-  fromAccountName: string;
-  toAccountName: string;
+  id: string;
+  fromAccount: { _id: string; name: string };
+  toAccount: { _id: string; name: string };
   createdAt: Date;
   value: number;
 }
 
 export default function TransferCard({
-  fromAccountName,
-  toAccountName,
+  id,
+  fromAccount,
+  toAccount,
   createdAt,
   value,
 }: TransferCard) {
   const [options, setOptions] = useState(false);
   const { colorScheme } = useMantineColorScheme();
   const [opened, { open, close }] = useDisclosure(false);
+
+  const { mutate } = useSWRConfig();
+
+  const {
+    trigger,
+    isMutating,
+    error: errorMutate,
+  } = useSWRMutation(`/transfers/${id}`, deleteService<TransferId>, {
+    onError(err, key, config) {
+      notifications.show({
+        color: 'red',
+        title: 'Erro ao excluir transferência',
+        message: 'Houve um erro ao excluir transferência',
+      });
+    },
+  });
+
+  const onDelete = async () => {
+    try {
+      await trigger();
+      await mutate(
+        (key) => typeof key === 'string' && key.startsWith('/transfers')
+      );
+
+      await mutate(
+        (key) => typeof key === 'string' && key.startsWith('/accounts')
+      );
+    } catch (error) {}
+  };
 
   return (
     <>
@@ -51,7 +88,7 @@ export default function TransferCard({
             >
               De{' '}
               <Text span fw="bold">
-                {fromAccountName}
+                {fromAccount.name}
               </Text>
             </Text>
             <Text
@@ -60,7 +97,7 @@ export default function TransferCard({
             >
               Para{' '}
               <Text span fw="bold">
-                {toAccountName}
+                {toAccount.name}
               </Text>
             </Text>
           </Stack>
@@ -96,6 +133,8 @@ export default function TransferCard({
                 </ActionIcon>
 
                 <ActionIcon
+                  onClick={onDelete}
+                  loading={isMutating}
                   size="xs"
                   variant="transparent"
                   color={colorScheme === 'dark' ? 'red.6' : 'red'}
@@ -122,7 +161,10 @@ export default function TransferCard({
         onClose={close}
         title="Editar Transferência"
       >
-        Oi
+        <EditTransferForm
+          close={close}
+          transfer={{ _id: id, fromAccount, toAccount, value, createdAt }}
+        />
       </Modal>
     </>
   );

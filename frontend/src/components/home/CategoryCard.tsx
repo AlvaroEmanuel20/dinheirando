@@ -10,16 +10,48 @@ import {
 import { useDisclosure } from '@mantine/hooks';
 import { IconEdit, IconTags, IconTrash } from '@tabler/icons-react';
 import { useState } from 'react';
+import EditCategoryForm from './EditCategoryForm';
+import { useSWRConfig } from 'swr';
+import useSWRMutation from 'swr/mutation';
+import { deleteService } from '@/lib/mutateServices';
+import { notifications } from '@mantine/notifications';
+import { CategoryId } from '@/lib/apiTypes/categories';
 
 interface CategoryCard {
+  id: string;
   name: string;
   type: string;
 }
 
-export default function CategoryCard({ name, type }: CategoryCard) {
+export default function CategoryCard({ id, name, type }: CategoryCard) {
   const [options, setOptions] = useState(false);
   const { colorScheme } = useMantineColorScheme();
   const [opened, { open, close }] = useDisclosure(false);
+
+  const { mutate } = useSWRConfig();
+
+  const {
+    trigger,
+    isMutating,
+    error: errorMutate,
+  } = useSWRMutation(`/categories/${id}`, deleteService<CategoryId>, {
+    onError(err, key, config) {
+      notifications.show({
+        color: 'red',
+        title: 'Erro ao excluir categoria',
+        message: 'Há transações ou transferências usando essa categoria',
+      });
+    },
+  });
+
+  const onDelete = async () => {
+    try {
+      await trigger();
+      await mutate(
+        (key) => typeof key === 'string' && key.startsWith('/categories')
+      );
+    } catch (error) {}
+  };
 
   return (
     <>
@@ -55,9 +87,11 @@ export default function CategoryCard({ name, type }: CategoryCard) {
                 </ActionIcon>
 
                 <ActionIcon
+                  onClick={onDelete}
                   size="xs"
                   variant="transparent"
                   color={colorScheme === 'dark' ? 'red.6' : 'red'}
+                  loading={isMutating}
                 >
                   <IconTrash size="1rem" />
                 </ActionIcon>
@@ -76,7 +110,10 @@ export default function CategoryCard({ name, type }: CategoryCard) {
       </Card>
 
       <Modal centered opened={opened} onClose={close} title="Editar Categoria">
-        Oi
+        <EditCategoryForm
+          close={close}
+          category={{ _id: id, name, type, totalOfTransactions: 0 }}
+        />
       </Modal>
     </>
   );

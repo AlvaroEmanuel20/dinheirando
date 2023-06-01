@@ -17,6 +17,7 @@ import useCategories from '@/hooks/useCategories';
 import { Category } from '@/lib/apiTypes/categories';
 import { useStylesHome } from '@/hooks/styles/useStylesHome';
 import { useDisclosure } from '@mantine/hooks';
+import AddCategoryForm from './AddCategoryForm';
 
 export default function CategoriesSection() {
   const { classes } = useStylesHome();
@@ -79,6 +80,7 @@ export default function CategoriesSection() {
                 incomeCategories.map((category) => (
                   <CategoryCard
                     key={category._id}
+                    id={category._id}
                     type={category.type}
                     name={category.name}
                   />
@@ -88,6 +90,7 @@ export default function CategoriesSection() {
                 expenseCategories &&
                 expenseCategories.map((category) => (
                   <CategoryCard
+                    id={category._id}
                     key={category._id}
                     type={category.type}
                     name={category.name}
@@ -148,7 +151,11 @@ export default function CategoriesSection() {
                 incomeCategories &&
                 incomeCategories.map((category) => (
                   <Carousel.Slide key={category._id}>
-                    <CategoryCard type={category.type} name={category.name} />
+                    <CategoryCard
+                      id={category._id}
+                      type={category.type}
+                      name={category.name}
+                    />
                   </Carousel.Slide>
                 ))}
 
@@ -156,7 +163,11 @@ export default function CategoriesSection() {
                 expenseCategories &&
                 expenseCategories.map((category) => (
                   <Carousel.Slide key={category._id}>
-                    <CategoryCard type={category.type} name={category.name} />
+                    <CategoryCard
+                      id={category._id}
+                      type={category.type}
+                      name={category.name}
+                    />
                   </Carousel.Slide>
                 ))}
 
@@ -169,7 +180,7 @@ export default function CategoriesSection() {
       </MediaQuery>
 
       <Modal centered opened={opened} onClose={close} title="Criar Categoria">
-        Oi
+        <AddCategoryForm close={close} />
       </Modal>
     </>
   );

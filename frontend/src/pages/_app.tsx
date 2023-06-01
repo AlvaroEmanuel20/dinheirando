@@ -64,7 +64,7 @@ export default function App({ Component, pageProps }: AppProps) {
             },
           }}
         >
-          <Notifications limit={5} />
+          <Notifications autoClose={5000} limit={5} />
           <RouterTransition />
           <SessionProvider session={pageProps.session}>
             <DatesProvider settings={{ locale: 'pt-br' }}>

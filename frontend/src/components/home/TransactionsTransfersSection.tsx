@@ -31,6 +31,8 @@ import { Transfer } from '@/lib/apiTypes/transfers';
 import useTransfers from '@/hooks/useTransfers';
 import { DatePickerInput } from '@mantine/dates';
 import { useDisclosure } from '@mantine/hooks';
+import AddTransactionForm from './AddTransactionForm';
+import AddTransferForm from './AddTransferForm';
 
 export default function TransactionsTransfersSection() {
   const { colorScheme } = useMantineColorScheme();
@@ -225,9 +227,10 @@ export default function TransactionsTransfersSection() {
                   {incomeTransactions.map((transaction) => (
                     <TransactionCard
                       key={transaction._id}
+                      id={transaction._id}
                       name={transaction.name}
-                      categoryName={transaction.category.name}
-                      accountName={transaction.account.name}
+                      category={transaction.category}
+                      account={transaction.account}
                       value={transaction.value}
                       type={transaction.type}
                       createdAt={new Date(transaction.createdAt)}
@@ -243,9 +246,10 @@ export default function TransactionsTransfersSection() {
                   {expenseTransactions.map((transaction) => (
                     <TransactionCard
                       key={transaction._id}
+                      id={transaction._id}
                       name={transaction.name}
-                      categoryName={transaction.category.name}
-                      accountName={transaction.account.name}
+                      category={transaction.category}
+                      account={transaction.account}
                       value={transaction.value}
                       type={transaction.type}
                       createdAt={new Date(transaction.createdAt)}
@@ -254,8 +258,11 @@ export default function TransactionsTransfersSection() {
                 </Stack>
               )}
 
-            {(incomeTransactions?.length === 0 ||
-              expenseTransactions?.length === 0) && (
+            {incomeChecked && incomeTransactions?.length === 0 && (
+              <NewItemCard height={57} openModal={open} />
+            )}
+
+            {!incomeChecked && expenseTransactions?.length === 0 && (
               <NewItemCard height={57} openModal={open} />
             )}
 
@@ -301,8 +308,9 @@ export default function TransactionsTransfersSection() {
                 {transfers.map((transfer) => (
                   <TransferCard
                     key={transfer._id}
-                    fromAccountName={transfer.fromAccount.name}
-                    toAccountName={transfer.toAccount.name}
+                    id={transfer._id}
+                    fromAccount={transfer.fromAccount}
+                    toAccount={transfer.toAccount}
                     value={transfer.value}
                     createdAt={new Date(transfer.createdAt)}
                   />
@@ -340,7 +348,11 @@ export default function TransactionsTransfersSection() {
             : 'Criar Transferência'
         }
       >
-        Oi
+        {menuSelected === 'transactions' ? (
+          <AddTransactionForm close={close} />
+        ) : (
+          <AddTransferForm close={close} />
+        )}
       </Modal>
     </>
   );

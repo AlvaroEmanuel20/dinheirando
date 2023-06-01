@@ -11,16 +11,48 @@ import {
 import { useDisclosure } from '@mantine/hooks';
 import { IconEdit, IconTrash, IconWallet } from '@tabler/icons-react';
 import { useState } from 'react';
+import EditWalletForm from './EditWalletForm';
+import { useSWRConfig } from 'swr';
+import useSWRMutation from 'swr/mutation';
+import { deleteService } from '@/lib/mutateServices';
+import { AccountId } from '@/lib/apiTypes/accounts';
+import { notifications } from '@mantine/notifications';
 
 interface WalletCard {
+  id: string;
   name: string;
   amount: number;
 }
 
-export default function WalletCard({ name, amount }: WalletCard) {
+export default function WalletCard({ id, name, amount }: WalletCard) {
   const [options, setOptions] = useState(false);
   const { colorScheme } = useMantineColorScheme();
   const [opened, { open, close }] = useDisclosure(false);
+
+  const { mutate } = useSWRConfig();
+
+  const {
+    trigger,
+    isMutating,
+    error: errorMutate,
+  } = useSWRMutation(`/accounts/${id}`, deleteService<AccountId>, {
+    onError(err, key, config) {
+      notifications.show({
+        color: 'red',
+        title: 'Erro ao excluir conta',
+        message: 'Há transações ou transferências usando essa conta',
+      });
+    },
+  });
+
+  const onDelete = async () => {
+    try {
+      await trigger();
+      await mutate(
+        (key) => typeof key === 'string' && key.startsWith('/accounts')
+      );
+    } catch (error) {}
+  };
 
   return (
     <>
@@ -59,9 +91,11 @@ export default function WalletCard({ name, amount }: WalletCard) {
                 </ActionIcon>
 
                 <ActionIcon
+                  onClick={onDelete}
                   size="xs"
                   variant="transparent"
                   color={colorScheme === 'dark' ? 'red.6' : 'red'}
+                  loading={isMutating}
                 >
                   <IconTrash size="1rem" />
                 </ActionIcon>
@@ -84,7 +118,7 @@ export default function WalletCard({ name, amount }: WalletCard) {
       </Card>
 
       <Modal centered opened={opened} onClose={close} title="Editar Conta">
-        Oi
+        <EditWalletForm close={close} account={{ _id: id, name, amount }} />
       </Modal>
     </>
   );

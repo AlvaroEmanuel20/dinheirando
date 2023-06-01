@@ -13,6 +13,7 @@ import { useStylesHome } from '@/hooks/styles/useStylesHome';
 import useAccounts from '@/hooks/useAccounts';
 import { Account } from '@/lib/apiTypes/accounts';
 import { useDisclosure } from '@mantine/hooks';
+import AddAccountForm from './AddAccountForm';
 
 export default function WalletSection() {
   const { classes } = useStylesHome();
@@ -47,6 +48,7 @@ export default function WalletSection() {
                 accounts.map((account) => (
                   <WalletCard
                     key={account._id}
+                    id={account._id}
                     name={account.name}
                     amount={account.amount}
                   />
@@ -78,7 +80,11 @@ export default function WalletSection() {
               {accounts &&
                 accounts.map((account) => (
                   <Carousel.Slide key={account._id}>
-                    <WalletCard name={account.name} amount={account.amount} />
+                    <WalletCard
+                      id={account._id}
+                      name={account.name}
+                      amount={account.amount}
+                    />
                   </Carousel.Slide>
                 ))}
 
@@ -91,7 +97,7 @@ export default function WalletSection() {
       </MediaQuery>
 
       <Modal centered opened={opened} onClose={close} title="Criar Conta">
-        Oi
+        <AddAccountForm close={close} />
       </Modal>
     </>
   );
