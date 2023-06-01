@@ -94,7 +94,7 @@ export default function useAuth() {
     } else {
       setIsLoadingSignOut(false);
       router.push(result.url);
-      await mutate(() => true, undefined, { revalidate: false });
+      //await mutate(() => true, undefined, { revalidate: false });
     }
   };
 
