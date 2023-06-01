@@ -30,9 +30,6 @@ export default function ListTransactionsTransfersMenu({
       opened={opened}
       onChange={setOpened}
       shadow="md"
-      trigger="hover"
-      openDelay={100}
-      closeDelay={400}
     >
       <Menu.Target>
         <Group sx={{ cursor: 'pointer' }} spacing={10}>

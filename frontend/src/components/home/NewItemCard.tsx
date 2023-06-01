@@ -1,18 +1,16 @@
 import { ActionIcon, Card } from '@mantine/core';
 import { IconAppsFilled } from '@tabler/icons-react';
-import Link from 'next/link';
 
 export default function NewItemCard({
-  link,
   height,
+  openModal,
 }: {
-  link: string;
   height?: number;
+  openModal: () => void;
 }) {
   return (
     <Card
-      component={Link}
-      href={link}
+      onClick={openModal}
       radius="6px"
       h={height}
       bg="none"
@@ -21,6 +19,7 @@ export default function NewItemCard({
         border: '1px dashed #868E96',
         justifyContent: 'center',
         alignItems: 'center',
+        cursor: 'pointer',
       }}
     >
       <ActionIcon

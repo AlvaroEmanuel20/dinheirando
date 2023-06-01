@@ -31,7 +31,7 @@ export default function useTransfers<T>({
   const result = useSWR<T>(
     `${url}?limit=${
       limit ? limit : 10
-    }&sort=${sort}&fromDate=${fromDateISO}&toDate=${toDateISO}`,
+    }&sort=${sort ? sort : 'desc'}&fromDate=${fromDateISO}&toDate=${toDateISO}`,
     fetcher,
     {
       onError(err, key, config) {

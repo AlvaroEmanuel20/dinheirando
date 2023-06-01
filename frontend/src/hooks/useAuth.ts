@@ -93,8 +93,8 @@ export default function useAuth() {
       setErrorSignOut({ message: 'Erro interno no servidor', statusCode: 500 });
     } else {
       setIsLoadingSignOut(false);
-      await mutate(() => true, undefined, { revalidate: false });
       router.push(result.url);
+      await mutate(() => true, undefined, { revalidate: false });
     }
   };
 
