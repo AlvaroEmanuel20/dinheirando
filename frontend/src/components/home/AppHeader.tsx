@@ -1,13 +1,11 @@
 import {
   ActionIcon,
-  Anchor,
   Avatar,
   Box,
   Drawer,
   Group,
   MediaQuery,
   Skeleton,
-  Stack,
   useMantineColorScheme,
 } from '@mantine/core';
 import Image from 'next/image';
@@ -16,7 +14,6 @@ import { IconLogout } from '@tabler/icons-react';
 import useAuth from '@/hooks/useAuth';
 import { useStylesHome } from '@/hooks/styles/useStylesHome';
 import useUser from '@/hooks/useUser';
-import Link from 'next/link';
 import getFirstLettersName from '@/lib/getFirstLettersName';
 import { useDisclosure } from '@mantine/hooks';
 import EditProfileForm from './EditProfileForm';
@@ -93,7 +90,7 @@ export default function AppHeader() {
         title="Editar Perfil"
         overlayProps={{ opacity: 0.5, blur: 4 }}
       >
-        <EditProfileForm />
+        <EditProfileForm userData={userData} isLoadingUser={isLoadingUser} />
       </Drawer>
     </>
   );

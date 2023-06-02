@@ -30,7 +30,7 @@ export const useStylesHome = createStyles((theme) => ({
       minWidth: 0,
       margin: 0,
       borderRadius: '10px 10px 0 0',
-      minHeight: 'calc(100vh - 200px)',
+      minHeight: 'calc(100vh - 350px)',
     },
 
     [theme.fn.smallerThan('xs')]: {

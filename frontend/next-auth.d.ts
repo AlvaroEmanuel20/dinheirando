@@ -35,6 +35,7 @@ declare module 'next-auth' {
 
   interface Profile {
     email_verified: boolean;
+    picture: string;
   }
 }
 
