@@ -20,6 +20,15 @@ import {
   Category,
   CategorySchema,
 } from 'src/categories/schemas/category.schema';
+import {
+  Transaction,
+  TransactionSchema,
+} from 'src/transactions/schemas/transaction.schema';
+import {
+  Transfer,
+  TransferSchema,
+} from 'src/transfers/schemas/transfer.schema';
+import { Account, AccountSchema } from 'src/accounts/schemas/account.schema';
 
 @Module({
   imports: [
@@ -28,6 +37,9 @@ import {
       { name: RefreshToken.name, schema: RefreshTokenSchema },
       { name: TransactionalToken.name, schema: TransactionalTokenSchema },
       { name: Category.name, schema: CategorySchema },
+      { name: Transaction.name, schema: TransactionSchema },
+      { name: Transfer.name, schema: TransferSchema },
+      { name: Account.name, schema: AccountSchema },
     ]),
     MailModule,
     TransactionalTokensModule,

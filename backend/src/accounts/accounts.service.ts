@@ -5,6 +5,7 @@ import { Account } from './schemas/account.schema';
 import { CreateAccountDto, UpdateAccountDto } from './dto/accounts.dto';
 import { Transaction } from 'src/transactions/schemas/transaction.schema';
 import { Transfer } from 'src/transfers/schemas/transfer.schema';
+import CustomBusinessError from 'src/shared/utils/CustomBusinessError';
 
 @Injectable()
 export class AccountsService {
@@ -56,14 +57,20 @@ export class AccountsService {
     });
 
     if (transactionsUsedAccount.length > 0)
-      throw new Error('There are transactions using this account');
+      throw new CustomBusinessError(
+        'There are transactions using this account',
+        409,
+      );
 
     const transfersUsedAccount = await this.Transfer.find({
       $or: [{ fromAccount: accountId }, { toAccount: accountId }],
     });
 
     if (transfersUsedAccount.length > 0)
-      throw new Error('There are transfers using this account');
+      throw new CustomBusinessError(
+        'There are transfers using this account',
+        409,
+      );
 
     await this.Account.deleteOne({ _id: accountId, user: userId }).orFail();
     return { accountId };

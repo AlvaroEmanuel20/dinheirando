@@ -14,6 +14,7 @@ import {
   HttpCode,
   UseInterceptors,
   UploadedFile,
+  HttpException,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import {
@@ -41,6 +42,7 @@ import {
   ApiFoundResponse,
 } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
+import CustomBusinessError from 'src/shared/utils/CustomBusinessError';
 
 @ApiTags('users')
 @Controller('users')
@@ -90,8 +92,9 @@ export class UsersController {
       await this.usersService.validateUserAccount(token);
       return { url: this.configService.get<string>('CLIENT_URL') };
     } catch (error) {
-      if (error.message === 'Blocked email token')
-        throw new UnauthorizedException(error.message);
+      if (error instanceof CustomBusinessError) {
+        throw new HttpException(error.message, error.status);
+      }
 
       if (error instanceof mongoose.Error.DocumentNotFoundError)
         throw new NotFoundException(error.message);

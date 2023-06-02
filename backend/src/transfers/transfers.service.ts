@@ -5,6 +5,7 @@ import { Model } from 'mongoose';
 import { CreateTransferDto, UpdateTransferDto } from './dto/transfers.dto';
 import { Account } from 'src/accounts/schemas/account.schema';
 import defineDateFilter from 'src/shared/utils/defineDateFilter';
+import CustomBusinessError from 'src/shared/utils/CustomBusinessError';
 
 export interface TransfersQuery {
   sort?: 'asc' | 'desc';
@@ -45,14 +46,16 @@ export class TransfersService {
       _id: data.fromAccount,
     });
 
-    if (!fromAccountExists) throw new Error('From account not found');
+    if (!fromAccountExists)
+      throw new CustomBusinessError('From account not found', 404);
 
     const toAccountExists = await this.Account.findOne({
       user: userId,
       _id: data.toAccount,
     });
 
-    if (!toAccountExists) throw new Error('To account not found');
+    if (!toAccountExists)
+      throw new CustomBusinessError('To account not found', 404);
 
     const newTransfer = await this.Transfer.create({
       user: userId,
@@ -75,15 +78,16 @@ export class TransfersService {
     const { value, fromAccount, toAccount, createdAt } = data;
 
     const transfer = await this.Transfer.findById(transferId);
-    if (!transfer) throw new Error('Transfer not found');
+    if (!transfer) throw new CustomBusinessError('Transfer not found', 404);
 
     const newFromAccount = await this.Account.findById(fromAccount);
     const newToAccount = await this.Account.findById(toAccount);
 
     if (fromAccount && fromAccount != transfer.fromAccount) {
       if (fromAccount === transfer.toAccount)
-        throw new Error('From account is equals to account');
-      if (!newFromAccount) throw new Error('New from account not found');
+        throw new CustomBusinessError('From account is equals to account', 409);
+      if (!newFromAccount)
+        throw new CustomBusinessError('New from account not found', 404);
 
       const oldFromAccount = await this.Account.findById(transfer.fromAccount);
 
@@ -97,8 +101,9 @@ export class TransfersService {
 
     if (toAccount && toAccount != transfer.toAccount) {
       if (toAccount === transfer.fromAccount)
-        throw new Error('To account is equals from account');
-      if (!newToAccount) throw new Error('New to account not found');
+        throw new CustomBusinessError('To account is equals from account', 409);
+      if (!newToAccount)
+        throw new CustomBusinessError('New to account not found', 404);
 
       const oldToAccount = await this.Account.findById(transfer.toAccount);
 
@@ -137,7 +142,7 @@ export class TransfersService {
 
   async deleteTransfer(transferId: string, userId: string) {
     const transfer = await this.Transfer.findById(transferId);
-    if (!transfer) throw new Error('Transfer not found');
+    if (!transfer) throw new CustomBusinessError('Transfer not found', 404);
 
     const fromAccount = await this.Account.findById(transfer.fromAccount);
     const toAccount = await this.Account.findById(transfer.toAccount);

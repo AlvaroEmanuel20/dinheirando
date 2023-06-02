@@ -9,6 +9,7 @@ import {
 import { Account } from 'src/accounts/schemas/account.schema';
 import { Category } from 'src/categories/schemas/category.schema';
 import defineDateFilter from 'src/shared/utils/defineDateFilter';
+import CustomBusinessError from 'src/shared/utils/CustomBusinessError';
 
 export interface TransactionsQuery {
   sort?: 'asc' | 'desc';
@@ -83,14 +84,15 @@ export class TransactionsService {
       _id: data.category,
     });
 
-    if (!categoryExists) throw new Error('Category not found');
+    if (!categoryExists)
+      throw new CustomBusinessError('Category not found', 404);
 
     const accountExists = await this.Account.findOne({
       user: userId,
       _id: data.account,
     });
 
-    if (!accountExists) throw new Error('Account not found');
+    if (!accountExists) throw new CustomBusinessError('Account not found', 404);
 
     const newTransaction = await this.Transaction.create({
       user: userId,
@@ -119,12 +121,14 @@ export class TransactionsService {
     const { name, createdAt, value, type, category, account } = data;
 
     const transaction = await this.Transaction.findById(transactionId);
-    if (!transaction) throw new Error('Transaction not found');
+    if (!transaction)
+      throw new CustomBusinessError('Transaction not found', 404);
 
     if (category && category != transaction.category) {
       const newCategory = await this.Category.findById(category);
       const oldCategory = await this.Category.findById(transaction.category);
-      if (!newCategory) throw new Error('New category not found');
+      if (!newCategory)
+        throw new CustomBusinessError('New category not found', 404);
 
       newCategory.totalOfTransactions += transaction.value;
       oldCategory.totalOfTransactions -= transaction.value;
@@ -136,7 +140,8 @@ export class TransactionsService {
       const newAccount = await this.Account.findById(account);
       const oldAccount = await this.Account.findById(transaction.account);
 
-      if (!newAccount) throw new Error('New account not found');
+      if (!newAccount)
+        throw new CustomBusinessError('New account not found', 404);
 
       if (oldAccount) {
         if (transaction.type === 'income') {
@@ -205,7 +210,8 @@ export class TransactionsService {
 
   async deleteTransaction(transactionId: string, userId: string) {
     const transaction = await this.Transaction.findById(transactionId);
-    if (!transaction) throw new Error('Transaction not found');
+    if (!transaction)
+      throw new CustomBusinessError('Transaction not found', 404);
 
     const category = await this.Category.findById(transaction.category);
     const account = await this.Account.findById(transaction.account);

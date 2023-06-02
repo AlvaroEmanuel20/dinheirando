@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  HttpException,
   NotFoundException,
   Post,
   Put,
@@ -32,6 +33,7 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import CustomBusinessError from 'src/shared/utils/CustomBusinessError';
 
 @ApiTags('passwords')
 @Controller('passwords')
@@ -49,7 +51,7 @@ export class PasswordController {
   @ApiCreatedResponse({ description: 'Send a reset password email' })
   async resetPassword(@Body() data: ResetPasswordDto) {
     try {
-      await this.passwordService.resetPassword(data);
+      return await this.passwordService.resetPassword(data);
     } catch (error) {
       throw new NotFoundException('User not found');
     }
@@ -71,8 +73,9 @@ export class PasswordController {
 
       return { url: `${clientUrl}/senha/nova?token=${tokenResult}` };
     } catch (error) {
-      if (error.message === 'Blocked password token')
-        throw new UnauthorizedException(error.message);
+      if (error instanceof CustomBusinessError) {
+        throw new HttpException(error.message, error.status);
+      }
 
       if (error instanceof mongoose.Error.DocumentNotFoundError)
         throw new NotFoundException('User not found');
@@ -92,8 +95,9 @@ export class PasswordController {
       const response = await this.passwordService.putResetPassword(data);
       return response;
     } catch (error) {
-      if (error.message === 'Blocked password token')
-        throw new UnauthorizedException(error.message);
+      if (error instanceof CustomBusinessError) {
+        throw new HttpException(error.message, error.status);
+      }
 
       if (error instanceof mongoose.Error.DocumentNotFoundError)
         throw new NotFoundException('User not found');

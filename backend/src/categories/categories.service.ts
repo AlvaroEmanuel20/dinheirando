@@ -4,6 +4,7 @@ import { Category } from './schemas/category.schema';
 import { Model } from 'mongoose';
 import { CreateCategoryDto, UpdateCategoryDto } from './dto/categories.dto';
 import { Transaction } from 'src/transactions/schemas/transaction.schema';
+import CustomBusinessError from 'src/shared/utils/CustomBusinessError';
 
 export interface CategoriesQuery {
   limit?: number;
@@ -55,7 +56,10 @@ export class CategoriesService {
     });
 
     if (transactionsUsedCategory.length > 0)
-      throw new Error('There are transactions using this category');
+      throw new CustomBusinessError(
+        'There are transactions using this category',
+        409,
+      );
 
     await this.Category.deleteOne({ _id: categoryId, user: userId }).orFail();
     return { categoryId };

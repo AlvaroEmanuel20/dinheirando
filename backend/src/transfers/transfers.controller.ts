@@ -9,7 +9,7 @@ import {
   NotFoundException,
   UsePipes,
   Query,
-  ConflictException,
+  HttpException,
 } from '@nestjs/common';
 import { User } from 'src/users/decorators/user.decorator';
 import { JoiValidationPipe } from 'src/shared/pipes/joiValidation.pipe';
@@ -32,6 +32,7 @@ import {
   updateTransferSchema,
 } from './validations/transfers.validations';
 import { ObjectIdValidationPipe } from 'src/shared/pipes/objectIdValidation.pipe';
+import CustomBusinessError from 'src/shared/utils/CustomBusinessError';
 
 @ApiTags('transfers')
 @Controller('transfers')
@@ -73,11 +74,8 @@ export class TransfersController {
     try {
       return await this.transfersService.createTransfer(data, userId);
     } catch (error) {
-      if (
-        error.message === 'From account not found' ||
-        error.message === 'To account not found'
-      ) {
-        throw new NotFoundException(error.message);
+      if (error instanceof CustomBusinessError) {
+        throw new HttpException(error.message, error.status);
       }
     }
   }
@@ -94,21 +92,14 @@ export class TransfersController {
     @User('sub') userId: string,
   ) {
     try {
-      return this.transfersService.updateTransfer(data, transferId, userId);
+      return await this.transfersService.updateTransfer(
+        data,
+        transferId,
+        userId,
+      );
     } catch (error) {
-      if (
-        error.message === 'Transfer not found' ||
-        error.message === 'New from account not found' ||
-        error.message === 'New to account not found'
-      ) {
-        throw new NotFoundException(error.message);
-      }
-
-      if (
-        error.message === 'From account is equals to account' ||
-        error.message === 'To account is equals from account'
-      ) {
-        throw new ConflictException(error.message);
+      if (error instanceof CustomBusinessError) {
+        throw new HttpException(error.message, error.status);
       }
     }
   }
@@ -121,7 +112,7 @@ export class TransfersController {
     @User('sub') userId: string,
   ) {
     try {
-      return this.transfersService.deleteTransfer(transferId, userId);
+      return await this.transfersService.deleteTransfer(transferId, userId);
     } catch (error) {
       throw new NotFoundException('Transfer not found');
     }
