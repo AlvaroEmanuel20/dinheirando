@@ -20,13 +20,10 @@ import { useForm, zodResolver } from '@mantine/form';
 import { updateUserSchema } from '@/lib/schemas/users';
 import { User, UserId } from '@/lib/apiTypes/users';
 import useSWRMutation from 'swr/mutation';
-import { deleteService, updateService } from '@/lib/mutateServices';
+import { updateService } from '@/lib/mutateServices';
 import { useSWRConfig } from 'swr';
 import getFirstLettersName from '@/lib/getFirstLettersName';
 import UploadAvatar from './UploadAvatar';
-import { notifications } from '@mantine/notifications';
-import { useRouter } from 'next/router';
-import axios from 'axios';
 
 interface UpdateUserValues {
   name?: string | null;
@@ -42,36 +39,15 @@ interface Arg {
 export default function EditProfileForm({
   userData,
   isLoadingUser,
+  onDelete,
+  isDeleting,
 }: {
   userData: User | undefined;
   isLoadingUser: boolean;
+  onDelete: () => Promise<void>;
+  isDeleting: boolean;
 }) {
   const { mutate } = useSWRConfig();
-  const router = useRouter();
-
-  const {
-    trigger: triggerDelete,
-    isMutating: isMutatingDelete,
-    error: errorMutateDelete,
-  } = useSWRMutation('/users', deleteService<UserId>, {
-    onSuccess(data, key, config) {
-      router.push('/login');
-    },
-    onError(err, key, config) {
-      notifications.show({
-        color: 'red',
-        title: 'Erro ao excluir usuário',
-        message: 'Houve um erro ao excluir sua conta',
-      });
-    },
-  });
-
-  const onDelete = async () => {
-    try {
-      await triggerDelete();
-      await fetch('/api/clearCookie');
-    } catch (error) {}
-  };
 
   const {
     trigger: triggerUpdateUser,
@@ -213,7 +189,7 @@ export default function EditProfileForm({
 
       <Group position="right" mt={20}>
         <Button
-          loading={isMutatingDelete}
+          loading={isDeleting}
           onClick={onDelete}
           variant="subtle"
           color="red"

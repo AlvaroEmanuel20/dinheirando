@@ -17,13 +17,44 @@ import useUser from '@/hooks/useUser';
 import getFirstLettersName from '@/lib/getFirstLettersName';
 import { useDisclosure } from '@mantine/hooks';
 import EditProfileForm from './EditProfileForm';
+import useSWRMutation from 'swr/mutation';
+import { deleteService } from '@/lib/mutateServices';
+import { UserId } from '@/lib/apiTypes/users';
+import { useRouter } from 'next/router';
+import { notifications } from '@mantine/notifications';
+import { mutate } from 'swr';
 
 export default function AppHeader() {
   const { signOutAndRedirect, isLoadingSignOut } = useAuth();
   const { colorScheme } = useMantineColorScheme();
   const { classes } = useStylesHome();
-  const { userData, isLoadingUser, errorUser } = useUser();
   const [opened, { open, close }] = useDisclosure(false);
+  const router = useRouter();
+
+  const {
+    trigger: triggerDelete,
+    isMutating: isMutatingDelete,
+    error: errorMutateDelete,
+  } = useSWRMutation('/users', deleteService<UserId>, {
+    onError(err, key, config) {
+      notifications.show({
+        color: 'red',
+        title: 'Erro ao excluir usuário',
+        message: 'Houve um erro ao excluir sua conta',
+      });
+    },
+  });
+
+  const { userData, isLoadingUser, errorUser } = useUser(isMutatingDelete);
+
+  const onDelete = async () => {
+    try {
+      await triggerDelete();
+      await mutate(() => true, undefined, { revalidate: false });
+      router.push('/login');
+      await fetch('/api/clearCookie');
+    } catch (error) {}
+  };
 
   return (
     <>
@@ -90,7 +121,12 @@ export default function AppHeader() {
         title="Editar Perfil"
         overlayProps={{ opacity: 0.5, blur: 4 }}
       >
-        <EditProfileForm userData={userData} isLoadingUser={isLoadingUser} />
+        <EditProfileForm
+          isDeleting={isMutatingDelete}
+          onDelete={onDelete}
+          userData={userData}
+          isLoadingUser={isLoadingUser}
+        />
       </Drawer>
     </>
   );
