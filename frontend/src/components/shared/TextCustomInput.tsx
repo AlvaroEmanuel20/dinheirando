@@ -7,7 +7,7 @@ export default function TextCustomInput(props: TextInputProps) {
       styles={(theme) => ({
         input: {
           '&:focus-within': {
-            borderColor: theme.colors.yellow[5],
+            borderColor: theme.colors.violet[6],
           },
         },
       })}

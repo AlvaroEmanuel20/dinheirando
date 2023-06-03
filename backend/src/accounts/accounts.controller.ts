@@ -33,6 +33,7 @@ import {
   updateAccountSchema,
 } from './validations/accounts.validation';
 import { ObjectIdValidationPipe } from 'src/shared/pipes/objectIdValidation.pipe';
+import CustomBusinessError from 'src/shared/utils/CustomBusinessError';
 
 @ApiTags('accounts')
 @Controller('accounts')
@@ -90,7 +91,7 @@ export class AccountsController {
     @User('sub') userId: string,
   ) {
     try {
-      return this.accountsService.updateAccount(data, accountId, userId);
+      return await this.accountsService.updateAccount(data, accountId, userId);
     } catch (error) {
       if (error instanceof mongoose.Error.DocumentNotFoundError) {
         throw new NotFoundException('Account not found');
@@ -109,12 +110,14 @@ export class AccountsController {
     @User('sub') userId: string,
   ) {
     try {
-      return this.accountsService.deleteAccount(accountId, userId);
+      return await this.accountsService.deleteAccount(accountId, userId);
     } catch (error) {
       if (error instanceof mongoose.Error.DocumentNotFoundError) {
         throw new NotFoundException('Account not found');
-      } else {
-        throw new ConflictException('Account is used in other resources');
+      }
+
+      if (error instanceof CustomBusinessError) {
+        throw new ConflictException(error.message);
       }
     }
   }

@@ -10,6 +10,10 @@ import { ConfigService } from '@nestjs/config';
 import { RefreshToken } from 'src/auth/schemas/refreshToken.schema';
 import { TransactionalToken } from 'src/transactionalTokens/schemas/transactionalToken.schema';
 import { Category } from 'src/categories/schemas/category.schema';
+import CustomBusinessError from 'src/shared/utils/CustomBusinessError';
+import { Transaction } from 'src/transactions/schemas/transaction.schema';
+import { Transfer } from 'src/transfers/schemas/transfer.schema';
+import { Account } from 'src/accounts/schemas/account.schema';
 
 @Injectable()
 export class UsersService {
@@ -21,6 +25,12 @@ export class UsersService {
     private readonly TransactionalToken: Model<TransactionalToken>,
     @InjectModel(Category.name)
     private readonly Category: Model<Category>,
+    @InjectModel(Account.name)
+    private readonly Account: Model<Account>,
+    @InjectModel(Transaction.name)
+    private readonly Transaction: Model<Transaction>,
+    @InjectModel(Transfer.name)
+    private readonly Transfer: Model<Transfer>,
     private readonly mailService: MailService,
     private readonly transactionalTokenService: TransactionalTokensService,
     private readonly configService: ConfigService,
@@ -49,7 +59,8 @@ export class UsersService {
       token,
     });
 
-    if (!storedEmailToken) throw new Error('Blocked email token');
+    if (!storedEmailToken)
+      throw new CustomBusinessError('Blocked email token', 401);
 
     const payload = await this.transactionalTokenService.verify(token);
     if (payload) {
@@ -82,6 +93,9 @@ export class UsersService {
   }
 
   async deleteUser(userId: string) {
+    await this.Transaction.deleteMany({ user: userId });
+    await this.Transfer.deleteMany({ user: userId });
+    await this.Account.deleteMany({ user: userId });
     await this.Category.deleteMany({ user: userId });
     await this.TransactionalToken.deleteMany({ user: userId });
     await this.RefreshToken.deleteOne({ user: userId });

@@ -1,26 +1,33 @@
-import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import {
   ColorScheme,
   ColorSchemeProvider,
   MantineProvider,
 } from '@mantine/core';
-import { useLocalStorage } from '@mantine/hooks';
 import { RouterTransition } from '@/components/shared/RouterTransition';
 import { SessionProvider } from 'next-auth/react';
 import { DatesProvider } from '@mantine/dates';
 import 'dayjs/locale/pt-br';
 import { Notifications } from '@mantine/notifications';
+import { useState } from 'react';
+import NextApp, { AppProps, AppContext } from 'next/app';
+import { getCookie, setCookie } from 'cookies-next';
 
-export default function App({ Component, pageProps }: AppProps) {
-  const [colorScheme, setColorScheme] = useLocalStorage<ColorScheme>({
-    key: 'theme-scheme',
-    defaultValue: 'light',
-    getInitialValueInEffect: true,
-  });
+export default function App(props: AppProps & { colorScheme: ColorScheme }) {
+  const { Component, pageProps } = props;
+  const [colorScheme, setColorScheme] = useState<ColorScheme>(
+    props.colorScheme
+  );
 
-  const toggleColorScheme = (value?: ColorScheme) =>
-    setColorScheme(value || (colorScheme === 'dark' ? 'light' : 'dark'));
+  const toggleColorScheme = (value?: ColorScheme) => {
+    const nextColorScheme =
+      value || (colorScheme === 'dark' ? 'light' : 'dark');
+    
+    setColorScheme(nextColorScheme);
+    setCookie('mantine-color-scheme', nextColorScheme, {
+      maxAge: 60 * 60 * 24 * 30,
+    });
+  };
 
   return (
     <>
@@ -47,13 +54,24 @@ export default function App({ Component, pageProps }: AppProps) {
               body: {
                 backgroundColor:
                   theme.colorScheme === 'dark'
-                    ? theme.colors.gray[9]
+                    ? theme.colors.dark[6]
                     : theme.white,
               },
             }),
+            breakpoints: {
+              xss: '25em',
+              xs: '30em',
+              lxs: '44em',
+              sm: '48em',
+              md: '64em',
+              lmd: '65em',
+              lg: '74em',
+              lgg: '80em',
+              xl: '90em',
+            },
           }}
         >
-          <Notifications limit={5} />
+          <Notifications autoClose={5000} limit={5} />
           <RouterTransition />
           <SessionProvider session={pageProps.session}>
             <DatesProvider settings={{ locale: 'pt-br' }}>
@@ -65,3 +83,11 @@ export default function App({ Component, pageProps }: AppProps) {
     </>
   );
 }
+
+App.getInitialProps = async (appContext: AppContext) => {
+  const appProps = await NextApp.getInitialProps(appContext);
+  return {
+    ...appProps,
+    colorScheme: getCookie('mantine-color-scheme', appContext.ctx) || 'light',
+  };
+};

@@ -1,18 +1,23 @@
 import { ActionIcon, useMantineColorScheme } from '@mantine/core';
 import { IconSun, IconMoonStars } from '@tabler/icons-react';
 
-export default function ThemeToggle() {
+interface ThemeToggle {
+  size: string;
+  color: string;
+}
+
+export default function ThemeToggle({ size, color }: ThemeToggle) {
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
   const dark = colorScheme === 'dark';
 
   return (
     <ActionIcon
-      variant="filled"
-      color="yellow.6"
+      variant="transparent"
+      color={color}
       onClick={() => toggleColorScheme()}
-      title="Toggle color scheme"
+      title="Alterar tema entre escuro e claro"
     >
-      {dark ? <IconSun size="1.1rem" /> : <IconMoonStars size="1.1rem" />}
+      {dark ? <IconSun size={size} /> : <IconMoonStars size={size} />}
     </ActionIcon>
   );
 }

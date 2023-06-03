@@ -120,7 +120,7 @@ export const authOptions: AuthOptions = {
         const res = await fetch(url, {
           method: 'POST',
           body: JSON.stringify({
-            avatar: profile.image,
+            avatar: profile.picture,
             idToken: account.id_token,
             name: profile.name,
             email: profile.email,
@@ -130,6 +130,8 @@ export const authOptions: AuthOptions = {
         });
 
         const userData = await res.json();
+        user.image = profile.picture;
+        user.avatar = profile.picture;
         user.accessToken = userData.accessToken;
         user.refreshToken = userData.refreshToken;
         user.userId = userData.userId;

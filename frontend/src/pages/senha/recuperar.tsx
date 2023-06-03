@@ -2,7 +2,7 @@ import TextCustomInput from '@/components/shared/TextCustomInput';
 import AuthLayout from '@/layouts/AuthLayout';
 import { apiInstance } from '@/lib/apiInstance';
 import { recoverPasswordSchema } from '@/lib/schemas/auth';
-import { Container, Stack, Title, Button, Text, Loader } from '@mantine/core';
+import { Container, Stack, Button, Text, Loader } from '@mantine/core';
 import { useForm, zodResolver } from '@mantine/form';
 import { IconMail } from '@tabler/icons-react';
 import { useState } from 'react';
@@ -40,12 +40,15 @@ export default function RecoverPassword() {
 
   return (
     <>
-      <AuthLayout>
-        <Container mt={30}>
-          <Title order={1} size="1.5rem" mb={15}>
-            Recuperar senha
-          </Title>
-
+      <AuthLayout
+        title="Recuperar senha"
+        auxLink={{
+          text: 'Lembrou a senha?',
+          textLink: 'Entre',
+          link: '/login',
+        }}
+      >
+        <Container size="xs" mt={20}>
           <form
             onSubmit={form.onSubmit(async (values) => {
               try {
@@ -62,7 +65,7 @@ export default function RecoverPassword() {
                 {...form.getInputProps('email')}
               />
 
-              <Button type="submit" color="yellow.6">
+              <Button type="submit" color="violet.6">
                 {isMutating ? (
                   <Loader size="xs" variant="dots" color="white" />
                 ) : (

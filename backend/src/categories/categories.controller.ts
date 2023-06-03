@@ -33,6 +33,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { ObjectIdValidationPipe } from 'src/shared/pipes/objectIdValidation.pipe';
+import CustomBusinessError from 'src/shared/utils/CustomBusinessError';
 
 @ApiTags('categories')
 @Controller('categories')
@@ -89,7 +90,11 @@ export class CategoriesController {
     @User('sub') userId: string,
   ) {
     try {
-      return this.categoriesService.updateCategory(data, categoryId, userId);
+      return await this.categoriesService.updateCategory(
+        data,
+        categoryId,
+        userId,
+      );
     } catch (error) {
       if (error instanceof mongoose.Error.DocumentNotFoundError) {
         throw new NotFoundException('Category not found');
@@ -108,12 +113,14 @@ export class CategoriesController {
     @User('sub') userId: string,
   ) {
     try {
-      return this.categoriesService.deleteCategory(categoryId, userId);
+      return await this.categoriesService.deleteCategory(categoryId, userId);
     } catch (error) {
       if (error instanceof mongoose.Error.DocumentNotFoundError) {
         throw new NotFoundException('Category not found');
-      } else {
-        throw new ConflictException('Category is used in other resources');
+      }
+
+      if (error instanceof CustomBusinessError) {
+        throw new ConflictException(error.message);
       }
     }
   }

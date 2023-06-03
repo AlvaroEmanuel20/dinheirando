@@ -3,24 +3,18 @@ import {
   Post,
   Req,
   UseGuards,
-  NotFoundException,
   HttpCode,
-  Get,
-  Redirect,
   Body,
   UnauthorizedException,
 } from '@nestjs/common';
 import { Request } from 'express';
 import { LocalAuthGuard } from './guards/localAuth.guard';
-import { AuthService, GoogleUserProfile, UserPayload } from './auth.service';
+import { AuthService, UserPayload } from './auth.service';
 import { Public } from './decorators/public.decorator';
-import { GoogleAuthGuard } from './guards/googleAuth.guard';
 import { ConfigService } from '@nestjs/config';
 import { RefreshJwtAuthGuard } from './guards/refreshJwtAuth.guard';
 import {
   ApiCreatedResponse,
-  ApiFoundResponse,
-  ApiNotFoundResponse,
   ApiOkResponse,
   ApiTags,
   ApiUnauthorizedResponse,
@@ -46,38 +40,6 @@ export class AuthController {
     const { user } = await this.authService.login(req.user as UserPayload);
     return user;
   }
-
-  /*@Public()
-  @Get('google')
-  @UseGuards(GoogleAuthGuard)
-  @ApiOkResponse({ description: 'Open OAuth google page' })
-  async googleAuth() {
-    //
-  }
-
-  @Public()
-  @Get('google/callback')
-  @UseGuards(GoogleAuthGuard)
-  @Redirect()
-  @ApiFoundResponse({
-    description: 'Returns to frontend with access and refresh tokens',
-  })
-  @ApiUnauthorizedResponse()
-  @ApiNotFoundResponse()
-  async googleAuthCallback(@Req() req: Request) {
-    if (!req.user) throw new NotFoundException('Google account not found');
-
-    const user = await this.authService.googleLogin(
-      req.user as GoogleUserProfile,
-    );
-
-    const { user: userData } = await this.authService.login({
-      sub: user.userId,
-      isVerified: user.isVerified,
-    });
-
-    return { url: this.configService.get<string>('CLIENT_URL') };
-  }*/
 
   @Public()
   @Post('google/login')

@@ -1,21 +1,63 @@
+import { useStylesHome } from '@/hooks/styles/useStylesHome';
 import { formatMoney } from '@/lib/formatMoney';
-import { Card, Text } from '@mantine/core';
+import {
+  ActionIcon,
+  Card,
+  Group,
+  Skeleton,
+  Stack,
+  Text,
+  useMantineColorScheme,
+} from '@mantine/core';
+import { IconEye, IconEyeOff } from '@tabler/icons-react';
+import { useState } from 'react';
 
 interface TotalCard {
-  bg: string;
   label: string;
   value: number;
 }
 
-export default function TotalCard({ bg, label, value }: TotalCard) {
+export default function TotalCard({ label, value }: TotalCard) {
+  const [show, setShow] = useState(true);
+  const { colorScheme } = useMantineColorScheme();
+  const { classes } = useStylesHome();
+
   return (
-    <Card padding="sm" bg={bg} h={80}>
-      <Text size="sm" color="white">
-        {label}
-      </Text>
-      <Text weight="bold" color="white">
-        R${formatMoney.format(value)}
-      </Text>
+    <Card
+      className={classes.totalCard}
+      p={12}
+      bg={colorScheme === 'dark' ? 'violet.6' : ''}
+      sx={{
+        background: 'rgba(255, 255, 255, 0.24)',
+        backdropFilter: 'blur(0.2px)',
+      }}
+      radius="6px"
+    >
+      <Stack spacing={0}>
+        <Group position="apart">
+          <Text color="white" size="sm">
+            {label}
+          </Text>
+
+          <ActionIcon variant="transparent" onClick={() => setShow(!show)}>
+            {show ? (
+              <IconEye color="white" size="1.1rem" />
+            ) : (
+              <IconEyeOff color="white" size="1.1rem" />
+            )}
+          </ActionIcon>
+        </Group>
+
+        <Text
+          className={classes.totalCardValue}
+          sx={{ filter: show ? 'none' : 'blur(0.4rem)' }}
+          color="white"
+          fw="bold"
+          size="xl"
+        >
+          R${formatMoney.format(value)}
+        </Text>
+      </Stack>
     </Card>
   );
 }

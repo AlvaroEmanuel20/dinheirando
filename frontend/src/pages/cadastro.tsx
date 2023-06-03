@@ -6,17 +6,13 @@ import { signUpSchema } from '@/lib/schemas/auth';
 import {
   Container,
   Stack,
-  Title,
   PasswordInput,
   Button,
-  Center,
   Text,
   Loader,
-  Anchor,
 } from '@mantine/core';
 import { useForm, zodResolver } from '@mantine/form';
 import { IconLock, IconMail, IconUser } from '@tabler/icons-react';
-import Link from 'next/link';
 
 export default function SignUp() {
   const { signUpAndRedirect, isLoadingSignUp, errorSignUp } = useAuth();
@@ -32,12 +28,15 @@ export default function SignUp() {
 
   return (
     <>
-      <AuthLayout>
-        <Container mt={30}>
-          <Title order={1} size="1.5rem" mb={15}>
-            Cadastro
-          </Title>
-
+      <AuthLayout
+        title="Cadastro"
+        auxLink={{
+          text: 'Já tem uma conta?',
+          textLink: 'Entre',
+          link: '/login',
+        }}
+      >
+        <Container size="xs" mt={20}>
           <form onSubmit={form.onSubmit((values) => signUpAndRedirect(values))}>
             <Stack spacing="sm">
               <TextCustomInput
@@ -64,50 +63,39 @@ export default function SignUp() {
                 styles={(theme) => ({
                   input: {
                     '&:focus-within': {
-                      borderColor: theme.colors.yellow[5],
+                      borderColor: theme.colors.violet[6],
                     },
                   },
                 })}
                 {...form.getInputProps('password')}
               />
 
-              <Button type="submit" color="yellow.6">
-                {isLoadingSignUp ? (
-                  <Loader size="xs" variant="dots" color="white" />
-                ) : (
-                  'Criar Conta'
-                )}
-              </Button>
+              <Stack spacing={10}>
+                <Button type="submit" color="violet.6">
+                  {isLoadingSignUp ? (
+                    <Loader size="xs" variant="dots" color="white" />
+                  ) : (
+                    'Criar Conta'
+                  )}
+                </Button>
 
-              {errorSignUp && (
-                <Text size="sm" color="red">
-                  {errorSignUp.message}
-                </Text>
-              )}
+                {errorSignUp && (
+                  <Text size="sm" color="red">
+                    {errorSignUp.message}
+                  </Text>
+                )}
+
+                <Button
+                  fullWidth
+                  leftIcon={<GoogleIcon />}
+                  variant="default"
+                  color="gray"
+                >
+                  Entrar com Google
+                </Button>
+              </Stack>
             </Stack>
           </form>
-
-          <Center my={15}>
-            <Text size="sm" color="dimmed">
-              Ou entre com
-            </Text>
-          </Center>
-
-          <Button
-            fullWidth
-            leftIcon={<GoogleIcon />}
-            variant="default"
-            color="gray"
-          >
-            Google
-          </Button>
-
-          <Text mt={15} size="sm" color="dimmed">
-            Já tem uma conta?{' '}
-            <Anchor component={Link} weight="bold" color="dimmed" href="/">
-              Entre
-            </Anchor>
-          </Text>
         </Container>
       </AuthLayout>
     </>

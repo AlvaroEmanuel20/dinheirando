@@ -9,6 +9,7 @@ import {
   NotFoundException,
   UsePipes,
   Query,
+  HttpException,
 } from '@nestjs/common';
 import { User } from 'src/users/decorators/user.decorator';
 import { JoiValidationPipe } from 'src/shared/pipes/joiValidation.pipe';
@@ -31,6 +32,7 @@ import {
   updateTransactionSchema,
 } from './validations/transactions.validations';
 import { ObjectIdValidationPipe } from 'src/shared/pipes/objectIdValidation.pipe';
+import CustomBusinessError from 'src/shared/utils/CustomBusinessError';
 
 @ApiTags('transactions')
 @Controller('transactions')
@@ -80,11 +82,8 @@ export class TransactionsController {
     try {
       return await this.transactionsService.createTransaction(data, userId);
     } catch (error) {
-      if (
-        error.message === 'Category not found' ||
-        error.message === 'Account not found'
-      ) {
-        throw new NotFoundException(error.message);
+      if (error instanceof CustomBusinessError) {
+        throw new HttpException(error.message, error.status);
       }
     }
   }
@@ -100,18 +99,14 @@ export class TransactionsController {
     @User('sub') userId: string,
   ) {
     try {
-      return this.transactionsService.updateTransaction(
+      return await this.transactionsService.updateTransaction(
         data,
         transactionId,
         userId,
       );
     } catch (error) {
-      if (
-        error.message === 'Transaction not found' ||
-        error.message === 'New category not found' ||
-        error.message === 'New account not found'
-      ) {
-        throw new NotFoundException(error.message);
+      if (error instanceof CustomBusinessError) {
+        throw new HttpException(error.message, error.status);
       }
     }
   }
@@ -124,7 +119,10 @@ export class TransactionsController {
     @User('sub') userId: string,
   ) {
     try {
-      return this.transactionsService.deleteTransaction(transactionId, userId);
+      return await this.transactionsService.deleteTransaction(
+        transactionId,
+        userId,
+      );
     } catch (error) {
       throw new NotFoundException('Transaction not found');
     }

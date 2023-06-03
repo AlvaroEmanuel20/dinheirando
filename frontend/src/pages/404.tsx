@@ -1,6 +1,7 @@
-import AuthLayout from '@/layouts/AuthLayout';
 import {
+  Box,
   Button,
+  Center,
   Container,
   Stack,
   Text,
@@ -15,30 +16,38 @@ export default function Custom404() {
 
   return (
     <>
-      <AuthLayout>
+      <Box mih="100vh" bg={colorScheme === 'dark' ? 'dark.7' : 'violet.6'}>
         <Container>
-          <Stack spacing={0}>
-            <Title
-              fw={900}
-              size="5rem"
-              align="center"
-              mt={40}
-              color={colorScheme === 'dark' ? 'dark.4' : 'gray.2'}
-            >
-              404
-            </Title>
-            <Title align="center" size="1.8rem">
-              Página não encontrada.
-            </Title>
-            <Text my={20} align="center" color="dimmed">
-              Tente digitar corretamente ou talvez essa página não exista mais.
-            </Text>
-            <Button color="yellow.6" onClick={() => router.back()}>
-              Voltar
-            </Button>
-          </Stack>
+          <Center mih="100vh">
+            <Stack spacing={0} align="center">
+              <Title
+                fw={900}
+                size="5rem"
+                align="center"
+                mt={40}
+                color={colorScheme === 'dark' ? 'gray.0' : 'gray.2'}
+              >
+                404
+              </Title>
+
+              <Title align="center" size="1.8rem" color='gray.0'>
+                Página não encontrada.
+              </Title>
+
+              <Text my={10} align="center" color="gray.0">
+                Tente digitar corretamente ou talvez essa página não exista
+                mais.
+              </Text>
+
+              <Box>
+                <Button color="violet.6" onClick={() => router.back()}>
+                  Voltar
+                </Button>
+              </Box>
+            </Stack>
+          </Center>
         </Container>
-      </AuthLayout>
+      </Box>
     </>
   );
 }

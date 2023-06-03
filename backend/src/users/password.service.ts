@@ -8,6 +8,7 @@ import { ConfigService } from '@nestjs/config';
 import { PutResetPasswordDto, ResetPasswordDto } from './dto/users.dto';
 import { hash } from 'bcryptjs';
 import { TransactionalToken } from 'src/transactionalTokens/schemas/transactionalToken.schema';
+import CustomBusinessError from 'src/shared/utils/CustomBusinessError';
 
 @Injectable()
 export class PasswordService {
@@ -49,7 +50,8 @@ export class PasswordService {
       token,
     });
 
-    if (!storedPasswordToken) throw new Error('Blocked password token');
+    if (!storedPasswordToken)
+      throw new CustomBusinessError('Blocked password token', 401);
 
     const payload = await this.transactionalTokenService.verify(token);
     await this.User.findById(payload.userId).orFail();
@@ -61,7 +63,8 @@ export class PasswordService {
       token: data.token,
     });
 
-    if (!storedPasswordToken) throw new Error('Blocked password token');
+    if (!storedPasswordToken)
+      throw new CustomBusinessError('Blocked password token', 401);
 
     const payload = await this.transactionalTokenService.verify(data.token);
     if (payload) {
