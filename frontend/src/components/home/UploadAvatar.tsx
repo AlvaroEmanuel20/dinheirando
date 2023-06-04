@@ -1,18 +1,20 @@
 import { apiInstance } from '@/lib/apiInstance';
+import { updateAvatarSchema } from '@/lib/schemas/users';
 import { Button, FileInput, Loader, Stack, Text } from '@mantine/core';
-import { useForm } from '@mantine/form';
+import { useForm, zodResolver } from '@mantine/form';
+import { notifications } from '@mantine/notifications';
 import { IconUpload } from '@tabler/icons-react';
+import { AxiosError } from 'axios';
 import { useState } from 'react';
+import { useSWRConfig } from 'swr';
 
 export default function UploadAvatar() {
+  const { mutate } = useSWRConfig();
   const [isUploading, setIsUploading] = useState(false);
-  const [errorUpload, setErrorUpload] = useState('');
   const formAvatar = useForm({
+    validate: zodResolver(updateAvatarSchema),
     initialValues: {
       avatar: null,
-    },
-    validate: {
-      avatar: (value) => (value === null ? 'Campo obrigatório' : null),
     },
   });
 
@@ -23,13 +25,32 @@ export default function UploadAvatar() {
     try {
       const formData = new FormData();
       formData.append('file', avatar);
-      const res = await apiInstance.post('/users/avatar', formData, {
+      await apiInstance.post('/users/avatar', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
-      console.log(res);
+
+      await mutate(
+        (key) => typeof key === 'string' && key.startsWith('/users')
+      );
       setIsUploading(false);
     } catch (error) {
-      console.log(error);
+      if (error instanceof AxiosError) {
+        if (error.response?.status === 422) {
+          notifications.show({
+            color: 'red',
+            title: 'Não foi possível processar seu upload',
+            message:
+              'Só são aceitas imagens com no máximo 500kb e com extensões jpeg, jpg e png',
+          });
+        } else {
+          notifications.show({
+            color: 'red',
+            title: 'Erro inesperado',
+            message: 'Houve um erro ao fazer upload do avatar',
+          });
+        }
+      }
+
       setIsUploading(false);
     }
   };

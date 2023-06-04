@@ -70,7 +70,11 @@ export default function EditProfileForm({
       <Skeleton visible={isLoadingUser}>
         <Group>
           <Avatar
-            src={userData ? userData.avatar : null}
+            src={
+              userData && userData.avatar
+                ? `${process.env.NEXT_PUBLIC_AVATARS_URL}/${userData.avatar}`
+                : null
+            }
             alt={userData?.name}
             color="violet.6"
             size="lg"

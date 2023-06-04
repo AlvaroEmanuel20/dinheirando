@@ -20,3 +20,22 @@ export const updateUserSchema = z
     message: 'As senhas devem ser iguais',
     path: ['confirmPassword'],
   });
+
+function fileTypeValidator(file: File | null) {
+  if (!file) return false;
+  const fileType = file.name.split('.')[1];
+  return fileType === 'jpg' || fileType === 'jpeg' || fileType === 'png';
+}
+
+export const updateAvatarSchema = z.object({
+  avatar: z
+    .any()
+    .refine(
+      (avatar: File | null) => avatar && avatar.size < 500000,
+      'Imagem tem que ter no máximo 500kb'
+    )
+    .refine(
+      (avatar: File | null) => fileTypeValidator(avatar),
+      'Selecione uma imagem correta, são aceitos formatos jpg, jpeg e png'
+    ),
+});
