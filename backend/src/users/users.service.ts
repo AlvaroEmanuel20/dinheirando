@@ -14,6 +14,8 @@ import CustomBusinessError from 'src/shared/utils/CustomBusinessError';
 import { Transaction } from 'src/transactions/schemas/transaction.schema';
 import { Transfer } from 'src/transfers/schemas/transfer.schema';
 import { Account } from 'src/accounts/schemas/account.schema';
+import { join } from 'node:path';
+import { unlink } from 'node:fs/promises';
 
 @Injectable()
 export class UsersService {
@@ -75,6 +77,31 @@ export class UsersService {
   async newConfirmEmail(userId: string) {
     const user = await this.User.findById(userId).orFail();
     await this.sendConfirmEmail(userId, user.email, user.name);
+  }
+
+  async updateAvatar(fileId: string, userId: string) {
+    const user = await this.User.findById(userId).orFail();
+    const oldAvatarPath = join(__dirname, '..', '..', 'avatars', user.avatar);
+
+    try {
+      await unlink(oldAvatarPath);
+    } catch (error) {
+      throw new CustomBusinessError(
+        'Error to update avatar and delete old avatar',
+        500,
+      );
+    }
+
+    await this.User.findByIdAndUpdate(userId, {
+      avatar: fileId,
+    }).orFail();
+
+    return { userId };
+  }
+
+  async getAvatar(fileId: string) {
+    const user = await this.User.findOne({ avatar: fileId }).orFail();
+    return { avatar: user.avatar };
   }
 
   async updateUser(data: UpdateUserDto, userId: string) {
