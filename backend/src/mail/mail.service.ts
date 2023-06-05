@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import * as SendinApiV3Sdk from '@sendinblue/client';
 import * as nodemailer from 'nodemailer';
+import axios from 'axios';
+import CustomBusinessError from 'src/shared/utils/CustomBusinessError';
 
 interface MailMetadata {
   to: string;
@@ -14,13 +15,7 @@ interface MailMetadata {
 
 @Injectable()
 export class MailService {
-  private readonly apiSendinBlue: SendinApiV3Sdk.TransactionalEmailsApi;
-  private smtpEmailSendinBlue: SendinApiV3Sdk.SendSmtpEmail;
-
-  constructor(private readonly configService: ConfigService) {
-    this.apiSendinBlue = new SendinApiV3Sdk.TransactionalEmailsApi();
-    this.smtpEmailSendinBlue = new SendinApiV3Sdk.SendSmtpEmail();
-  }
+  constructor(private readonly configService: ConfigService) {}
 
   private async getTestTransport() {
     const testAccount = await nodemailer.createTestAccount();
@@ -65,41 +60,40 @@ export class MailService {
     templateId,
     params,
   }: MailMetadata) {
+    const env = this.configService.get<'dev' | 'prod'>('MAIL_ENV');
+    const fromEmail = this.configService.get<string>('FROM_EMAIL');
+    const fromEmailName = this.configService.get<string>('FROM_EMAIL_NAME');
+    const replyEmail = this.configService.get<string>('REPLY_EMAIL');
+
+    if (env === 'dev') {
+      return await this.sendTestMail(
+        { to, subject, plainText, html },
+        fromEmailName,
+        fromEmail,
+      );
+    }
+
+    const apiKey = this.configService.get<string>('SENDIN_BLUE_API_KEY');
+    const emailConfig = {
+      subject,
+      textContent: plainText,
+      htmlContent: html,
+      sender: { name: fromEmailName, email: fromEmail },
+      to: [{ email: to }],
+      replyTo: { email: replyEmail },
+      templateId: Number(templateId),
+      params,
+    };
+
     try {
-      const env = this.configService.get<'dev' | 'prod'>('MAIL_ENV');
-      const fromEmail = this.configService.get<string>('FROM_EMAIL');
-      const fromEmailName = this.configService.get<string>('FROM_EMAIL_NAME');
+      const url = 'https://api.brevo.com/v3/smtp/email';
+      const res = await axios.post(url, emailConfig, {
+        headers: { 'api-key': apiKey },
+      });
 
-      if (env === 'dev') {
-        await this.sendTestMail(
-          { to, subject, plainText, html },
-          fromEmailName,
-          fromEmail,
-        );
-      } else {
-        const apiKey = this.configService.get<string>('SENDIN_BLUE_API_KEY');
-        const replyEmail = this.configService.get<string>('REPLY_EMAIL');
-
-        this.apiSendinBlue.setApiKey(
-          SendinApiV3Sdk.TransactionalEmailsApiApiKeys.apiKey,
-          apiKey,
-        );
-
-        this.smtpEmailSendinBlue = {
-          subject,
-          textContent: plainText,
-          htmlContent: html,
-          sender: { name: fromEmailName, email: fromEmail },
-          to: [{ email: to }],
-          replyTo: { email: replyEmail },
-          templateId,
-          params,
-        };
-
-        await this.apiSendinBlue.sendTransacEmail(this.smtpEmailSendinBlue);
-      }
+      return res.data;
     } catch (error) {
-      return error as Error;
+      throw new CustomBusinessError('Error to send confirmation email', 500);
     }
   }
 }

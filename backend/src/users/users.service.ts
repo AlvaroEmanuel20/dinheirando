@@ -137,8 +137,8 @@ export class UsersService {
     });
 
     const token = await this.transactionalTokenService.create(userId, 'EMAIL');
-
     const serverUrl = this.configService.get<string>('SERVER_URL');
+
     await this.mailService.sendMail({
       to: email,
       templateId: this.configService.get<number>('CONFIRM_ACCOUNT_TEMPLATE_ID'),

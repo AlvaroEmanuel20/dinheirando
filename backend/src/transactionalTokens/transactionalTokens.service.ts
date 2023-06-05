@@ -24,8 +24,6 @@ export class TransactionalTokensService {
   ) {}
 
   async create(userId: string, scope: Scope) {
-    let token: string;
-
     const newToken = this.jwtService.sign(
       { userId, scope },
       {
@@ -34,13 +32,13 @@ export class TransactionalTokensService {
       },
     );
 
-    await this.TransactionalToken.create({
+    const token = await this.TransactionalToken.create({
       token: newToken,
       user: userId,
       scope,
     });
 
-    return token;
+    return token.token;
   }
 
   async verify(token: string): Promise<TransactionalTokenPayload> {

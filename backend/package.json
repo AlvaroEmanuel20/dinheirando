@@ -28,7 +28,7 @@
     "@nestjs/passport": "^9.0.3",
     "@nestjs/platform-express": "^9.0.0",
     "@nestjs/swagger": "^6.3.0",
-    "@sendinblue/client": "^3.3.1",
+    "axios": "^1.4.0",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.6",
     "google-auth-library": "^8.8.0",
