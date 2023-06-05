@@ -76,6 +76,10 @@ export class UsersController {
     try {
       return await this.usersService.createUser(data);
     } catch (error) {
+      if (error instanceof CustomBusinessError) {
+        throw new HttpException(error.message, error.status);
+      }
+
       throw new ConflictException('There is an user with this email');
     }
   }
@@ -127,7 +131,6 @@ export class UsersController {
     }
   }
 
-  //ROTA DE VALIDAÇÃO DE EMAIL
   @Public()
   @Get('confirm')
   @Redirect()
@@ -150,7 +153,6 @@ export class UsersController {
     }
   }
 
-  //ROTA PARA GERAR NOVO EMAIL DE CONFIRMAÇÃO
   @Post('confirm/new')
   @HttpCode(200)
   @ApiNotFoundResponse()
@@ -159,6 +161,10 @@ export class UsersController {
     try {
       await this.usersService.newConfirmEmail(userId);
     } catch (error) {
+      if (error instanceof CustomBusinessError) {
+        throw new HttpException(error.message, error.status);
+      }
+
       throw new NotFoundException('User not found');
     }
   }
@@ -172,11 +178,15 @@ export class UsersController {
     try {
       return await this.usersService.updateUser(data, userId);
     } catch (error) {
+      if (error instanceof CustomBusinessError) {
+        throw new HttpException(error.message, error.status);
+      }
+
       if (error instanceof mongoose.Error.DocumentNotFoundError) {
         throw new NotFoundException('User not found');
-      } else {
-        throw new ConflictException('There is an user with this email');
       }
+
+      throw new ConflictException('There is an user with this email');
     }
   }
 
