@@ -20,7 +20,7 @@ import { useForm, zodResolver } from '@mantine/form';
 import { updateUserSchema } from '@/lib/schemas/users';
 import { User, UserId } from '@/lib/apiTypes/users';
 import useSWRMutation from 'swr/mutation';
-import { updateService } from '@/lib/mutateServices';
+import { createService, updateService } from '@/lib/mutateServices';
 import { useSWRConfig } from 'swr';
 import getFirstLettersName from '@/lib/getFirstLettersName';
 import UploadAvatar from './UploadAvatar';
@@ -54,6 +54,12 @@ export default function EditProfileForm({
     isMutating: isMutatingUser,
     error: errorMutateUser,
   } = useSWRMutation('/users', updateService<UserId, Arg>);
+
+  const {
+    trigger: triggerNewEmail,
+    isMutating: isMutatingNewEmail,
+    error: errorMutateNewEmail,
+  } = useSWRMutation('/users/confirm/new', createService);
 
   const form = useForm({
     validate: zodResolver(updateUserSchema),
@@ -106,7 +112,17 @@ export default function EditProfileForm({
             Seu email ainda não foi verificado. Verifique o email enviado por
             nós com as instruções para verificar seu email.
           </div>
-          <Button mt={8} compact color="violet.6">
+          <Button
+            loading={isMutatingNewEmail}
+            onClick={async () => {
+              try {
+                await triggerNewEmail({});
+              } catch (error) {}
+            }}
+            mt={8}
+            compact
+            color="violet.6"
+          >
             Reenviar email
           </Button>
         </Alert>
