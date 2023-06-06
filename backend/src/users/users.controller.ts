@@ -112,6 +112,7 @@ export class UsersController {
     try {
       return await this.usersService.updateAvatar(file.filename, userId);
     } catch (error) {
+      console.log(error);
       if (error instanceof CustomBusinessError) {
         throw new HttpException(error.message, error.status);
       }
