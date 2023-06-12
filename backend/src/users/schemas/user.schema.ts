@@ -17,6 +17,9 @@ export class User {
   @Prop()
   avatar: string;
 
+  @Prop()
+  avatarUrl: string;
+
   @Prop({ required: true, default: false })
   isGoogleAccount: boolean;
 

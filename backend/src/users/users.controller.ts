@@ -12,13 +12,7 @@ import {
   Redirect,
   UnauthorizedException,
   HttpCode,
-  UseInterceptors,
-  UploadedFile,
   HttpException,
-  Res,
-  Param,
-  ParseFilePipeBuilder,
-  HttpStatus,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import {
@@ -45,10 +39,7 @@ import {
   ApiUnauthorizedResponse,
   ApiFoundResponse,
 } from '@nestjs/swagger';
-import { FileInterceptor } from '@nestjs/platform-express';
 import CustomBusinessError from 'src/shared/utils/CustomBusinessError';
-import { diskStorage } from 'multer';
-import { Response } from 'express';
 
 @ApiTags('users')
 @Controller('users')
@@ -81,54 +72,6 @@ export class UsersController {
       }
 
       throw new ConflictException('There is an user with this email');
-    }
-  }
-
-  @Post('avatar')
-  @UseInterceptors(
-    FileInterceptor('file', {
-      storage: diskStorage({
-        destination: './avatars',
-        filename(req, file, callback) {
-          return callback(
-            null,
-            `dinheirando_${Date.now()}_${file.originalname}`,
-          );
-        },
-      }),
-    }),
-  )
-  async uploadAvatar(
-    @UploadedFile(
-      new ParseFilePipeBuilder()
-        .addMaxSizeValidator({ maxSize: 500000 })
-        .build({
-          errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
-        }),
-    )
-    file: Express.Multer.File,
-    @User('sub') userId: string,
-  ) {
-    try {
-      return await this.usersService.updateAvatar(file.filename, userId);
-    } catch (error) {
-      console.log(error);
-      if (error instanceof CustomBusinessError) {
-        throw new HttpException(error.message, error.status);
-      }
-
-      throw new NotFoundException('User not found');
-    }
-  }
-
-  @Public()
-  @Get('avatars/:fileId')
-  async getAvatar(@Param('fileId') fileId: string, @Res() res: Response) {
-    try {
-      const { avatar } = await this.usersService.getAvatar(fileId);
-      res.sendFile(avatar, { root: 'avatars' });
-    } catch (error) {
-      throw new NotFoundException('Avatar not found');
     }
   }
 
