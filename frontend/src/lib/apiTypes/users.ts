@@ -1,6 +1,7 @@
 export interface User {
   _id: string;
   avatar: string;
+  avatarUrl: string;
   name: string;
   email: string;
   isVerified: boolean;

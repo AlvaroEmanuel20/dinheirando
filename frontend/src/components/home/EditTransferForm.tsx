@@ -36,7 +36,7 @@ export default function EditTransferForm({
 }: {
   transfer: Transfer;
   close: () => void;
-  }) {
+}) {
   const { mutate } = useSWRConfig();
 
   const {
@@ -163,6 +163,7 @@ export default function EditTransferForm({
           />
 
           <DatePickerInput
+            dropdownType="modal"
             withAsterisk
             label="Data"
             placeholder="09/05/2023"

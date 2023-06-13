@@ -8,6 +8,9 @@ export class UserDto {
   avatar: string;
 
   @ApiProperty()
+  avatarUrl: string;
+
+  @ApiProperty()
   name: string;
 
   @ApiProperty()
@@ -36,6 +39,9 @@ export class CreateUserDto {
   avatar?: string;
 
   @ApiPropertyOptional()
+  avatarUrl?: string;
+
+  @ApiPropertyOptional()
   isVerified?: boolean;
 
   @ApiPropertyOptional()
@@ -54,6 +60,9 @@ export class CreateUserDto {
 export class UpdateUserDto {
   @ApiPropertyOptional()
   avatar?: string;
+
+  @ApiPropertyOptional()
+  avatarUrl?: string;
 
   @ApiPropertyOptional()
   name?: string;

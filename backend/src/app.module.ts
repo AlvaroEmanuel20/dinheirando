@@ -11,6 +11,8 @@ import { CategoriesModule } from './categories/categories.module';
 import { AccountsModule } from './accounts/accounts.module';
 import { TransactionsModule } from './transactions/transactions.module';
 import { TransfersModule } from './transfers/transfers.module';
+import { AvatarsModule } from './avatars/avatars.module';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
 
 @Module({
   imports: [
@@ -30,6 +32,8 @@ import { TransfersModule } from './transfers/transfers.module';
     AccountsModule,
     TransactionsModule,
     TransfersModule,
+    AvatarsModule,
+    CloudinaryModule,
   ],
   providers: [
     {

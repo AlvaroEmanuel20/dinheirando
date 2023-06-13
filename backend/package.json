@@ -30,7 +30,9 @@
     "@nestjs/swagger": "^6.3.0",
     "axios": "^1.4.0",
     "bcryptjs": "^2.4.3",
+    "cloudinary": "^1.37.1",
     "cookie-parser": "^1.4.6",
+    "datauri": "^4.1.0",
     "google-auth-library": "^8.8.0",
     "joi": "^17.9.2",
     "mongoose": "^7.0.5",
@@ -41,7 +43,8 @@
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
     "reflect-metadata": "^0.1.13",
-    "rxjs": "^7.2.0"
+    "rxjs": "^7.2.0",
+    "streamifier": "^0.1.1"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.0.0",
@@ -57,6 +60,7 @@
     "@types/passport-google-oauth20": "^2.0.11",
     "@types/passport-jwt": "^3.0.8",
     "@types/passport-local": "^1.0.35",
+    "@types/streamifier": "^0.1.0",
     "@types/supertest": "^2.0.11",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.0.0",

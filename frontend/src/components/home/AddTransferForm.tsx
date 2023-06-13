@@ -166,6 +166,7 @@ export default function AddTransferForm({ close }: { close: () => void }) {
           />
 
           <DatePickerInput
+            dropdownType="modal"
             withAsterisk
             label="Data"
             placeholder="09/05/2023"
