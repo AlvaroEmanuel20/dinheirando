@@ -18,7 +18,7 @@ export class CloudinaryService {
         const uploadStream = cloudinary.uploader.upload_stream(
           {
             folder: this.configService.get<string>('CLOUDINARY_FOLDER'),
-            public_id: `${userId}_avatar`,
+            public_id: `${userId}-${Date.now()}-avatar`,
           },
           (error, result) => {
             if (error) return reject(error);
