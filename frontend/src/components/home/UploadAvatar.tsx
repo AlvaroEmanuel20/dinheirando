@@ -25,7 +25,7 @@ export default function UploadAvatar() {
     try {
       const formData = new FormData();
       formData.append('file', avatar);
-      await apiInstance.post('/users/avatar', formData, {
+      await apiInstance.post('/avatars', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 

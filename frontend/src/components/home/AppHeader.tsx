@@ -104,11 +104,7 @@ export default function AppHeader() {
                 })}
                 color={colorScheme === 'dark' ? 'dark.5' : 'gray.0'}
                 radius="xl"
-                src={
-                  userData && userData.avatar
-                    ? `${process.env.NEXT_PUBLIC_AVATARS_URL}/${userData.avatar}`
-                    : null
-                }
+                src={userData && userData.avatar ? userData.avatarUrl : null}
                 alt={userData?.name}
               >
                 {userData && getFirstLettersName(userData.name).join('')}

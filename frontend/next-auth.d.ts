@@ -15,6 +15,7 @@ declare module 'next-auth' {
       isVerified: boolean;
       isGoogleAccount: boolean;
       avatar?: string;
+      avatarUrl?: string;
     } & DefaultSession['user'];
     error?: 'RefreshAccessTokenError';
     authType: ProviderType;
@@ -27,6 +28,7 @@ declare module 'next-auth' {
   interface User {
     userId: string;
     avatar?: string;
+    avatarUrl?: string;
     isVerified: boolean;
     isGoogleAccount: boolean;
     accessToken: string;
@@ -44,6 +46,7 @@ declare module 'next-auth/jwt' {
   interface JWT {
     userId: string;
     avatar?: string;
+    avatarUrl?: string;
     isVerified: boolean;
     isGoogleAccount: boolean;
     accessToken: string;

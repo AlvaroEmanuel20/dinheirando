@@ -113,7 +113,8 @@ export default function AddTransactionForm({ close }: { close: () => void }) {
             );
 
             await mutate(
-              (key) => typeof key === 'string' && key.startsWith('/transactions')
+              (key) =>
+                typeof key === 'string' && key.startsWith('/transactions')
             );
           } catch (error) {}
         })}
@@ -186,6 +187,7 @@ export default function AddTransactionForm({ close }: { close: () => void }) {
           />
 
           <DatePickerInput
+            dropdownType="modal"
             withAsterisk
             label="Data"
             placeholder="09/05/2023"

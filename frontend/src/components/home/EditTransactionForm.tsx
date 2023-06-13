@@ -118,7 +118,8 @@ export default function EditTransactionForm({
           try {
             await trigger(values);
             await mutate(
-              (key) => typeof key === 'string' && key.startsWith('/transactions')
+              (key) =>
+                typeof key === 'string' && key.startsWith('/transactions')
             );
 
             await mutate(
@@ -156,6 +157,7 @@ export default function EditTransactionForm({
           />
 
           <DatePickerInput
+            dropdownType="modal"
             withAsterisk
             label="Data"
             placeholder="09/05/2023"

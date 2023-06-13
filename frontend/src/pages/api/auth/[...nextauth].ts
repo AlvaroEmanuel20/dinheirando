@@ -152,6 +152,7 @@ export const authOptions: AuthOptions = {
         token.userId = user.userId;
         token.picture = user.avatar;
         token.avatar = user.avatar;
+        token.avatarUrl = user.avatarUrl;
         token.isGoogleAccount = user.isGoogleAccount;
         token.isVerified = user.isVerified;
 
@@ -170,6 +171,7 @@ export const authOptions: AuthOptions = {
       session.user.oauth_accessToken = token.oauth_accessToken;
       session.user.oauth_refreshToken = token.oauth_refreshToken;
       session.user.avatar = token.avatar;
+      session.user.avatarUrl = token.avatarUrl;
       session.user.isVerified = token.isVerified;
       session.user.isGoogleAccount = token.isGoogleAccount;
       session.error = token.error;
