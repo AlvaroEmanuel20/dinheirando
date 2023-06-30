@@ -22,7 +22,7 @@ export default function App(props: AppProps & { colorScheme: ColorScheme }) {
   const toggleColorScheme = (value?: ColorScheme) => {
     const nextColorScheme =
       value || (colorScheme === 'dark' ? 'light' : 'dark');
-    
+
     setColorScheme(nextColorScheme);
     setCookie('mantine-color-scheme', nextColorScheme, {
       maxAge: 60 * 60 * 24 * 30,
@@ -38,6 +38,14 @@ export default function App(props: AppProps & { colorScheme: ColorScheme }) {
           name="viewport"
           content="minimum-scale=1, initial-scale=1, width=device-width"
         />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="Dinheirando" />
+        <meta
+          property="og:description"
+          content="Aplicativo de controle financeiro pessoal."
+        />
+        <meta property="og:site_name" content="Dinheirando" />
+        <link rel="manifest" href="/manifest.json" />
         <link rel="icon" href="/favicon.svg" />
       </Head>
 
@@ -91,3 +99,4 @@ App.getInitialProps = async (appContext: AppContext) => {
     colorScheme: getCookie('mantine-color-scheme', appContext.ctx) || 'light',
   };
 };
+
