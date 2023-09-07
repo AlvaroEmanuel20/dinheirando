@@ -39,7 +39,7 @@ export class PasswordService {
       ),
       params: {
         name: user.name,
-        link: `${serverUrl}/password/reset/confirm?token=${passwordToken}`,
+        link: `${serverUrl}/passwords/reset/confirm?token=${passwordToken}`,
         newLink: `${clientUrl}/senha/resetar`,
       },
     });
