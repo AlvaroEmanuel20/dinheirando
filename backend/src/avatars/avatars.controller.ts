@@ -12,7 +12,9 @@ import {
 import { AvatarsService } from './avatars.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { User } from 'src/users/decorators/user.decorator';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('avatars')
 @Controller('avatars')
 export class AvatarsController {
   constructor(private readonly avatarsService: AvatarsService) {}

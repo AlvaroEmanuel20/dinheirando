@@ -10,7 +10,6 @@ import {
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { IconDotsVertical, IconEdit, IconTrash } from '@tabler/icons-react';
-import { format } from 'our-dates';
 import { useState } from 'react';
 import EditTransferForm from './EditTransferForm';
 import { useSWRConfig } from 'swr';
@@ -18,6 +17,7 @@ import useSWRMutation from 'swr/mutation';
 import { deleteService } from '@/lib/mutateServices';
 import { TransferId } from '@/lib/apiTypes/transfers';
 import { notifications } from '@mantine/notifications';
+import { format } from 'date-fns';
 
 interface TransferCard {
   id: string;

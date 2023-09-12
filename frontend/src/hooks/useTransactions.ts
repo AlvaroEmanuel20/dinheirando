@@ -1,6 +1,6 @@
 import { fetcher } from '@/lib/apiInstance';
 import { notifications } from '@mantine/notifications';
-import { format } from 'our-dates';
+import { formatISO } from 'date-fns';
 import useSWR from 'swr';
 
 interface UseTransactions {
@@ -26,8 +26,8 @@ export default function useTransactions<T>({
   let fromDateISO = '';
   let toDateISO = '';
   if (fromDate && toDate) {
-    fromDateISO = format(new Date(fromDate), 'yyyy-MM-dd');
-    toDateISO = format(new Date(toDate), 'yyyy-MM-dd');
+    fromDateISO = formatISO(fromDate, { representation: 'date' });
+    toDateISO = formatISO(toDate, { representation: 'date' });
   }
 
   const result = useSWR<T>(

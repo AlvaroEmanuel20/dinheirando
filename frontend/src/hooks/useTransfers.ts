@@ -1,6 +1,6 @@
 import { fetcher } from '@/lib/apiInstance';
 import { notifications } from '@mantine/notifications';
-import { format } from 'our-dates';
+import { formatISO } from 'date-fns';
 import useSWR from 'swr';
 
 interface UseTransfers {
@@ -24,14 +24,14 @@ export default function useTransfers<T>({
   let fromDateISO = '';
   let toDateISO = '';
   if (fromDate && toDate) {
-    fromDateISO = format(new Date(fromDate), 'yyyy-MM-dd');
-    toDateISO = format(new Date(toDate), 'yyyy-MM-dd');
+    fromDateISO = formatISO(new Date(fromDate), { representation: 'date' });
+    toDateISO = formatISO(new Date(toDate), { representation: 'date' });
   }
 
   const result = useSWR<T>(
-    `${url}?limit=${
-      limit ? limit : 10
-    }&sort=${sort ? sort : 'desc'}&fromDate=${fromDateISO}&toDate=${toDateISO}`,
+    `${url}?limit=${limit ? limit : 10}&sort=${
+      sort ? sort : 'desc'
+    }&fromDate=${fromDateISO}&toDate=${toDateISO}`,
     fetcher,
     {
       onError(err, key, config) {
