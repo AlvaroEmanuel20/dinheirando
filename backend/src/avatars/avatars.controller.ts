@@ -12,7 +12,13 @@ import {
 import { AvatarsService } from './avatars.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { User } from 'src/users/decorators/user.decorator';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  ApiCreatedResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { AvatarUploadDto, AvatarUrlDto } from './dto/avatars.dto';
 
 @ApiTags('avatars')
 @Controller('avatars')
@@ -21,6 +27,7 @@ export class AvatarsController {
 
   @Post()
   @UseInterceptors(FileInterceptor('file'))
+  @ApiCreatedResponse({ type: AvatarUploadDto })
   async uploadAvatar(
     @UploadedFile(
       new ParseFilePipeBuilder()
@@ -44,6 +51,8 @@ export class AvatarsController {
   }
 
   @Get()
+  @ApiOkResponse({ type: AvatarUrlDto })
+  @ApiNotFoundResponse()
   async getAvatarUrl(@User('sub') userId: string) {
     try {
       const url = await this.avatarsService.getAvatarUrl(userId);
