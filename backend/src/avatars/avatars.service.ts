@@ -13,7 +13,7 @@ export class AvatarsService {
 
   async uploadAvatar(image: Express.Multer.File, userId: string) {
     const user = await this.User.findById(userId);
-    await this.cloudinaryService.deleteImage(user.avatar);
+    if (user.avatar) await this.cloudinaryService.deleteImage(user.avatar);
 
     const result = await this.cloudinaryService.uploadImage(image, userId);
     const avatarUrl = await this.cloudinaryService.getImageUrl(
