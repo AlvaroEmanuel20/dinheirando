@@ -11,7 +11,6 @@ import {
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { IconDotsVertical, IconEdit, IconTrash } from '@tabler/icons-react';
-import { format } from 'our-dates';
 import { useState } from 'react';
 import EditTransactionForm from './EditTransactionForm';
 import { useSWRConfig } from 'swr';
@@ -19,6 +18,7 @@ import useSWRMutation from 'swr/mutation';
 import { deleteService } from '@/lib/mutateServices';
 import { TransactionId } from '@/lib/apiTypes/transactions';
 import { notifications } from '@mantine/notifications';
+import { format } from 'date-fns';
 
 interface TransactionCard {
   id: string;
