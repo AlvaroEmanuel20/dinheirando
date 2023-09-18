@@ -5,6 +5,7 @@ import {
   Button,
   Group,
   Loader,
+  Modal,
   PasswordInput,
   Skeleton,
   Stack,
@@ -24,6 +25,7 @@ import { createService, updateService } from '@/lib/mutateServices';
 import { useSWRConfig } from 'swr';
 import getFirstLettersName from '@/lib/getFirstLettersName';
 import UploadAvatar from './UploadAvatar';
+import { useState } from 'react';
 
 interface UpdateUserValues {
   name?: string | null;
@@ -36,18 +38,21 @@ interface Arg {
   arg: UpdateUserValues;
 }
 
+interface EditProfileForm {
+  userData: User | undefined;
+  isLoadingUser: boolean;
+  onDelete: () => Promise<void>;
+  isDeleting: boolean;
+}
+
 export default function EditProfileForm({
   userData,
   isLoadingUser,
   onDelete,
   isDeleting,
-}: {
-  userData: User | undefined;
-  isLoadingUser: boolean;
-  onDelete: () => Promise<void>;
-  isDeleting: boolean;
-}) {
+}: EditProfileForm) {
   const { mutate } = useSWRConfig();
+  const [deleteModal, setDeleteModal] = useState(false);
 
   const {
     trigger: triggerUpdateUser,
@@ -205,14 +210,42 @@ export default function EditProfileForm({
 
       <Group position="right" mt={20}>
         <Button
-          loading={isDeleting}
-          onClick={onDelete}
+          onClick={() => setDeleteModal(true)}
           variant="subtle"
           color="red"
         >
           Excluir conta
         </Button>
       </Group>
+
+      <Modal
+        opened={deleteModal}
+        onClose={() => setDeleteModal(false)}
+        title="Exclusão de conta"
+        zIndex={500}
+      >
+        <Stack spacing={15}>
+          <Text>
+            Você tem certeza disso? Excluir a sua conta apagará todos os seus
+            dados.
+          </Text>
+
+          <Group position="right" spacing={10}>
+            <Button onClick={() => setDeleteModal(false)} color="gray">
+              Cancelar
+            </Button>
+
+            <Button
+              variant="light"
+              color="red"
+              loading={isDeleting}
+              onClick={onDelete}
+            >
+              Confirmar
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
     </>
   );
 }
