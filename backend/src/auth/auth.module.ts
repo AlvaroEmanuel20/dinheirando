@@ -7,7 +7,6 @@ import { AuthController } from './auth.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './strategies/jwt.strategy';
-import { GoogleStrategy } from './strategies/google.strategy';
 import { RefreshJwtStrategy } from './strategies/refreshJwt.strategy';
 import { MongooseModule } from '@nestjs/mongoose';
 import {
@@ -36,13 +35,7 @@ import {
       { name: RefreshToken.name, schema: RefreshTokenSchema },
     ]),
   ],
-  providers: [
-    AuthService,
-    LocalStrategy,
-    JwtStrategy,
-    GoogleStrategy,
-    RefreshJwtStrategy,
-  ],
+  providers: [AuthService, LocalStrategy, JwtStrategy, RefreshJwtStrategy],
   controllers: [AuthController],
 })
 export class AuthModule {}
