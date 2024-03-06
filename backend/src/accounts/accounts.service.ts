@@ -13,7 +13,7 @@ export class AccountsService {
     @InjectModel(Account.name) private readonly Account: Model<Account>,
     @InjectModel(Transaction.name)
     private readonly Transaction: Model<Transaction>,
-    @InjectModel(Transfer.name) private readonly Transfer: Model<Transfer>,
+    @InjectModel(Transfer.name) private readonly Transfer: Model<Transfer>
   ) {}
 
   async showAccounts(userId: string) {
@@ -42,11 +42,11 @@ export class AccountsService {
   async updateAccount(
     data: UpdateAccountDto,
     accountId: string,
-    userId: string,
+    userId: string
   ) {
     await this.Account.updateOne(
       { _id: accountId, user: userId },
-      data,
+      data
     ).orFail();
     return { accountId };
   }
@@ -59,7 +59,7 @@ export class AccountsService {
     if (transactionsUsedAccount.length > 0)
       throw new CustomBusinessError(
         'There are transactions using this account',
-        409,
+        409
       );
 
     const transfersUsedAccount = await this.Transfer.find({
@@ -69,7 +69,7 @@ export class AccountsService {
     if (transfersUsedAccount.length > 0)
       throw new CustomBusinessError(
         'There are transfers using this account',
-        409,
+        409
       );
 
     await this.Account.deleteOne({ _id: accountId, user: userId }).orFail();

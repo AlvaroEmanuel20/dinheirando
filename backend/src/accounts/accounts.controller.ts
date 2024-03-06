@@ -58,7 +58,7 @@ export class AccountsController {
   @ApiNotFoundResponse()
   async showAccount(
     @Param('accountId', ObjectIdValidationPipe) accountId: string,
-    @User('sub') userId: string,
+    @User('sub') userId: string
   ) {
     const account = await this.accountsService.showAccount(accountId, userId);
     if (!account) throw new NotFoundException('Account not found');
@@ -71,7 +71,7 @@ export class AccountsController {
   @ApiConflictResponse()
   async createAccount(
     @Body() data: CreateAccountDto,
-    @User('sub') userId: string,
+    @User('sub') userId: string
   ) {
     try {
       return await this.accountsService.createAccount(data, userId);
@@ -88,7 +88,7 @@ export class AccountsController {
   async updateAccount(
     @Body() data: UpdateAccountDto,
     @Param('accountId', ObjectIdValidationPipe) accountId: string,
-    @User('sub') userId: string,
+    @User('sub') userId: string
   ) {
     try {
       return await this.accountsService.updateAccount(data, accountId, userId);
@@ -107,7 +107,7 @@ export class AccountsController {
   @ApiConflictResponse()
   async deleteAccount(
     @Param('accountId', ObjectIdValidationPipe) accountId: string,
-    @User('sub') userId: string,
+    @User('sub') userId: string
   ) {
     try {
       return await this.accountsService.deleteAccount(accountId, userId);

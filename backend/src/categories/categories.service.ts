@@ -16,7 +16,7 @@ export class CategoriesService {
   constructor(
     @InjectModel(Category.name) private readonly Category: Model<Category>,
     @InjectModel(Transaction.name)
-    private readonly Transaction: Model<Transaction>,
+    private readonly Transaction: Model<Transaction>
   ) {}
 
   async showCategories(userId: string, query: CategoriesQuery) {
@@ -41,11 +41,11 @@ export class CategoriesService {
   async updateCategory(
     data: UpdateCategoryDto,
     categoryId: string,
-    userId: string,
+    userId: string
   ) {
     await this.Category.updateOne(
       { _id: categoryId, user: userId },
-      data,
+      data
     ).orFail();
     return { categoryId };
   }
@@ -58,7 +58,7 @@ export class CategoriesService {
     if (transactionsUsedCategory.length > 0)
       throw new CustomBusinessError(
         'There are transactions using this category',
-        409,
+        409
       );
 
     await this.Category.deleteOne({ _id: categoryId, user: userId }).orFail();

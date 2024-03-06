@@ -10,7 +10,7 @@ describe('TransactionalTokensService', () => {
     }).compile();
 
     service = module.get<TransactionalTokensService>(
-      TransactionalTokensService,
+      TransactionalTokensService
     );
   });
 

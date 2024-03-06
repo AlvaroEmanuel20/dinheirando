@@ -43,7 +43,7 @@ export class TransfersController {
   @ApiOkResponse({ type: [TransferDto] })
   async showTransfers(
     @User('sub') userId: string,
-    @Query() query: TransfersQuery,
+    @Query() query: TransfersQuery
   ) {
     return await this.transfersService.showTransfers(userId, query);
   }
@@ -53,11 +53,11 @@ export class TransfersController {
   @ApiNotFoundResponse()
   async showTransfer(
     @Param('transferId', ObjectIdValidationPipe) transferId: string,
-    @User('sub') userId: string,
+    @User('sub') userId: string
   ) {
     const transfer = await this.transfersService.showTransfer(
       transferId,
-      userId,
+      userId
     );
     if (!transfer) throw new NotFoundException('Transfer not found');
     return transfer;
@@ -69,7 +69,7 @@ export class TransfersController {
   @ApiNotFoundResponse({ description: 'From or to account not found' })
   async createTransfer(
     @Body() data: CreateTransferDto,
-    @User('sub') userId: string,
+    @User('sub') userId: string
   ) {
     try {
       return await this.transfersService.createTransfer(data, userId);
@@ -89,13 +89,13 @@ export class TransfersController {
   async updateTransfer(
     @Body() data: UpdateTransferDto,
     @Param('transferId', ObjectIdValidationPipe) transferId: string,
-    @User('sub') userId: string,
+    @User('sub') userId: string
   ) {
     try {
       return await this.transfersService.updateTransfer(
         data,
         transferId,
-        userId,
+        userId
       );
     } catch (error) {
       if (error instanceof CustomBusinessError) {
@@ -109,7 +109,7 @@ export class TransfersController {
   @ApiNotFoundResponse()
   async deleteTransfer(
     @Param('transferId', ObjectIdValidationPipe) transferId: string,
-    @User('sub') userId: string,
+    @User('sub') userId: string
   ) {
     try {
       return await this.transfersService.deleteTransfer(transferId, userId);

@@ -40,7 +40,7 @@ import CustomBusinessError from 'src/shared/utils/CustomBusinessError';
 export class PasswordController {
   constructor(
     private readonly passwordService: PasswordService,
-    private readonly configService: ConfigService,
+    private readonly configService: ConfigService
   ) {}
 
   //ROUTE THAT SEND RESET EMAIL
@@ -68,7 +68,7 @@ export class PasswordController {
     try {
       const clientUrl = this.configService.get<string>('CLIENT_URL');
       const tokenResult = await this.passwordService.confirmResetPassword(
-        token,
+        token
       );
 
       return { url: `${clientUrl}/senha/nova?token=${tokenResult}` };

@@ -38,7 +38,7 @@ export class MailService {
   private async sendTestMail(
     mailData: MailMetadata,
     fromEmailName: string,
-    fromEmail: string,
+    fromEmail: string
   ) {
     const transporter = await this.getTestTransport();
     const info = await transporter.sendMail({
@@ -69,7 +69,7 @@ export class MailService {
       return await this.sendTestMail(
         { to, subject, plainText, html },
         fromEmailName,
-        fromEmail,
+        fromEmail
       );
     }
 

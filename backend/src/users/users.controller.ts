@@ -46,7 +46,7 @@ import CustomBusinessError from 'src/shared/utils/CustomBusinessError';
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
-    private readonly configService: ConfigService,
+    private readonly configService: ConfigService
   ) {}
 
   @Get()

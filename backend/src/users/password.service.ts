@@ -18,7 +18,7 @@ export class PasswordService {
     private readonly TransactionalToken: Model<TransactionalToken>,
     private readonly mailService: MailService,
     private readonly transactionalTokenService: TransactionalTokensService,
-    private readonly configService: ConfigService,
+    private readonly configService: ConfigService
   ) {}
 
   async resetPassword(data: ResetPasswordDto) {
@@ -27,7 +27,7 @@ export class PasswordService {
     await this.TransactionalToken.deleteOne({ user: user._id });
     const passwordToken = await this.transactionalTokenService.create(
       user.id as string,
-      'PASSWORD',
+      'PASSWORD'
     );
 
     const clientUrl = this.configService.get<string>('CLIENT_URL');
@@ -35,7 +35,7 @@ export class PasswordService {
     await this.mailService.sendMail({
       to: data.email,
       templateId: this.configService.get<number>(
-        'RECOVER_PASSWORD_TEMPLATE_ID',
+        'RECOVER_PASSWORD_TEMPLATE_ID'
       ),
       params: {
         name: user.name,

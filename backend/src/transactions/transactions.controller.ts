@@ -43,7 +43,7 @@ export class TransactionsController {
   @ApiOkResponse({ type: [TransactionDto] })
   async showTransactions(
     @User('sub') userId: string,
-    @Query() query: TransactionsQuery,
+    @Query() query: TransactionsQuery
   ) {
     return await this.transactionsService.showTransactions(userId, query);
   }
@@ -60,11 +60,11 @@ export class TransactionsController {
   @ApiNotFoundResponse()
   async showTransaction(
     @Param('transactionId', ObjectIdValidationPipe) transactionId: string,
-    @User('sub') userId: string,
+    @User('sub') userId: string
   ) {
     const transaction = await this.transactionsService.showTransaction(
       transactionId,
-      userId,
+      userId
     );
 
     if (!transaction) throw new NotFoundException('Transaction not found');
@@ -77,7 +77,7 @@ export class TransactionsController {
   @ApiNotFoundResponse({ description: 'Category or account not found' })
   async createTransaction(
     @Body() data: CreateTransactionDto,
-    @User('sub') userId: string,
+    @User('sub') userId: string
   ) {
     try {
       return await this.transactionsService.createTransaction(data, userId);
@@ -96,13 +96,13 @@ export class TransactionsController {
   async updateTransaction(
     @Body() data: UpdateTransactionDto,
     @Param('transactionId', ObjectIdValidationPipe) transactionId: string,
-    @User('sub') userId: string,
+    @User('sub') userId: string
   ) {
     try {
       return await this.transactionsService.updateTransaction(
         data,
         transactionId,
-        userId,
+        userId
       );
     } catch (error) {
       if (error instanceof CustomBusinessError) {
@@ -116,12 +116,12 @@ export class TransactionsController {
   @ApiNotFoundResponse()
   async deleteTransaction(
     @Param('transactionId', ObjectIdValidationPipe) transactionId: string,
-    @User('sub') userId: string,
+    @User('sub') userId: string
   ) {
     try {
       return await this.transactionsService.deleteTransaction(
         transactionId,
-        userId,
+        userId
       );
     } catch (error) {
       throw new NotFoundException('Transaction not found');

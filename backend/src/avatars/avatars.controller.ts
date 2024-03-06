@@ -18,7 +18,7 @@ import {
   ApiOkResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { AvatarUploadDto, AvatarUrlDto } from './dto/avatars.dto';
+import { AvatarSuccessUploadDto, AvatarUrlDto } from './dto/avatars.dto';
 
 @ApiTags('avatars')
 @Controller('avatars')
@@ -27,23 +27,23 @@ export class AvatarsController {
 
   @Post()
   @UseInterceptors(FileInterceptor('file'))
-  @ApiCreatedResponse({ type: AvatarUploadDto })
+  @ApiCreatedResponse({ type: AvatarSuccessUploadDto })
   async uploadAvatar(
     @UploadedFile(
       new ParseFilePipeBuilder()
         .addMaxSizeValidator({ maxSize: 500000 })
         .build({
           errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
-        }),
+        })
     )
     file: Express.Multer.File,
-    @User('sub') userId: string,
+    @User('sub') userId: string
   ) {
     try {
       const result = await this.avatarsService.uploadAvatar(file, userId);
       if (!result.uploaded || !result.imageId)
         throw new InternalServerErrorException(
-          'Server error when uploading avatar',
+          'Server error when uploading avatar'
         );
 
       return result;
