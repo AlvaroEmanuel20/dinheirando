@@ -23,7 +23,7 @@ import {
 import TransactionCard from './TransactionCard';
 import NewItemCard from './NewItemCard';
 import TransferCard from './TransferCard';
-import { useStylesHome } from '@/hooks/styles/useStylesHome';
+import { useStylesHome } from '@/hooks/useStylesHome';
 import { useState } from 'react';
 import useTransactions from '@/hooks/useTransactions';
 import { Transaction } from '@/lib/apiTypes/transactions';
@@ -108,6 +108,12 @@ export default function TransactionsTransfersSection() {
                   onChange={(event) =>
                     setIncomeChecked(event.currentTarget.checked)
                   }
+                  styles={{
+                    track: {
+                      backgroundColor: 'red',
+                      borderColor: 'red',
+                    },
+                  }}
                   color="teal.9"
                   thumbIcon={
                     !incomeChecked ? (
@@ -317,7 +323,7 @@ export default function TransactionsTransfersSection() {
                 ))}
               </Stack>
             ) : (
-              <NewItemCard height={61} openModal={open} />
+              <NewItemCard height={57} openModal={open} />
             )}
 
             {transfers && transfers.length >= limitTransfers && (

@@ -15,7 +15,7 @@ import { Carousel } from '@mantine/carousel';
 import { useState } from 'react';
 import useCategories from '@/hooks/useCategories';
 import { Category } from '@/lib/apiTypes/categories';
-import { useStylesHome } from '@/hooks/styles/useStylesHome';
+import { useStylesHome } from '@/hooks/useStylesHome';
 import { useDisclosure } from '@mantine/hooks';
 import AddCategoryForm from './AddCategoryForm';
 
@@ -50,6 +50,12 @@ export default function CategoriesSection() {
               onChange={(event) =>
                 setIncomeChecked(event.currentTarget.checked)
               }
+              styles={{
+                track: {
+                  backgroundColor: 'red',
+                  borderColor: 'red',
+                },
+              }}
               color="teal.9"
               thumbIcon={
                 !incomeChecked ? (
