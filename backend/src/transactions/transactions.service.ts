@@ -27,7 +27,7 @@ export class TransactionsService {
     @InjectModel(Account.name)
     private readonly Account: Model<Account>,
     @InjectModel(Category.name)
-    private readonly Category: Model<Category>,
+    private readonly Category: Model<Category>
   ) {}
 
   async showTransactions(userId: string, query: TransactionsQuery) {
@@ -116,7 +116,7 @@ export class TransactionsService {
   async updateTransaction(
     data: UpdateTransactionDto,
     transactionId: string,
-    userId: string,
+    userId: string
   ) {
     const { name, createdAt, value, type, category, account } = data;
 
@@ -203,7 +203,7 @@ export class TransactionsService {
         value,
         category,
         account,
-      },
+      }
     ).orFail();
     return { transactionId };
   }

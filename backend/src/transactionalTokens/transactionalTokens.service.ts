@@ -20,7 +20,7 @@ export class TransactionalTokensService {
     @InjectModel(TransactionalToken.name)
     private readonly TransactionalToken: Model<TransactionalToken>,
     private readonly jwtService: JwtService,
-    private readonly configService: ConfigService,
+    private readonly configService: ConfigService
   ) {}
 
   async create(userId: string, scope: Scope) {
@@ -29,7 +29,7 @@ export class TransactionalTokensService {
       {
         secret: this.configService.get<string>('TRANSACTIONAL_JWT_SECRET'),
         expiresIn: scope === 'PASSWORD' ? '3h' : '1d',
-      },
+      }
     );
 
     const token = await this.TransactionalToken.create({

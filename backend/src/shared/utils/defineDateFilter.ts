@@ -16,7 +16,7 @@ export default function defineDateFilter(fromDate?: string, toDate?: string) {
     new Date(
       date.getFullYear(),
       date.getMonth(),
-      monthLength(date.getMonth(), date.getFullYear()),
+      monthLength(date.getMonth(), date.getFullYear())
     ),
   ];
 }

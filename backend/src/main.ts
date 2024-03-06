@@ -6,23 +6,19 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
   const configService = app.get(ConfigService);
-  const PORT = configService.get<number>('PORT');
-  const CLIENT_URL = configService.get<string>('CLIENT_URL');
 
-  app.enableCors({ origin: CLIENT_URL });
+  app.enableCors({ origin: configService.get<string>('CLIENT_URL') });
   app.use(cookieParser());
 
   const config = new DocumentBuilder()
-    .setTitle('Dinheirando backend')
-    .setDescription('Definição de rotas e esquemas do backend')
-    .setVersion('1.0')
-    .addTag('dinheirando')
+    .setTitle('Dinheirando API')
+    .setDescription('API that provide Dinheirando App')
+    .setVersion('0.0.1')
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('api/docs', app, document);
 
-  await app.listen(PORT);
+  await app.listen(configService.get<number>('PORT'));
 }
 bootstrap();

@@ -8,7 +8,7 @@ import { User } from 'src/users/schemas/user.schema';
 export class AvatarsService {
   constructor(
     @InjectModel(User.name) private readonly User: Model<User>,
-    private readonly cloudinaryService: CloudinaryService,
+    private readonly cloudinaryService: CloudinaryService
   ) {}
 
   async uploadAvatar(image: Express.Multer.File, userId: string) {
@@ -17,7 +17,7 @@ export class AvatarsService {
 
     const result = await this.cloudinaryService.uploadImage(image, userId);
     const avatarUrl = await this.cloudinaryService.getImageUrl(
-      result.public_id,
+      result.public_id
     );
 
     await this.User.updateOne(
@@ -25,7 +25,7 @@ export class AvatarsService {
       {
         avatar: result.public_id,
         avatarUrl,
-      },
+      }
     );
 
     return { imageId: result.public_id, uploaded: true };

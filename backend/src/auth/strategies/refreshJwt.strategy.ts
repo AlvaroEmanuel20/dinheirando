@@ -15,13 +15,13 @@ import { Model } from 'mongoose';
 @Injectable()
 export class RefreshJwtStrategy extends PassportStrategy(
   Strategy,
-  'refreshJwt',
+  'refreshJwt'
 ) {
   constructor(
     private readonly configService: ConfigService,
     private readonly usersService: UsersService,
     @InjectModel(RefreshToken.name)
-    private readonly RefreshToken: Model<RefreshToken>,
+    private readonly RefreshToken: Model<RefreshToken>
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),

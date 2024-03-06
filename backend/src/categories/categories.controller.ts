@@ -44,7 +44,7 @@ export class CategoriesController {
   @ApiOkResponse({ type: [CategoryDto] })
   async showCategories(
     @User('sub') userId: string,
-    @Query() query: CategoriesQuery,
+    @Query() query: CategoriesQuery
   ) {
     return await this.categoriesService.showCategories(userId, query);
   }
@@ -54,11 +54,11 @@ export class CategoriesController {
   @ApiNotFoundResponse()
   async showCategory(
     @Param('categoryId', ObjectIdValidationPipe) categoryId: string,
-    @User('sub') userId: string,
+    @User('sub') userId: string
   ) {
     const category = await this.categoriesService.showCategory(
       categoryId,
-      userId,
+      userId
     );
     if (!category) throw new NotFoundException('Category not found');
     return category;
@@ -70,7 +70,7 @@ export class CategoriesController {
   @ApiConflictResponse()
   async createCategory(
     @Body() data: CreateCategoryDto,
-    @User('sub') userId: string,
+    @User('sub') userId: string
   ) {
     try {
       return await this.categoriesService.createCategory(data, userId);
@@ -87,13 +87,13 @@ export class CategoriesController {
   async updateCategory(
     @Body() data: UpdateCategoryDto,
     @Param('categoryId', ObjectIdValidationPipe) categoryId: string,
-    @User('sub') userId: string,
+    @User('sub') userId: string
   ) {
     try {
       return await this.categoriesService.updateCategory(
         data,
         categoryId,
-        userId,
+        userId
       );
     } catch (error) {
       if (error instanceof mongoose.Error.DocumentNotFoundError) {
@@ -110,7 +110,7 @@ export class CategoriesController {
   @ApiConflictResponse()
   async deleteCategory(
     @Param('categoryId', ObjectIdValidationPipe) categoryId: string,
-    @User('sub') userId: string,
+    @User('sub') userId: string
   ) {
     try {
       return await this.categoriesService.deleteCategory(categoryId, userId);

@@ -29,7 +29,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     @InjectModel(RefreshToken.name)
-    private readonly RefreshToken: Model<RefreshToken>,
+    private readonly RefreshToken: Model<RefreshToken>
   ) {}
 
   async validateUser(email: string, password: string) {
@@ -115,24 +115,6 @@ export class AuthService {
     await this.RefreshToken.deleteOne({ user: user.sub });
   }
 
-  /*async googleLogin(user: GoogleUserProfile) {
-    const findUser = await this.usersService.showUserByEmail(user.email);
-    if (!findUser) {
-      const createdUser = await this.usersService.createUser({
-        name: user.name,
-        email: user.email,
-        avatar: user.photos,
-        isVerified: user.isVerified,
-        isGoogleAccount: true,
-        password: '',
-      });
-
-      return { ...user, userId: createdUser.userId };
-    }
-
-    return { ...user, userId: findUser._id };
-  }*/
-
   async googleLoginVerify(data: GoogleLoginDto) {
     const findUser = await this.usersService.showUserByEmail(data.email);
     if (!findUser) {
@@ -157,7 +139,7 @@ export class AuthService {
       {
         secret: this.configService.get<string>('REFRESH_JWT_SECRET'),
         expiresIn: this.configService.get<string>('REFRESH_JWT_EXPIRES_IN'),
-      },
+      }
     );
 
     await this.RefreshToken.create({

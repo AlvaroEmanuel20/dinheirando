@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class AvatarUploadDto {
+export class AvatarSuccessUploadDto {
   @ApiProperty()
   imageId: string;
 

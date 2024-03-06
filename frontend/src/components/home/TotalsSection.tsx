@@ -1,7 +1,7 @@
 import { Group, MediaQuery, SimpleGrid, Skeleton, Stack } from '@mantine/core';
 import TotalCard from './TotalCard';
 import TotalCardTransparent from './TotalCardTransparent';
-import { useStylesHome } from '@/hooks/styles/useStylesHome';
+import { useStylesHome } from '@/hooks/useStylesHome';
 import useSWR from 'swr';
 import { TransactionsTotals } from '@/lib/apiTypes/transactions';
 import { fetcher } from '@/lib/apiInstance';

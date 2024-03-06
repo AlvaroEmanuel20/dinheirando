@@ -19,7 +19,7 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { GoogleLoginDto, LoginUserDto } from './dto/auth.dto';
+import { GoogleLoginDto, LoggedUserDto } from './dto/auth.dto';
 import { OAuth2Client } from 'google-auth-library';
 
 @ApiTags('auth')
@@ -27,7 +27,7 @@ import { OAuth2Client } from 'google-auth-library';
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
-    private readonly configService: ConfigService,
+    private readonly configService: ConfigService
   ) {}
 
   @UseGuards(LocalAuthGuard)
@@ -35,7 +35,7 @@ export class AuthController {
   @Post('login')
   @HttpCode(200)
   @ApiUnauthorizedResponse()
-  @ApiOkResponse({ type: LoginUserDto })
+  @ApiOkResponse({ type: LoggedUserDto })
   async login(@Req() req: Request) {
     const { user } = await this.authService.login(req.user as UserPayload);
     return user;
@@ -46,6 +46,8 @@ export class AuthController {
   @ApiUnauthorizedResponse()
   @ApiCreatedResponse()
   async googleLogin(@Body() data: GoogleLoginDto) {
+    //This route is a auxiliar to frontend google authentication with NextAuth
+    //Verify if google credentials of user is OK
     try {
       const googleClientId = this.configService.get<string>('GOOGLE_CLIENT_ID');
       const googleClient = new OAuth2Client(googleClientId);
@@ -70,7 +72,7 @@ export class AuthController {
   @Public()
   @Post('refresh')
   @HttpCode(200)
-  @ApiOkResponse({ type: LoginUserDto })
+  @ApiOkResponse({ type: LoggedUserDto })
   @ApiUnauthorizedResponse()
   async refresh(@Req() req: Request) {
     const { user } = await this.authService.refresh(req.user as UserPayload);

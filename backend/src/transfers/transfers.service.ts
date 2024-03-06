@@ -20,7 +20,7 @@ export class TransfersService {
     @InjectModel(Transfer.name)
     private readonly Transfer: Model<Transfer>,
     @InjectModel(Account.name)
-    private readonly Account: Model<Account>,
+    private readonly Account: Model<Account>
   ) {}
 
   async showTransfers(userId: string, query: TransfersQuery) {
@@ -73,7 +73,7 @@ export class TransfersService {
   async updateTransfer(
     data: UpdateTransferDto,
     transferId: string,
-    userId: string,
+    userId: string
   ) {
     const { value, fromAccount, toAccount, createdAt } = data;
 
@@ -135,7 +135,7 @@ export class TransfersService {
         createdAt,
         fromAccount,
         toAccount,
-      },
+      }
     ).orFail();
     return { transferId };
   }

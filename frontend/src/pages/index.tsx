@@ -5,7 +5,7 @@ import { authOptions } from './api/auth/[...nextauth]';
 import { signIn, useSession } from 'next-auth/react';
 import { useEffect } from 'react';
 import AppHeader from '@/components/home/AppHeader';
-import { useStylesHome } from '@/hooks/styles/useStylesHome';
+import { useStylesHome } from '@/hooks/useStylesHome';
 import TotalsSection from '@/components/home/TotalsSection';
 import WalletSection from '@/components/home/WalletSection';
 import CategoriesSection from '@/components/home/CategoriesSection';

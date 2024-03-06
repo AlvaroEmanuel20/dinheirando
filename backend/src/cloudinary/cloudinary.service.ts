@@ -23,11 +23,11 @@ export class CloudinaryService {
           (error, result) => {
             if (error) return reject(error);
             resolve(result);
-          },
+          }
         );
 
         streamifier.createReadStream(image.buffer).pipe(uploadStream);
-      },
+      }
     );
   }
 

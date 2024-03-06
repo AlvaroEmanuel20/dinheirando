@@ -33,7 +33,7 @@ export class UsersService {
     private readonly Transfer: Model<Transfer>,
     private readonly mailService: MailService,
     private readonly transactionalTokenService: TransactionalTokensService,
-    private readonly configService: ConfigService,
+    private readonly configService: ConfigService
   ) {}
 
   async showUser(userId: string) {
