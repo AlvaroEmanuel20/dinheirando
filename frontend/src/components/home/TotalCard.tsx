@@ -1,4 +1,4 @@
-import { useStylesHome } from '@/hooks/styles/useStylesHome';
+import { useStylesHome } from '@/hooks/useStylesHome';
 import { formatMoney } from '@/lib/formatMoney';
 import {
   ActionIcon,

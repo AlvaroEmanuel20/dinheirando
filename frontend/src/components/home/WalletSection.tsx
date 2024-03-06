@@ -9,7 +9,7 @@ import {
 import WalletCard from './WalletCard';
 import NewItemCard from './NewItemCard';
 import { Carousel } from '@mantine/carousel';
-import { useStylesHome } from '@/hooks/styles/useStylesHome';
+import { useStylesHome } from '@/hooks/useStylesHome';
 import useAccounts from '@/hooks/useAccounts';
 import { Account } from '@/lib/apiTypes/accounts';
 import { useDisclosure } from '@mantine/hooks';

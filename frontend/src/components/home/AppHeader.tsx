@@ -12,7 +12,7 @@ import Image from 'next/image';
 import ThemeToggle from '../shared/ThemeToggle';
 import { IconLogout } from '@tabler/icons-react';
 import useAuth from '@/hooks/useAuth';
-import { useStylesHome } from '@/hooks/styles/useStylesHome';
+import { useStylesHome } from '@/hooks/useStylesHome';
 import useUser from '@/hooks/useUser';
 import getFirstLettersName from '@/lib/getFirstLettersName';
 import { useDisclosure } from '@mantine/hooks';
