@@ -14,7 +14,7 @@ O Dinheirando é uma ferramenta poderosa para ajudar no controle e organização
 
 ## Documentação da API
 
-A documentação da API está disponível no caminho http://localhost:8000/api
+A documentação da API está disponível no caminho http://localhost:8000/api/docs
 
 ## Configuração do Ambiente
 
