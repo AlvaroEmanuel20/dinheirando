@@ -1,6 +1,8 @@
 # compiled output
 /dist
 /node_modules
+# compodoc documentation folder (generated in prod)
+/documentation
 
 # static files
 /avatars

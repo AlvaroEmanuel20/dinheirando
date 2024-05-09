@@ -6,8 +6,8 @@ import { User, UserSchema } from './schemas/user.schema';
 import { MailModule } from 'src/mail/mail.module';
 import { TransactionalTokensModule } from 'src/transactionalTokens/transactionalTokens.module';
 import { ConfigModule } from '@nestjs/config';
-import { PasswordService } from './password.service';
-import { PasswordController } from './password.controller';
+import { PasswordService } from './passwords/password.service';
+import { PasswordController } from './passwords/password.controller';
 import {
   RefreshToken,
   RefreshTokenSchema,

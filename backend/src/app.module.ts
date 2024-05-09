@@ -16,7 +16,6 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
 
 @Module({
   imports: [
-    MailModule,
     ConfigModule.forRoot({
       envFilePath: ['.env.local', '.env'],
     }),
@@ -27,6 +26,7 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
       }),
       inject: [ConfigService],
     }),
+    MailModule,
     UsersModule,
     AuthModule,
     TransactionalTokensModule,

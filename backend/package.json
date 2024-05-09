@@ -1,8 +1,8 @@
 {
-  "name": "backend",
+  "name": "dinheirando-backend",
   "version": "0.0.1",
-  "description": "Dinheirando API",
-  "author": "Álvaro",
+  "description": "Dinheirando App API",
+  "author": "Álvaro Emanuel",
   "private": true,
   "license": "UNLICENSED",
   "engines": {
@@ -10,17 +10,20 @@
   },
   "scripts": {
     "build": "nest build",
-    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "format:check": "prettier --check --debug-check \"src/**/*.ts\" \"test/**/*.ts\"",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "docs:serve": "npx @compodoc/compodoc -p tsconfig.json -s",
+    "precommit": "npm run lint && npm run format && npm run test"
   },
   "dependencies": {
     "@nestjs/common": "^10.3.8",
@@ -50,6 +53,7 @@
     "streamifier": "^0.1.1"
   },
   "devDependencies": {
+    "@compodoc/compodoc": "^1.1.24",
     "@nestjs/cli": "^9.5.0",
     "@nestjs/schematics": "^9.2.0",
     "@nestjs/testing": "^10.3.8",
