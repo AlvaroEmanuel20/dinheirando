@@ -13,7 +13,7 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .setTitle('Dinheirando API')
-    .setDescription('API that provide Dinheirando App')
+    .setDescription('API for the Dinheirando App')
     .setVersion('0.0.1')
     .build();
   const document = SwaggerModule.createDocument(app, config);
